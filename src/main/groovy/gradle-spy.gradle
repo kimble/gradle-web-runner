@@ -1,0 +1,65 @@
+
+
+class BuildSpy {
+
+    ServerSocket serverSocket
+    Socket socket
+
+    BuildSpy(int port) {
+        try {
+            serverSocket = new ServerSocket(port);
+            println "Gradle build spy started on port $port"
+            println "I'll be hanging around waiting for the g-viz to connect.."
+        }
+        catch (IOException ex) {
+            throw new BuildCancelledException("Unable to listen to port " + port, ex)
+        }
+
+        Socket socket = serverSocket.accept()
+    }
+
+    synchronized void send(String key, Object payload) {
+        println "Sending $key => $payload"
+    }
+
+}
+
+def spy = null
+
+
+
+
+gradle.addListener(new BuildListener() {
+
+    void buildStarted(Gradle gradle) {
+        println "\nBuild started!\n"
+    }
+
+    void settingsEvaluated(Settings settings) {
+        logger.lifecycle "Settings evaluated"
+
+        String spyPort = System.getenv("SPY_PORT")
+
+        if (!spyPort) {
+            throw new BuildCancelledException("No environment variable SPY_PORT set")
+        }
+
+        spy = new BuildSpy(Integer.parseInt(spyPort))
+        spy.send "project-directory", settings.rootProject
+        spy.send "start-parameter", settings.startParameter
+    }
+
+    void projectsLoaded(Gradle gradle) {
+        println "Halla, I'm loaded!"
+    }
+
+    void projectsEvaluated(Gradle gradle) {
+        println "Projects evaluated!"
+    }
+
+    void buildFinished(BuildResult result) {
+        println "Finished"
+    }
+
+})
+
