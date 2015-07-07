@@ -11,10 +11,10 @@ ratpack {
 
     handlers {
         get {
-            render groovyTemplate("skin.html", title: "Groovy Web Console")
+            render groovyTemplate("skin.html")
         }
 
-        fileSystem "public", { f -> f.files() }
+        fileSystem "public", { f ->  println f ; f.files() }
     }
 
 }

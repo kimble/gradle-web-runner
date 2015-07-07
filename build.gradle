@@ -54,6 +54,12 @@ dependencies {
     testCompile "org.spockframework:spock-core:0.7-groovy-2.0", {
         exclude module: "groovy-all"
     }
+
+
+
+    compile 'org.webjars:bootstrap:3.3.5'
+    compile 'org.webjars:d3js:3.5.5-1'
+    compile 'org.webjars.bower:bacon:0.7.53'
 }
 
 run {
