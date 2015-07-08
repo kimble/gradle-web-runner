@@ -22,15 +22,8 @@
                 margin-top: 4em;
             }
 
-            #taskList {
-                text-align: center;
-            }
-
             .task {
-                display: inline-block;
-                margin: 4px 8px;
-
-                transition: color 0.9s ease;
+                margin: 2px 8px;
             }
 
             .task h2 {
@@ -104,9 +97,31 @@
                 </div>
             </div>
 
+
             <div class="row">
-                <div class="col-md-12">
-                    <div id="taskList"></div>
+                <div class="col-md-4">
+                    <div class="page-header">
+                        <h2>Running</h2>
+                    </div>
+                    <div id="runningTasks"></div>
+
+
+                    <div class="page-header">
+                        <h2>Candidates</h2>
+                    </div>
+                    <div id="candidateTasks"></div>
+
+
+                    <div class="page-header">
+                        <h2>Blocked</h2>
+                    </div>
+                    <div id="blockedTasks"></div>
+
+
+                    <div class="page-header">
+                        <h2>Completed</h2>
+                    </div>
+                    <div id="completedTasks"></div>
                 </div>
             </div>
         </div>
@@ -137,7 +152,10 @@
                 };
 
                 var d3roots = {
-                    taskList: d3.select("#taskList")
+                    runningTasks: d3.select("#runningTasks"),
+                    blockedTasks: d3.select("#blockedTasks"),
+                    candidateTasks: d3.select("#candidateTasks"),
+                    completedTasks: d3.select("#completedTasks")
                 };
 
                 function poll() {
@@ -151,30 +169,16 @@
                     });
                 }
 
+
+
+
+
+
+
                 function updateView(data) {
                     console.log("Updating view", data);
 
                     $elements.projectName.html(data.projectName);
-
-
-                    var tasks = d3roots.taskList.selectAll(".task")
-                            .data(data.tasks, namedAttr("path"));
-
-                    var enterTaskGroup = tasks.enter()
-                            .append("div")
-                            .attr("class", "task");
-
-                    var header = enterTaskGroup.append("h2");
-
-                    header.append("span").attr("class", "completed-icon glyphicon glyphicon-ok-sign");
-                    header.append("span").attr("class", "candidate-icon glyphicon glyphicon-time");
-                    header.append("span").attr("class", "running-icon glyphicon glyphicon-play-circle");
-                    header.append("span").attr("class", "blocked-icon glyphicon glyphicon-pause");
-
-                    header.append("span").text(namedAttr("path"));
-
-
-                    // ENTER + UPDATE
 
                     function getTask(path) {
                         for (var i in data.tasks) {
@@ -186,7 +190,6 @@
 
                         throw "No task with path " + path
                     }
-
 
                     function hasCompleted(t) { return t.duration != null; }
                     function hasStarted(t) { return t.started != null; }
@@ -208,12 +211,79 @@
 
                     function isCandidate(t) { return !hasCompleted(t) && !hasStarted(t) && !isBlocked(t); }
 
-                    tasks.classed("started", hasStarted)
-                        .classed("completed", hasCompleted)
-                        .classed("candidate", isCandidate)
-                        .classed("blocked", isBlocked)
-                        .classed("running", isRunning);
 
+
+
+
+                    // Running tasks
+                    (function() {
+                        var task = d3roots.runningTasks.selectAll(".task")
+                                .data(data.tasks.filter(isRunning), namedAttr("path"));
+
+                        // Enter
+                        var enterTaskGroup = task.enter()
+                                .append("div")
+                                .attr("class", "task");
+
+                        var header = enterTaskGroup.append("h2");
+                        header.append("span").text(namedAttr("path"));
+
+
+                        /// Delete
+                        task.exit().remove();
+                    })();
+
+                    // Candidate tasks
+                    (function() {
+                        var task = d3roots.candidateTasks.selectAll(".task")
+                                .data(data.tasks.filter(isCandidate), namedAttr("path"));
+
+                        // Enter
+                        var enterTaskGroup = task.enter()
+                                .append("div")
+                                .attr("class", "task");
+
+                        var header = enterTaskGroup.append("h2");
+                        header.append("span").text(namedAttr("path"));
+
+
+                        /// Delete
+                        task.exit().remove();
+                    })();
+
+                    // Blocked tasks
+                    (function() {
+                        var task = d3roots.blockedTasks.selectAll(".task")
+                                .data(data.tasks.filter(isBlocked), namedAttr("path"));
+
+                        // Enter
+                        var enterTaskGroup = task.enter()
+                                .append("div")
+                                .attr("class", "task");
+
+                        var header = enterTaskGroup.append("h2");
+                        header.append("span").text(namedAttr("path"));
+
+                        /// Delete
+                        task.exit().remove();
+                    })();
+
+                    // Completed tasks
+                    (function() {
+                        var task = d3roots.completedTasks.selectAll(".task")
+                                .data(data.tasks.filter(hasCompleted), namedAttr("path"));
+
+                        // Enter
+                        var enterTaskGroup = task.enter()
+                                .append("div")
+                                .attr("class", "task");
+
+                        var header = enterTaskGroup.append("h2");
+                        header.append("span").text(namedAttr("path"));
+
+                        /// Delete
+                        task.exit().remove();
+                    })();
 
                 }
 
