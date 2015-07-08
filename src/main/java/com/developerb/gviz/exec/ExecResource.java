@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.valueOf;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 
@@ -167,7 +168,8 @@ public class ExecResource {
                         System.out.println(" --- " + line);
 
                         if (line.contains("I'll be hanging around waiting for the g-viz to connect..")) {
-                            listen();
+                            log.info("Kicking off thread to listen for socket messages");
+                            new Thread(Build.this::listen).start();
                         }
                     }
 
@@ -177,10 +179,17 @@ public class ExecResource {
 
 
                 ProcessResult result = executor.executeNoTimeout();
+
+                completed(result);
             }
             catch (Exception ex) {
                 log.error("Failure", ex);
             }
+        }
+
+        private void completed(ProcessResult result) {
+            log.info("EXIT CODE: {}", result.getExitValue());
+            state.exitCode = result.getExitValue();
         }
 
         @SuppressWarnings("unchecked")
@@ -209,6 +218,7 @@ public class ExecResource {
             }
             catch (Exception ex) {
                 log.error("failure..", ex);
+                state.exitCode = -1;
             }
         }
 
@@ -233,14 +243,25 @@ public class ExecResource {
 
                 case "before-task":
                     MapPayload wrapper = new MapPayload(payload);
-                    TaskState task = state.task(wrapper.str("path"));
+                    TaskState task = state.test(wrapper.str("path"));
                     task.started(new Date(wrapper.lng("started")));
                     break;
 
                 case "after-task":
                     MapPayload after = new MapPayload(payload);
-                    TaskState afterTask = state.task(after.str("path"));
+                    TaskState afterTask = state.test(after.str("path"));
                     afterTask.finished(after.lng("duration"));
+                    break;
+
+                case "before-test":
+                    MapPayload beforeTestPayload = new MapPayload(payload);
+                    state.tests.add(new TestState(beforeTestPayload.str("className"), beforeTestPayload.str("name")));
+                    break;
+
+                case "after-test":
+                    MapPayload afterTestPayload = new MapPayload(payload);
+                    TestState test = state.test(afterTestPayload.str("className"), afterTestPayload.str("name"));
+                    test.finished(afterTestPayload.str("result"), afterTestPayload.lng("duration"));
                     break;
 
                 default:
@@ -279,10 +300,20 @@ public class ExecResource {
         @JsonProperty String projectName;
         @JsonProperty Integer maxWorkerCount;
         @JsonProperty List<TaskState> tasks = Lists.newArrayList();
+        @JsonProperty List<TestState> tests = Lists.newArrayList();
 
-        public TaskState task(String path) {
+        @JsonProperty Integer exitCode;
+
+        public TaskState test(String path) {
             return tasks.stream()
                     .filter(taskState -> path.equals(taskState.path))
+                    .findFirst()
+                    .get();
+        }
+
+        public TestState test(String className, String name) {
+            return tests.stream()
+                    .filter(test -> className.equals(test.className) && name.equals(test.name))
                     .findFirst()
                     .get();
         }
@@ -311,6 +342,25 @@ public class ExecResource {
         }
 
         public void finished(Long duration) {
+            this.duration = duration;
+        }
+
+    }
+
+    public static class TestState {
+
+        @JsonProperty String name;
+        @JsonProperty String className;
+        @JsonProperty String result;
+        @JsonProperty Long duration;
+
+        public TestState(String className, String name) {
+            this.className = className;
+            this.name = name;
+        }
+
+        void finished(String result, Long duration) {
+            this.result = result;
             this.duration = duration;
         }
 

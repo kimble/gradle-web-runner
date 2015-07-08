@@ -28,7 +28,7 @@
                 margin: 2px 8px;
             }
 
-            .task h2 {
+            .task h3 {
                 font-family: Ubuntu, monospace;
                 font-size: 0.9em;
                 margin: 0;
@@ -58,28 +58,34 @@
                     <div id="taskDonut"></div>
 
 
-                    <div class="page-header">
-                        <h2>Running</h2>
+                    <div id="runningTasks">
+                        <div class="page-header">
+                            <h2>Running</h2>
+                        </div>
+                        <div id="runningTasks"></div>
                     </div>
-                    <div id="runningTasks"></div>
 
-
-                    <div class="page-header">
-                        <h2>Candidates</h2>
+                    <div id="readyTasks">
+                        <div class="page-header">
+                            <h2>Coming up</h2>
+                        </div>
+                        <div id="candidateTasks"></div>
                     </div>
-                    <div id="candidateTasks"></div>
 
 
-                    <div class="page-header">
-                        <h2>Blocked</h2>
+                    <div id="blockedTasks">
+                        <div class="page-header">
+                            <h2>Blocked</h2>
+                        </div>
+                        <div id="blockedTasks"></div>
                     </div>
-                    <div id="blockedTasks"></div>
 
-
-                    <div class="page-header">
-                        <h2>Completed</h2>
+                    <div id="completedTasks">
+                        <div class="page-header">
+                            <h2>Completed</h2>
+                        </div>
+                        <div id="completedTasks"></div>
                     </div>
-                    <div id="completedTasks"></div>
                 </div>
             </div>
         </div>
@@ -192,35 +198,43 @@
 
                     // Running tasks
                     (function() {
+                        var runningTasks = data.tasks.filter(isRunning);
                         var task = d3roots.runningTasks.selectAll(".task")
-                                .data(data.tasks.filter(isRunning), namedAttr("path"));
+                                .data(runningTasks, namedAttr("path"));
 
                         // Enter
                         var enterTaskGroup = task.enter()
                                 .append("div")
                                 .attr("class", "task");
 
-                        var header = enterTaskGroup.append("h2");
+                        var header = enterTaskGroup.append("h3");
                         header.append("span").text(namedAttr("path"));
 
 
                         /// Delete
                         task.exit().remove();
+
+
+                        // Header
+                        $("#runningTasks h2").text("Running (" + runningTasks.length + ")");
                     })();
 
                     // Candidate tasks
                     (function() {
+                        var readyTasks = data.tasks.filter(isCandidate);
                         var task = d3roots.candidateTasks.selectAll(".task")
-                                .data(data.tasks.filter(isCandidate), namedAttr("path"));
+                                .data(readyTasks, namedAttr("path"));
 
                         // Enter
                         var enterTaskGroup = task.enter()
                                 .append("div")
                                 .attr("class", "task");
 
-                        var header = enterTaskGroup.append("h2");
+                        var header = enterTaskGroup.append("h3");
                         header.append("span").text(namedAttr("path"));
 
+                        // Header
+                        $("#readyTasks h2").text("Ready (" + readyTasks.length + ")");
 
                         /// Delete
                         task.exit().remove();
@@ -228,36 +242,45 @@
 
                     // Blocked tasks
                     (function() {
+                        var blockedTasks = data.tasks.filter(isBlocked);
                         var task = d3roots.blockedTasks.selectAll(".task")
-                                .data(data.tasks.filter(isBlocked), namedAttr("path"));
+                                .data(blockedTasks, namedAttr("path"));
 
                         // Enter
                         var enterTaskGroup = task.enter()
                                 .append("div")
                                 .attr("class", "task");
 
-                        var header = enterTaskGroup.append("h2");
+                        var header = enterTaskGroup.append("h3");
                         header.append("span").text(namedAttr("path"));
 
                         /// Delete
                         task.exit().remove();
+
+
+                        // Header
+                        $("#blockedTasks h2").text("Blocked (" + blockedTasks.length + ")");
                     })();
 
                     // Completed tasks
                     (function() {
+                        var completedTasks = data.tasks.filter(hasCompleted);
                         var task = d3roots.completedTasks.selectAll(".task")
-                                .data(data.tasks.filter(hasCompleted), namedAttr("path"));
+                                .data(completedTasks, namedAttr("path"));
 
                         // Enter
                         var enterTaskGroup = task.enter()
                                 .append("div")
                                 .attr("class", "task");
 
-                        var header = enterTaskGroup.append("h2");
+                        var header = enterTaskGroup.append("h3");
                         header.append("span").text(namedAttr("path"));
 
                         /// Delete
                         task.exit().remove();
+
+                        // Header
+                        $("#completedTasks h2").text("Completed (" + completedTasks.length + ")");
                     })();
 
                 }

@@ -29,7 +29,7 @@ class BuildSpy {
 
             socketWriter.flush()
 
-            Thread.sleep(20); // REMOVE ME
+            // Thread.sleep(20); // REMOVE ME
         }
         catch (Exception ex) {
             throw new BuildCancelledException("failed to send message", ex)
@@ -38,7 +38,7 @@ class BuildSpy {
 
 }
 
-def spy = null
+BuildSpy spy = null
 
 
 
@@ -78,7 +78,42 @@ gradle.addListener(new BuildListener() {
             }
 
             spy.send "task-list", tasks
+
+
+            graph.allTasks.forEach { Task task ->
+                if (task instanceof Test) {
+                    task.addTestListener(new TestListener() {
+                        @Override
+                        void beforeSuite(TestDescriptor suite) { }
+
+                        @Override
+                        void afterSuite(TestDescriptor suite, TestResult result) { }
+
+                        @Override
+                        void beforeTest(TestDescriptor testDescriptor) {
+                            spy.send("before-test", [
+                                    name: testDescriptor.name,
+                                    className: testDescriptor.className
+                            ])
+                        }
+
+                        @Override
+                        void afterTest(TestDescriptor testDescriptor, TestResult result) {
+                            spy.send("after-test", [
+                                    name: testDescriptor.name,
+                                    className: testDescriptor.className,
+                                    result: result.resultType.name(),
+                                    duration: result.endTime - result.startTime,
+                                    exception: result.exception?.message
+                            ])
+                        }
+
+                    })
+                }
+            }
         }
+
+
 
 
         gradle.taskGraph.addTaskExecutionListener(new TaskExecutionListener() {
