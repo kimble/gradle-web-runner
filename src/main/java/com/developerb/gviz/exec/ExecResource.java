@@ -3,6 +3,7 @@ package com.developerb.gviz.exec;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
+import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -156,6 +157,7 @@ public class ExecResource {
             try {
                 ProcessExecutor executor = new ProcessExecutor()
                         .directory(directory)
+                        .environment("GRADLE_USER_HOME", "/tmp")
                         .environment("SPY_PORT", "10000")
                         .command("./gradlew", "--stacktrace", "--no-daemon", "--init-script", gradleInitScript.getAbsolutePath(), tasks)
                         .readOutput(true)
@@ -166,6 +168,8 @@ public class ExecResource {
                     @Override
                     protected void processLine(String line) {
                         System.out.println(" --- " + line);
+
+                        state.onLine(line);
 
                         if (line.contains("I'll be hanging around waiting for the g-viz to connect..")) {
                             log.info("Kicking off thread to listen for socket messages");
@@ -297,12 +301,21 @@ public class ExecResource {
 
     public static class BuildState {
 
+        private final EvictingQueue<String> consoleBuffer = EvictingQueue.create(20);
+
         @JsonProperty String projectName;
         @JsonProperty Integer maxWorkerCount;
         @JsonProperty List<TaskState> tasks = Lists.newArrayList();
         @JsonProperty List<TestState> tests = Lists.newArrayList();
 
         @JsonProperty Integer exitCode;
+
+        @JsonProperty
+        public String getConsoleBuffer() {
+            StringBuilder buffer = new StringBuilder();
+            consoleBuffer.stream().forEach(s -> buffer.append(s).append("\n"));
+            return buffer.toString();
+        }
 
         public TaskState test(String path) {
             return tasks.stream()
@@ -318,6 +331,9 @@ public class ExecResource {
                     .get();
         }
 
+        public void onLine(String line) {
+            consoleBuffer.add(line);
+        }
     }
 
     public static class TaskState {

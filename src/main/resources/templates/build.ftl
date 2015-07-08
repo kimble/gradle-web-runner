@@ -13,6 +13,7 @@
         <script src="/assets/d3/d3.min.js"></script>
 
         <script src="/assets/lib/task-donut.js"></script>
+        <script src="/assets/lib/test-list.js"></script>
 
         <style type="text/css">
             .container-full {
@@ -36,6 +37,12 @@
             }
 
 
+            .test h3 {
+                font-family: Ubuntu, monospace;
+                font-size: 0.9em;
+                margin: 0;
+                font-weight: bold;
+            }
 
 
         </style>
@@ -52,6 +59,11 @@
                 </div>
             </div>
 
+            <div class="row">
+                <pre id="consoleBuffer"></pre>
+
+                <hr/>
+            </div>
 
             <div class="row">
                 <div class="col-md-4">
@@ -87,7 +99,33 @@
                         <div id="completedTasks"></div>
                     </div>
                 </div>
+
+
+
+                <div id="testList" class="col-md-6">
+                    <div class="running-tests">
+                        <div class="page-header">
+                            <h2>Running tests</h2>
+                        </div>
+                        <div id="runningTests"></div>
+                    </div>
+
+                    <div class="failed-tests">
+                        <div class="page-header">
+                            <h2>Failed and skipped tests</h2>
+                        </div>
+                        <div id="failedTests"></div>
+                    </div>
+
+                    <div class="successful-tests">
+                        <div class="page-header">
+                            <h2>Successful tests</h2>
+                        </div>
+                        <div id="successfulTests"></div>
+                    </div>
+                </div>
             </div>
+
         </div>
 
 
@@ -112,7 +150,8 @@
 
 
                 var $elements = {
-                    projectName: $("#projectName")
+                    projectName: $("#projectName"),
+                    consuleBuffer: $("#consoleBuffer")
                 };
 
                 var d3roots = {
@@ -124,6 +163,7 @@
 
 
                 var updateTaskDonut = createTaskDonut();
+                var updateTestList = createTestList();
 
                 function poll() {
                     d3.json("/api/build/" + buildNumber + "/state", function(error, json) {
@@ -134,6 +174,7 @@
 
                         updateView(json);
                         updateTaskDonut(json);
+                        updateTestList(json);
                     });
                 }
 
@@ -147,6 +188,7 @@
                     console.log("Updating view", data);
 
                     $elements.projectName.html(data.projectName);
+                    $elements.consuleBuffer.html(data.consoleBuffer);
 
                     // Todo: move into poll
                     function getTask(path) {
