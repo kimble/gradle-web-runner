@@ -33,7 +33,7 @@
             </div>
             <div class="row">
                 <div class="col-md-10">
-                    <input type="text" class="input-dashed" id="tasks" placeholder=":tasks" value="clean" />
+                    <input type="text" class="input-dashed" id="tasks" placeholder=":tasks" value="test" />
                 </div>
                 <div class="col-md-2">
                     <input type="button" id="go" value="GO!" class="btn btn-default btn-lg" />

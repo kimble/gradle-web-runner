@@ -57,6 +57,47 @@ gradle.addListener(new BuildListener() {
 
     void projectsLoaded(Gradle gradle) {
         println "Halla, I'm loaded!"
+
+
+        gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+            def tasks = graph.allTasks.collect { Task task ->
+                return [
+                        name: task.name,
+                        path: task.path,
+                        description: task.description,
+                        dependsOn: task.taskDependencies.getDependencies(task).collect { it.path }
+                ]
+            }
+
+            spy.send "tasks", tasks
+        }
+
+
+        gradle.taskGraph.addTaskExecutionListener(new TaskExecutionListener() {
+
+            @Override
+            void beforeExecute(Task task) {
+                spy.send("before-task", [
+                        name: task.name,
+                        path: task.path,
+                        description: task.description
+                ])
+            }
+
+            @Override
+            void afterExecute(Task task, TaskState state) {
+                spy.send("after-task", [
+                        name: task.name,
+                        path: task.path,
+                        didWork: state.didWork,
+                        executed: state.executed,
+                        skipped: state.skipped,
+                        skippedMessage: state.skipMessage,
+                        failureMessage: state.failure?.message
+                ])
+            }
+
+        })
     }
 
     void projectsEvaluated(Gradle gradle) {
