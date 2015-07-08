@@ -12,6 +12,8 @@
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
+        <script src="/assets/lib/task-donut.js"></script>
+
         <style type="text/css">
             .container-full {
                 margin: 0 auto;
@@ -33,56 +35,9 @@
                 font-weight: bold;
             }
 
-            .task .running-icon,.blocked-icon,.completed-icon,.candidate-icon {
-                display: none;
-            }
-
-            .task .glyphicon {
-                font-size: 0.9em;
-                padding-right: 3px;
-            }
 
 
-            /* Blocked */
 
-            .task.blocked {
-                color: #777;
-            }
-
-            .task.blocked .blocked-icon {
-                display: inline;
-            }
-
-
-            /* Candidate (not blocked) */
-
-            .task.candidate {
-
-            }
-
-            .task.candidate .candidate-icon {
-                display: inline;
-            }
-
-            /* Running */
-
-            .task.running {
-                font-weight: bold;
-            }
-
-            .task.running .running-icon {
-                display: inline;
-            }
-
-            /* Completed */
-
-            .task.completed {
-
-            }
-
-            .task.completed .completed-icon {
-                display: inline;
-            }
         </style>
     </head>
 
@@ -100,6 +55,9 @@
 
             <div class="row">
                 <div class="col-md-4">
+                    <div id="taskDonut"></div>
+
+
                     <div class="page-header">
                         <h2>Running</h2>
                     </div>
@@ -158,6 +116,9 @@
                     completedTasks: d3.select("#completedTasks")
                 };
 
+
+                var updateTaskDonut = createTaskDonut();
+
                 function poll() {
                     d3.json("/api/build/" + buildNumber + "/state", function(error, json) {
                         if (error) {
@@ -166,6 +127,7 @@
                         }
 
                         updateView(json);
+                        updateTaskDonut(json);
                     });
                 }
 
@@ -180,6 +142,7 @@
 
                     $elements.projectName.html(data.projectName);
 
+                    // Todo: move into poll
                     function getTask(path) {
                         for (var i in data.tasks) {
                             var task = data.tasks[i];
@@ -210,6 +173,18 @@
                     }
 
                     function isCandidate(t) { return !hasCompleted(t) && !hasStarted(t) && !isBlocked(t); }
+
+
+
+                    // Enrich data
+
+                    data.tasks.forEach(function(task) {
+                        task.isBlocker = isBlocked(task);
+                        task.isRunning = isRunning(task);
+                        task.isCandidate = isCandidate(task);
+                        task.hasCompleted = hasCompleted(task);
+                    });
+
 
 
 
@@ -295,7 +270,7 @@
 
 
                 poll();
-                setInterval(poll, 1000 * 1);
+                setInterval(poll, 1000 * 2);
 
             })();
         </script>
