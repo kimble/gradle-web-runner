@@ -8,7 +8,7 @@
         <title>G-Viz</title>
 
         <!-- Bootstrap core CSS -->
-        <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     </head>
 
     <body>

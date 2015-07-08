@@ -25,7 +25,9 @@ repositories {
 dependencies {
 
     // dropwizard
-    compile 'io.dropwizard:dropwizard-core:' + dropwizardVersion
+    compile 'io.dropwizard:dropwizard-core:' + dropwizardVersion,
+            'io.dropwizard:dropwizard-views-freemarker:' + dropwizardVersion,
+            'io.dropwizard:dropwizard-assets:' + dropwizardVersion
 
     // test
     testCompile 'junit:junit:4.12'
