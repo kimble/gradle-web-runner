@@ -10,24 +10,37 @@
 
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
+        <script src="/assets/d3/d3.min.js"></script>
 
         <style type="text/css">
-            .input-dashed {
-                padding: 5px 10px;
-                font-size: 1.6em;
-                border: none;
-                border-bottom: 3px dotted #777;
-                font-family: Ubuntu, monospace;
-                margin-top: 1em;
-                width: 100%;
-            }
 
-            #go {
-                margin-top: 2em;
-            }
 
             #headerRow {
                 margin-top: 4em;
+            }
+
+            .task {
+                display: inline-block;
+                float: left;
+                margin: 4px 8px;
+            }
+
+            .task h2 {
+                font-family: Ubuntu, monospace;
+                font-size: 0.9em;
+                margin: 0;
+            }
+
+            .task .running-icon,.blocked-icon {
+                display: none;
+            }
+
+            .task.blocked .blocked-icon {
+                display: inline;
+            }
+
+            .task.running .running-icon {
+                display: inline;
             }
         </style>
     </head>
@@ -38,23 +51,127 @@
             <div class="row">
                 <div id="headerRow" class="col-md-12">
                     <div class="page-header">
-                        <h1>#${buildNumber}</h1>
+                        <h1>#${buildNumber} <span id="projectName">Loading data...</span></h1>
                     </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-12">
-                    ...
+                    <div id="taskList"></div>
                 </div>
             </div>
         </div>
 
 
         <script type="text/javascript">
+            function namedAttr(name) {
+                return function(obj) {
+                    return obj[name];
+                };
+            }
+
+            function not(func) {
+                return function() {
+                    return !func();
+                }
+            }
+
+
             (function() {
                 "use strict";
 
+                var buildNumber = ${buildNumber};
+
+
+                var $elements = {
+                    projectName: $("#projectName")
+                };
+
+                var d3roots = {
+                    taskList: d3.select("#taskList")
+                };
+
+                function poll() {
+                    d3.json("/api/build/" + buildNumber + "/state", function(error, json) {
+                        if (error) {
+                            console.warn(error);
+                            return;
+                        }
+
+                        updateView(json);
+                    });
+                }
+
+                function updateView(data) {
+                    console.log("Updating view", data);
+
+                    $elements.projectName.html(data.projectName);
+
+
+                    var tasks = d3roots.taskList.selectAll(".task")
+                            .data(data.tasks, namedAttr("path"));
+
+                    var enterTaskGroup = tasks.enter()
+                            .append("div")
+                            .attr("class", "task");
+
+                    var header = enterTaskGroup.append("h2");
+
+                    var runningIcon = header.append("span").attr("class", "running-icon glyphicon glyphicon-time");
+                    var blockedIcon = header.append("span").attr("class", "blocked-icon glyphicon glyphicon-pause");
+                    header.append("span").text(namedAttr("path"));
+
+
+                    // ENTER + UPDATE
+
+                    function getTask(path) {
+                        for (var i in data.tasks) {
+                            var task = data.tasks[i];
+                            if (task.path === path) {
+                                return task;
+                            }
+                        }
+
+                        throw "No task with path " + path
+                    }
+
+
+                    function hasCompleted(t) { return t.duration != null; }
+                    function hasStarted(t) { return t.started != null; }
+                    function isRunning(t) { return hasStarted(t) && !hasCompleted(t); }
+
+
+
+                    function isBlocked(task) {
+                        for (var i in task.dependsOn) {
+                            var dependencyPath = task.dependsOn[i];
+                            var dependency = getTask(dependencyPath);
+                            if (!hasCompleted(dependency)) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+
+                    tasks.classed("started", hasStarted)
+                        .classed("completed", hasCompleted)
+                        .classed("blocked", isBlocked)
+                        .classed("running", isRunning);
+
+
+                }
+
+
+
+
+
+
+
+
+                poll();
+                setInterval(poll, 1000 * 1);
 
             })();
         </script>

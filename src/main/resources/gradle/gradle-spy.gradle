@@ -21,11 +21,19 @@ class BuildSpy {
     }
 
     synchronized void send(String key, Object payload) {
-        socketWriter.write(JsonOutput.toJson([
-                message: key,
-                payload: payload
-        ]) + "\n")
-        socketWriter.flush()
+        try {
+            socketWriter.write(JsonOutput.toJson([
+                    message: key,
+                    payload: payload
+            ]) + "\n")
+
+            socketWriter.flush()
+
+            Thread.sleep(70); // REMOVE ME
+        }
+        catch (Exception ex) {
+            throw new BuildCancelledException("failed to send message", ex)
+        }
     }
 
 }
@@ -75,12 +83,16 @@ gradle.addListener(new BuildListener() {
 
         gradle.taskGraph.addTaskExecutionListener(new TaskExecutionListener() {
 
+            Map<String, Long> taskStartTime = [:]
+
             @Override
             void beforeExecute(Task task) {
+                taskStartTime[task.path] = System.currentTimeMillis()
+
                 spy.send("before-task", [
                         name: task.name,
                         path: task.path,
-                        description: task.description
+                        started: taskStartTime[task.path]
                 ])
             }
 
@@ -93,7 +105,8 @@ gradle.addListener(new BuildListener() {
                         executed: state.executed,
                         skipped: state.skipped,
                         skippedMessage: state.skipMessage,
-                        failureMessage: state.failure?.message
+                        failureMessage: state.failure?.message,
+                        duration: System.currentTimeMillis() - taskStartTime[task.path]
                 ])
             }
 

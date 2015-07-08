@@ -2,7 +2,6 @@ package com.developerb.gviz.exec;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.BuilderBasedDeserializer;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -18,7 +17,6 @@ import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.stream.LogOutputStream;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,15 +24,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 
 @Path("/api")
@@ -88,19 +87,36 @@ public class ExecResource {
     @GET
     @Path("build/{nr}")
     @Produces("text/html")
-    public View viewBuild(@PathParam("nr") Integer nr) {
-        Build build = builds.get(nr);
+    public Response viewBuild(@PathParam("nr") Integer nr) {
+        if (builds.containsKey(nr)) {
+            Build build = builds.get(nr);
+            BuildView view = new BuildView(build);
 
-        return new BuildView(build);
+            return Response.ok()
+                    .entity(view)
+                    .build();
+        }
+        else {
+            return Response.status(NOT_FOUND)
+                    .entity("No such build: " + nr)
+                    .build();
+        }
     }
 
     @GET
     @Path("build/{nr}/state")
     @Produces(APPLICATION_JSON)
     public Response viewBuildState(@PathParam("nr") Integer nr) {
-        return Response.ok()
-                .entity(builds.get(nr).state)
-                .build();
+        if (builds.containsKey(nr)) {
+            return Response.ok()
+                    .entity(builds.get(nr).state)
+                    .build();
+        }
+        else {
+            return Response.status(NOT_FOUND)
+                    .entity("No such build: " + nr)
+                    .build();
+        }
     }
 
 
@@ -116,7 +132,7 @@ public class ExecResource {
     }
 
 
-    static class Build {
+    public static class Build {
 
         private final Logger log;
 
@@ -173,14 +189,19 @@ public class ExecResource {
 
             try {
                 try (Socket socket = new Socket("localhost", 10_000)) {
+                    log.info("Connected to spy running inside build");
+
                     try (InputStreamReader reader = new InputStreamReader(socket.getInputStream())) {
                         try (BufferedReader in = new BufferedReader(reader)) {
                             String userInput;
                             while ((userInput = in.readLine()) != null) {
-                                //System.out.println(" >> " + userInput);
-
+                                System.out.println(" >> " + userInput);
                                 Map<String, Object> message = objectMapper.readValue(userInput, Map.class);
-                                onMessage((String) message.get("message"), message.get("payload"));
+
+                                onMessage (
+                                        (String) message.get("message"),
+                                        message.get("payload")
+                                );
                             }
                         }
                     }
@@ -193,6 +214,7 @@ public class ExecResource {
 
         @SuppressWarnings("unchecked")
         public void onMessage(String message, Object payload) {
+
             switch (message) {
                 case "project-name":
                     state.projectName = (String) payload;
@@ -209,8 +231,44 @@ public class ExecResource {
                             .collect(Collectors.toList());
                     break;
 
+                case "before-task":
+                    MapPayload wrapper = new MapPayload(payload);
+                    TaskState task = state.task(wrapper.str("path"));
+                    task.started(new Date(wrapper.lng("started")));
+                    break;
+
+                case "after-task":
+                    MapPayload after = new MapPayload(payload);
+                    TaskState afterTask = state.task(after.str("path"));
+                    afterTask.finished(after.lng("duration"));
+                    break;
+
                 default:
                     log.warn("Unprocessed message {}: {}", message, payload);
+            }
+        }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    static class MapPayload {
+
+        private final Map<String, Object> payload;
+
+        MapPayload(Object payload) {
+            this.payload = (Map<String, Object>) payload;
+        }
+
+        String str(String key) {
+            return (String) payload.get(key);
+        }
+
+        Long lng(String key) {
+            if (payload.get(key) instanceof Integer) {
+                return ((Integer) payload.get(key)).longValue();
+            }
+            else {
+                return (Long) payload.get(key);
             }
         }
 
@@ -222,6 +280,13 @@ public class ExecResource {
         @JsonProperty Integer maxWorkerCount;
         @JsonProperty List<TaskState> tasks = Lists.newArrayList();
 
+        public TaskState task(String path) {
+            return tasks.stream()
+                    .filter(taskState -> path.equals(taskState.path))
+                    .findFirst()
+                    .get();
+        }
+
     }
 
     public static class TaskState {
@@ -231,11 +296,22 @@ public class ExecResource {
         @JsonProperty String path;
         @JsonProperty List<String> dependsOn;
 
+        @JsonProperty Date started;
+        @JsonProperty Long duration;
+
         public TaskState(String name, String description, String path, List<String> dependsOn) {
             this.description = description;
             this.dependsOn = dependsOn;
             this.name = name;
             this.path = path;
+        }
+
+        void started(Date started) {
+            this.started = started;
+        }
+
+        public void finished(Long duration) {
+            this.duration = duration;
         }
 
     }
