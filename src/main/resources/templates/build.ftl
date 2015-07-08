@@ -13,33 +13,81 @@
         <script src="/assets/d3/d3.min.js"></script>
 
         <style type="text/css">
-
+            .container-full {
+                margin: 0 auto;
+                width: 95%;
+            }
 
             #headerRow {
                 margin-top: 4em;
             }
 
+            #taskList {
+                text-align: center;
+            }
+
             .task {
                 display: inline-block;
-                float: left;
                 margin: 4px 8px;
+
+                transition: color 0.9s ease;
             }
 
             .task h2 {
                 font-family: Ubuntu, monospace;
                 font-size: 0.9em;
                 margin: 0;
+                font-weight: bold;
             }
 
-            .task .running-icon,.blocked-icon {
+            .task .running-icon,.blocked-icon,.completed-icon,.candidate-icon {
                 display: none;
+            }
+
+            .task .glyphicon {
+                font-size: 0.9em;
+                padding-right: 3px;
+            }
+
+
+            /* Blocked */
+
+            .task.blocked {
+                color: #777;
             }
 
             .task.blocked .blocked-icon {
                 display: inline;
             }
 
+
+            /* Candidate (not blocked) */
+
+            .task.candidate {
+
+            }
+
+            .task.candidate .candidate-icon {
+                display: inline;
+            }
+
+            /* Running */
+
+            .task.running {
+                font-weight: bold;
+            }
+
             .task.running .running-icon {
+                display: inline;
+            }
+
+            /* Completed */
+
+            .task.completed {
+
+            }
+
+            .task.completed .completed-icon {
                 display: inline;
             }
         </style>
@@ -47,7 +95,7 @@
 
     <body>
 
-        <div class="container">
+        <div class="container container-full">
             <div class="row">
                 <div id="headerRow" class="col-md-12">
                     <div class="page-header">
@@ -118,8 +166,11 @@
 
                     var header = enterTaskGroup.append("h2");
 
-                    var runningIcon = header.append("span").attr("class", "running-icon glyphicon glyphicon-time");
-                    var blockedIcon = header.append("span").attr("class", "blocked-icon glyphicon glyphicon-pause");
+                    header.append("span").attr("class", "completed-icon glyphicon glyphicon-ok-sign");
+                    header.append("span").attr("class", "candidate-icon glyphicon glyphicon-time");
+                    header.append("span").attr("class", "running-icon glyphicon glyphicon-play-circle");
+                    header.append("span").attr("class", "blocked-icon glyphicon glyphicon-pause");
+
                     header.append("span").text(namedAttr("path"));
 
 
@@ -155,8 +206,11 @@
                         return false;
                     }
 
+                    function isCandidate(t) { return !hasCompleted(t) && !hasStarted(t) && !isBlocked(t); }
+
                     tasks.classed("started", hasStarted)
                         .classed("completed", hasCompleted)
+                        .classed("candidate", isCandidate)
                         .classed("blocked", isBlocked)
                         .classed("running", isRunning);
 
