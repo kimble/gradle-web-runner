@@ -7,60 +7,72 @@
 
         <title>G-Viz</title>
 
-        <!-- Bootstrap core CSS -->
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
+
+        <style type="text/css">
+            .input-dashed {
+                padding: 5px 10px;
+                font-size: 2em;
+                border: none;
+                border-bottom: 2px dashed #999;
+                margin-top: 1em;
+                width: 100%;
+            }
+
+        </style>
     </head>
 
     <body>
 
         <div class="container">
-            <div class="header clearfix">
-                <nav>
-                    <ul class="nav nav-pills pull-right">
-                        <li role="presentation" class="active"><a href="#">Home</a></li>
-                        <li role="presentation"><a href="#">About</a></li>
-                        <li role="presentation"><a href="#">Contact</a></li>
-                    </ul>
-                </nav>
-                <h3 class="text-muted">Project name</h3>
-            </div>
-
-            <div class="jumbotron">
-                <h1>Jumbotron heading</h1>
-                <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-                <p><a class="btn btn-lg btn-success" href="#" role="button">Sign up today</a></p>
-            </div>
-
-            <div class="row marketing">
-                <div class="col-lg-6">
-                    <h4>Subheading</h4>
-                    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-                    <h4>Subheading</h4>
-                    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-                    <h4>Subheading</h4>
-                    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-                </div>
-
-                <div class="col-lg-6">
-                    <h4>Subheading</h4>
-                    <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-                    <h4>Subheading</h4>
-                    <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-                    <h4>Subheading</h4>
-                    <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="text" class="input-dashed" id="path" placeholder="/path/to/project" value="/home/kim/development/mine-pasientreiser/pro-ng" autofocus />
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-10">
+                    <input type="text" class="input-dashed" id="tasks" placeholder=":tasks" value="clean" />
+                </div>
+                <div class="col-md-2">
+                    <input type="button" id="go" value="GO!" class="btn btn-default btn-lg" />
+                </div>
+            </div>
+        </div>
 
-            <footer class="footer">
-                <p>&copy; Company 2014</p>
-            </footer>
 
-        </div> <!-- /container -->
+        <script type="text/javascript">
+            jQuery.extend({
+                postJSON: function(url, data, callback) {
+                    return jQuery.ajax({
+                        type: "POST",
+                        url: url,
+                        data: JSON.stringify(data),
+                        success: callback,
+                        dataType: "json",
+                        contentType: "application/json",
+                        processData: false
+                    });
+                }
+            });
 
+
+            (function() {
+                "use strict";
+
+                $("#go").on("click", function() {
+                    var path = $("#path").val();
+                    var tasks = $("#tasks").val();
+
+
+                    console.log("Posting..");
+                    $.postJSON('/exec', { path: path, tasks: tasks }, function(callback) {
+                        console.log("Response: " + callback);
+                    })
+                });
+            })();
+        </script>
 
     </body>
 </html>

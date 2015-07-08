@@ -1,9 +1,10 @@
-
+import groovy.json.JsonOutput
 
 class BuildSpy {
 
     ServerSocket serverSocket
     Socket socket
+    Writer socketWriter
 
     BuildSpy(int port) {
         try {
@@ -15,11 +16,16 @@ class BuildSpy {
             throw new BuildCancelledException("Unable to listen to port " + port, ex)
         }
 
-        Socket socket = serverSocket.accept()
+        socket = serverSocket.accept()
+        socketWriter = socket.outputStream.newWriter("utf-8")
     }
 
     synchronized void send(String key, Object payload) {
-        println "Sending $key => $payload"
+        socketWriter.write(JsonOutput.toJson([
+                message: key,
+                payload: payload
+        ]) + "\n")
+        socketWriter.flush()
     }
 
 }
@@ -45,8 +51,8 @@ gradle.addListener(new BuildListener() {
         }
 
         spy = new BuildSpy(Integer.parseInt(spyPort))
-        spy.send "project-directory", settings.rootProject
-        spy.send "start-parameter", settings.startParameter
+        spy.send "project-name", settings.rootProject.name
+        spy.send "max-worker-count", settings.startParameter.maxWorkerCount
     }
 
     void projectsLoaded(Gradle gradle) {

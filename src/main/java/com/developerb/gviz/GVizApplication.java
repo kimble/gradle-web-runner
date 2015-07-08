@@ -1,6 +1,7 @@
 package com.developerb.gviz;
 
 
+import com.developerb.gviz.exec.ExecResource;
 import com.developerb.gviz.root.RootResource;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -26,6 +27,7 @@ public class GVizApplication extends Application<GVizConfiguration> {
     @Override
     public void run(GVizConfiguration configuration, Environment environment) throws Exception {
         environment.jersey().register(new RootResource());
+        environment.jersey().register(new ExecResource());
     }
 
 }
