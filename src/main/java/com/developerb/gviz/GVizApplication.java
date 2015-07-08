@@ -27,7 +27,7 @@ public class GVizApplication extends Application<GVizConfiguration> {
     @Override
     public void run(GVizConfiguration configuration, Environment environment) throws Exception {
         environment.jersey().register(new RootResource());
-        environment.jersey().register(new ExecResource());
+        environment.jersey().register(new ExecResource(environment.getObjectMapper()));
     }
 
 }

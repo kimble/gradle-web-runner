@@ -1,5 +1,7 @@
 package com.developerb.gviz.exec;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.BuilderBasedDeserializer;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -7,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
-import org.zeroturnaround.exec.listener.ProcessListener;
 import org.zeroturnaround.exec.stream.LogOutputStream;
-import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Charsets.UTF_8;
 
@@ -35,10 +37,14 @@ public class ExecResource {
     private final static Logger log = LoggerFactory.getLogger(ExecResource.class);
 
 
+    private final AtomicInteger buildNumber = new AtomicInteger(0);
+
 
     private final File gradleInitScript;
+    private final ObjectMapper objectMapper;
 
-    public ExecResource() throws IOException {
+    public ExecResource(ObjectMapper objectMapper) throws IOException {
+        this.objectMapper = objectMapper;
         gradleInitScript = writeScriptToTemporaryDirectory();
     }
 
@@ -56,10 +62,12 @@ public class ExecResource {
 
     @POST
     public Response exec(ExecRequest request) throws Exception {
+        Build build = new Build(buildNumber.incrementAndGet());
+
         ProcessExecutor executor = new ProcessExecutor()
                 .directory(request.directory())
                 .environment("SPY_PORT", "10000")
-                .command("./gradlew", "--stacktrace", "--init-script", gradleInitScript.getAbsolutePath(), request.tasks)
+                .command("./gradlew", "--stacktrace", "--no-daemon", "--init-script", gradleInitScript.getAbsolutePath(), request.tasks)
                 .readOutput(true)
                 .exitValues(0);
 
@@ -70,7 +78,7 @@ public class ExecResource {
                 System.out.println(" --- " + line);
 
                 if (line.contains("I'll be hanging around waiting for the g-viz to connect..")) {
-                    listen();
+                    listen(build);
                 }
             }
 
@@ -85,7 +93,8 @@ public class ExecResource {
                 .build();
     }
 
-    private void listen() {
+    @SuppressWarnings("unchecked")
+    private void listen(Build build) {
         log.info("Attempting to connect to spy script");
 
         try {
@@ -94,7 +103,10 @@ public class ExecResource {
                     try (BufferedReader in = new BufferedReader(reader)) {
                         String userInput;
                         while ((userInput = in.readLine()) != null) {
-                            System.out.println(" >> " + userInput);
+                            //System.out.println(" >> " + userInput);
+
+                            Map<String, Object> message = objectMapper.readValue(userInput, Map.class);
+                            build.onMessage((String) message.get("message"), message.get("payload"));
                         }
                     }
                 }
@@ -117,5 +129,22 @@ public class ExecResource {
 
     }
 
+
+    static class Build {
+
+        private final Logger log;
+
+        private final int number;
+
+        public Build(int number) {
+            this.log = LoggerFactory.getLogger("build-" + number);
+            this.number = number;
+        }
+
+        public void onMessage(String message, Object payload) {
+            log.info("GOT MESSAGE: " + message + " :: " + payload);
+        }
+        
+    }
 
 }
