@@ -1,18 +1,15 @@
 package com.developerb.gviz.exec;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import io.dropwizard.views.View;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
@@ -20,18 +17,11 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 @Path("/api")
 public class ExecResource {
 
-    private final AtomicInteger buildNumber = new AtomicInteger(0);
-    private final ConcurrentMap<Integer, Build> builds = Maps.newConcurrentMap();
+    private final BuildRepository buildRepository;
 
-    private final GradleForker gradleForker;
-    private final ObjectMapper objectMapper;
-
-
-    public ExecResource(GradleForker gradleForker, ObjectMapper objectMapper) throws IOException {
-        this.gradleForker = gradleForker;
-        this.objectMapper = objectMapper;
+    public ExecResource(BuildRepository buildRepository) throws IOException {
+        this.buildRepository = buildRepository;
     }
-
 
 
     @POST
@@ -39,15 +29,12 @@ public class ExecResource {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response exec(ExecRequest request) {
-        Integer buildNumber = this.buildNumber.incrementAndGet();
-        Build build = new Build(buildNumber, gradleForker, objectMapper);
-
-        builds.put(buildNumber, build);
+        Build build = buildRepository.create();
 
         new Thread(() -> build.execute(request.directory(), request.tasks)).start();
 
         return Response.ok()
-                .entity(ImmutableMap.of("number", buildNumber))
+                .entity(ImmutableMap.of("number", build.getBuildNumber()))
                 .build();
     }
 
@@ -55,8 +42,10 @@ public class ExecResource {
     @Path("build/{nr}")
     @Produces("text/html")
     public Response viewBuild(@PathParam("nr") Integer nr) {
-        if (builds.containsKey(nr)) {
-            Build build = builds.get(nr);
+        Optional<Build> optionalBuild = buildRepository.get(nr);
+
+        if (optionalBuild.isPresent()) {
+            Build build = optionalBuild.get();
             BuildView view = new BuildView(build);
 
             return Response.ok()
@@ -88,7 +77,7 @@ public class ExecResource {
         private final Build build;
 
         public BuildView(Build build) {
-            super("/templates/build.ftl", Charsets.UTF_8);
+            super("/templates/build-progress.ftl", UTF_8);
             this.build = build;
         }
 

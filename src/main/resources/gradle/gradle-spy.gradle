@@ -18,11 +18,12 @@ class BuildSpy {
 
         socket = serverSocket.accept()
         OutputStream bufferedSocketOutputStream = new BufferedOutputStream(socket.outputStream)
-
         socketWriter = bufferedSocketOutputStream.newWriter("utf-8")
     }
 
     synchronized void send(String key, Object payload) {
+        println("Sending message of type " + key)
+
         try {
             socketWriter.write(JsonOutput.toJson([
                     type: key,
@@ -35,6 +36,8 @@ class BuildSpy {
         catch (Exception ex) {
             throw new GradleException("failed to send message", ex)
         }
+
+        println " - done sending "
     }
 
     void terminate() {
@@ -51,8 +54,12 @@ if (!spyPort) {
 }
 
 
-logger.lifecycle "Gradle build spy started on port $spyPort"
-logger.lifecycle "I'll be hanging around waiting for the g-viz to connect.."
+logger.lifecycle "Gradle build spy starting on port $spyPort"
+new Thread({
+    Thread.sleep(500) // Gi litt tid til å åpne porten
+    logger.lifecycle "I'll be hanging around waiting for the g-viz to connect.."
+}).start()
+
 BuildSpy spy = new BuildSpy(Integer.parseInt(spyPort))
 
 
@@ -68,14 +75,16 @@ gradle.addListener(new BuildListener() {
         logger.lifecycle "SETTINGS EVALUATED"
 
         spy.send("settings-ready", [
-                projectName: settings.rootProject.name,
-                parallelProjectExecutionEnabled: settings.startParameter.parallelProjectExecutionEnabled,
-                maxWorkerCount: settings.startParameter.maxWorkerCount,
-                configureOnDemand: settings.startParameter.configureOnDemand,
-                gradleUserHomeDir: settings.startParameter.gradleUserHomeDir,
-                projectDir: settings.startParameter.projectDir,
-                gradleVersion: settings.gradle.gradleVersion
-        ]);
+                settings: [
+                    projectName: settings.rootProject.name,
+                    parallelProjectExecutionEnabled: settings.startParameter.parallelProjectExecutionEnabled,
+                    maxWorkerCount: settings.startParameter.maxWorkerCount,
+                    configureOnDemand: settings.startParameter.configureOnDemand,
+                    gradleUserHomeDir: settings.startParameter.gradleUserHomeDir?.absolutePath,
+                    projectDir: settings.startParameter.projectDir?.absolutePath,
+                    gradleVersion: settings.gradle.gradleVersion
+                ]
+        ])
     }
 
     void projectsLoaded(Gradle gradle) {

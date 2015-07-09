@@ -1,5 +1,6 @@
 package com.developerb.gviz.exec;
 
+import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.stream.LogOutputStream;
@@ -27,8 +28,11 @@ public class GradleForker {
             ProcessResult result = executor.executeNoTimeout(); // Blocking..
             build.onCompletion(result.getExitValue());
         }
+        catch (InvalidExitValueException ex) {
+            build.onUnknownFailure("Gradle process exited with a non-zero exit code", ex);
+        }
         catch (Exception ex) {
-            build.onUnknownFailure(ex);
+            build.onUnknownFailure("Unexpected exception while running forked Gradle build", ex);
         }
     }
 

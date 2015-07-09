@@ -14,6 +14,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 project.ext {
     dropwizardVersion = '0.8.2'
+    jettyVersion = '9.2.9.v20150224' // sync with dropwizard
 }
 
 mainClassName = 'com.developerb.GVizApplication'
@@ -28,6 +29,9 @@ dependencies {
     compile 'io.dropwizard:dropwizard-core:' + dropwizardVersion,
             'io.dropwizard:dropwizard-views-freemarker:' + dropwizardVersion,
             'io.dropwizard:dropwizard-assets:' + dropwizardVersion
+
+    // jetty
+    compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:' + jettyVersion
 
     // utils
     compile 'org.zeroturnaround:zt-exec:1.8'

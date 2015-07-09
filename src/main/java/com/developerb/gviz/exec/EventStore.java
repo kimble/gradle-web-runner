@@ -19,5 +19,17 @@ public class EventStore {
         }
     }
 
+    public int head() {
+        synchronized (store) {
+            return store.size();
+        }
+    }
+
+    public List<Event> read(int from, int to) {
+        synchronized (store) {
+            List<Event> view = store.subList(from, to);
+            return Collections.unmodifiableList(view);
+        }
+    }
 
 }

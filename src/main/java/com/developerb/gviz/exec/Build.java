@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.ProcessResult;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,8 +33,10 @@ public class Build {
 
 
     public void onConsoleOutput(String line) {
+        log.info(" >> {}", line);
+
         if (line.contains("I'll be hanging around waiting for the g-viz to connect..")) {
-            onBuildSpyReady();
+            connectoToSpyWithinBuild();
         }
 
         Date timestamp = new Date();
@@ -44,7 +45,7 @@ public class Build {
         eventStore.push(event);
     }
 
-    private void onBuildSpyReady() {
+    private void connectoToSpyWithinBuild() {
         log.info("Kicking off thread to listen for socket messages");
         new Thread(Build.this::listen).start();
     }
@@ -81,12 +82,12 @@ public class Build {
             }
         }
         catch (Exception ex) {
-            onUnknownFailure(ex);
+            onUnknownFailure("Failed to connect to the spy running within build", ex);
         }
     }
 
-    public void onUnknownFailure(Exception ex) {
-        log.error("failure..", ex);
+    public void onUnknownFailure(String message, Exception ex) {
+        log.error(message, ex);
 
         Event event = new UnknownErrorOccurred(ex);
         eventStore.push(event);
@@ -94,7 +95,6 @@ public class Build {
 
     public void execute(File directory, String tasks) {
         gradleForker.execute(this, directory, tasks);
-
     }
 
     public void onCompletion(int exitValue) {
@@ -104,5 +104,14 @@ public class Build {
 
     public Integer getBuildNumber() {
         return buildNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "Build #" + buildNumber;
+    }
+
+    public EventStore getEventStore() {
+        return eventStore;
     }
 }
