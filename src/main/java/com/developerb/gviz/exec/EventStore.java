@@ -3,6 +3,7 @@ package com.developerb.gviz.exec;
 import com.developerb.gviz.events.Event;
 import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,7 +29,9 @@ public class EventStore {
     public List<Event> read(int from, int to) {
         synchronized (store) {
             List<Event> view = store.subList(from, to);
-            return Collections.unmodifiableList(view);
+            List<Event> copy = Lists.newArrayList(view); // Concurrent wtf..
+
+            return Collections.unmodifiableList(copy);
         }
     }
 

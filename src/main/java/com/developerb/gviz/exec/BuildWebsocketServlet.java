@@ -2,6 +2,7 @@ package com.developerb.gviz.exec;
 
 import com.developerb.gviz.events.BuildCompleted;
 import com.developerb.gviz.events.Event;
+import com.developerb.gviz.events.GradleBuildCompleted;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
@@ -69,7 +70,7 @@ public class BuildWebsocketServlet extends WebSocketServlet {
                             remote.sendString(serialized);
                             ++clientPosition;
 
-                            if (newEvent instanceof BuildCompleted) {
+                            if (newEvent instanceof GradleBuildCompleted) {
                                 log.info("Detected last event, closing down websocket");
                                 session.close();
                                 done = true;

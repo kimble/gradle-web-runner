@@ -22,22 +22,15 @@ class BuildSpy {
     }
 
     synchronized void send(String key, Object payload) {
-        println("Sending message of type " + key)
-
         try {
             socketWriter.write(JsonOutput.toJson([
                     type: key,
                     event: payload
             ]) + "\n")
-
-            // socketWriter.flush() // Unødvendig?
-            // Thread.sleep(20); // REMOVE ME
         }
         catch (Exception ex) {
             throw new GradleException("failed to send message", ex)
         }
-
-        println " - done sending "
     }
 
     void terminate() {
@@ -203,7 +196,7 @@ gradle.addListener(new BuildListener() {
     void buildFinished(BuildResult result) {
         logger.lifecycle "BUILD FINISHED"
 
-        spy.send("build-finished", [
+        spy.send("build-completed", [
                 failureMessage: result.failure?.message,
                 timestamp: System.currentTimeMillis()
         ]);

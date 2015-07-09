@@ -69,8 +69,11 @@ public class Build {
 
                             switch (type) {
                                 case "settings-ready":
-                                    Event settingsEvent = jackson.treeToValue(json.path("event"), SettingsReady.class);
-                                    eventStore.push(settingsEvent);
+                                    handleEvent(json, SettingsReady.class);
+                                    break;
+
+                                case "build-completed":
+                                    handleEvent(json, GradleBuildCompleted.class);
                                     break;
 
                                 default:
@@ -84,6 +87,11 @@ public class Build {
         catch (Exception ex) {
             onUnknownFailure("Failed to connect to the spy running within build", ex);
         }
+    }
+
+    private void handleEvent(JsonNode json, Class<? extends Event> eventType) throws com.fasterxml.jackson.core.JsonProcessingException {
+        Event settingsEvent = jackson.treeToValue(json.path("event"), eventType);
+        eventStore.push(settingsEvent);
     }
 
     public void onUnknownFailure(String message, Exception ex) {
