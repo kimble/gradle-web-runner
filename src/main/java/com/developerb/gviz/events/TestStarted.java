@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Kim A. Betti
  */
-public class TestStarted {
+public class TestStarted extends Event {
 
     private final String className;
     private final String name;

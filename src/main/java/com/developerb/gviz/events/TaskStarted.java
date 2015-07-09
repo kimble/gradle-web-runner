@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * @author Kim A. Betti
  */
-public class TaskStarted {
+public class TaskStarted extends Event {
 
     private final String path;
     private final Date timestamp;

@@ -1,5 +1,7 @@
 import groovy.json.JsonOutput
 
+
+
 class BuildSpy {
 
     ServerSocket serverSocket
@@ -15,7 +17,9 @@ class BuildSpy {
         }
 
         socket = serverSocket.accept()
-        socketWriter = socket.outputStream.newWriter("utf-8")
+        OutputStream bufferedSocketOutputStream = new BufferedOutputStream(socket.outputStream)
+
+        socketWriter = bufferedSocketOutputStream.newWriter("utf-8")
     }
 
     synchronized void send(String key, Object payload) {
@@ -31,6 +35,10 @@ class BuildSpy {
         catch (Exception ex) {
             throw new GradleException("failed to send message", ex)
         }
+    }
+
+    void terminate() {
+        socketWriter.close()
     }
 
 }
@@ -75,6 +83,7 @@ gradle.addListener(new BuildListener() {
 
 
         // Used to store test output as we receive it
+        // Replace this with a Task metaclass property?
         def testOutput = [:]
 
 
@@ -189,6 +198,10 @@ gradle.addListener(new BuildListener() {
                 failureMessage: result.failure?.message,
                 timestamp: System.currentTimeMillis()
         ]);
+
+
+        logger.lifecycle "Terminating build spy"
+        spy.terminate()
     }
 
 })

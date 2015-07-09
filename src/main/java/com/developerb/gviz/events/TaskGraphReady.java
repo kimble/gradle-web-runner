@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * @author Kim A. Betti
  */
-public class TaskGraphReady {
+public class TaskGraphReady extends Event {
 
     private final List<Task> tasks;
 

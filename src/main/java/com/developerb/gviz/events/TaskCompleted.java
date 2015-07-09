@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Kim A. Betti
  */
-public class TaskCompleted {
+public class TaskCompleted extends Event {
 
     private final String path;
 

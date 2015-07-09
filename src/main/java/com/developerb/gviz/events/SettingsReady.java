@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author Kim A. Betti
  */
-public class SettingsReady {
+public class SettingsReady extends Event {
 
     private final Map<String, Object> settings;
 

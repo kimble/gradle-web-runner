@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author Kim A. Betti
  */
-public class TestCompleted {
+public class TestCompleted extends Event {
 
     private final String className;
     private final String name;
