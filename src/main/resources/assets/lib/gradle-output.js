@@ -7,18 +7,8 @@ function createGradleOutputConsole(pubsub) {
     var $header = $gradleOutputContainer.find(".page-header");
 
 
-
-    var hidden = false;
-
     $header.on("click", function() {
-        if (hidden) {
-            $gradleOutputContainer.css("bottom", "20px");
-            hidden = false;
-        }
-        else {
-            $gradleOutputContainer.css("bottom", "-340px");
-            hidden = true;
-        }
+        $gradleOutputContainer.toggleClass("shy");
     });
 
 

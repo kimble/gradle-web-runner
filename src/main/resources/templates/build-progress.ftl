@@ -42,6 +42,10 @@
                 transition: bottom 0.7s;
             }
 
+            #gradleOutput.shy {
+                bottom: -340px;
+            }
+
             #gradleOutput .page-header {
                 cursor: pointer;
             }
