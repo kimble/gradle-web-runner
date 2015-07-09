@@ -39,11 +39,12 @@
                 border: 1px solid #eee;
                 box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
 
-                transition: bottom 0.7s;
+                transition: bottom 0.7s, right 0.7s;
             }
 
             #gradleOutput.shy {
                 bottom: -340px;
+                right: -300px;
             }
 
             #gradleOutput .page-header {
