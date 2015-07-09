@@ -25,10 +25,10 @@
 
             #gradleOutput {
                 position: absolute;
-                top: 98px;
-                left: 10%;
+                bottom: 10px;
+                right: 20px;
 
-                width: 80%;
+                width: 60%;
                 height: 400px;
 
                 border: 1px solid #eee;
@@ -40,7 +40,7 @@
             }
 
             #gradleOutput .output-container {
-                font-family: monospace;
+                font-family: "Ubuntu Mono", monospace;
                 height: 300px;
                 width: 99%;
                 overflow: auto;

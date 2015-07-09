@@ -8,7 +8,9 @@ function createGradleOutputConsole(pubsub) {
         .onValue(function(event) {
             $lastLine.html(event.line);
 
-            $("<div>" + event.line + "</div>").appendTo($outputContainer);
+            $outputContainer.append("<div>" + event.line + "</div>");
+
+            $outputContainer.prop("scrollTop", $outputContainer.prop("scrollHeight") - $outputContainer.height());
         });
 
 
