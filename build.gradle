@@ -36,6 +36,9 @@ dependencies {
     // utils
     compile 'org.zeroturnaround:zt-exec:1.8'
 
+    // webjars
+    compile 'org.webjars:baconjs:0.7.18'
+
     // test
     testCompile 'junit:junit:4.12'
     testCompile 'io.dropwizard:dropwizard-testing:' + dropwizardVersion

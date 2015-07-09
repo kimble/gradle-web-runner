@@ -27,7 +27,8 @@ public class GVizApplication extends Application<GVizConfiguration> {
 
     @Override
     public void initialize(Bootstrap<GVizConfiguration> bootstrap) {
-        bootstrap.addBundle(new AssetsBundle("/assets/", "/assets"));
+        bootstrap.addBundle(new AssetsBundle("/assets/", "/assets", "x.x", "assets"));
+        bootstrap.addBundle(new AssetsBundle("/META-INF/resources/webjars", "/webjars", null, "webjars"));
         bootstrap.addBundle(new ViewBundle<>());
     }
 

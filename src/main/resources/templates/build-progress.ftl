@@ -10,6 +10,7 @@
 
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
+        <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
         <script src="/assets/lib/task-donut.js"></script>

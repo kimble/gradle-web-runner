@@ -1,6 +1,5 @@
 package com.developerb.gviz.exec;
 
-import com.developerb.gviz.events.BuildCompleted;
 import com.developerb.gviz.events.Event;
 import com.developerb.gviz.events.GradleBuildCompleted;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.annotation.WebServlet;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +24,6 @@ import java.util.Optional;
 public class BuildWebsocketServlet extends WebSocketServlet {
 
     private final static Logger log = LoggerFactory.getLogger(BuildWebsocketServlet.class);
-
 
 
     private final BuildRepository buildRepository;
@@ -64,10 +63,7 @@ public class BuildWebsocketServlet extends WebSocketServlet {
                     if (head > clientPosition) {
                         List<Event> newEvents = eventStore.read(clientPosition, head - 1);
                         for (Event newEvent : newEvents) {
-                            String simpleEventName = newEvent.getClass().getSimpleName();
-                            EventTransport transport = new EventTransport(simpleEventName, newEvent);
-                            String serialized = jackson.writeValueAsString(transport);
-                            remote.sendString(serialized);
+                            serializeAndSend(remote, newEvent);
                             ++clientPosition;
 
                             if (newEvent instanceof GradleBuildCompleted) {
@@ -86,6 +82,13 @@ public class BuildWebsocketServlet extends WebSocketServlet {
                 log.error("Unexpected exception", ex);
                 session.close();
             }
+        }
+
+        private void serializeAndSend(RemoteEndpoint remote, Event newEvent) throws IOException {
+            String simpleEventName = newEvent.getClass().getSimpleName();
+            EventTransport transport = new EventTransport(simpleEventName, newEvent);
+            String serialized = jackson.writeValueAsString(transport);
+            remote.sendString(serialized);
         }
 
     }
