@@ -1,11 +1,14 @@
 package com.developerb.gviz.exec;
 
+import com.google.common.collect.Lists;
 import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.stream.LogOutputStream;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Responsible for launching a Gradle build process with the correct parameters.
@@ -37,10 +40,13 @@ public class GradleForker {
     }
 
     private ProcessExecutor configureExecutor(File directory, String tasks) {
+        List<String> command = Lists.newArrayList("./gradlew", "--stacktrace", "--no-daemon", "--init-script", gradleInitScript.getAbsolutePath());
+        Collections.addAll(command, tasks.split(" "));
+
         return new ProcessExecutor()
                 .directory(directory)
                 .environment("SPY_PORT", "10000")
-                .command("./gradlew", "--stacktrace", "--init-script", gradleInitScript.getAbsolutePath(), tasks)
+                .command(command)
                 .readOutput(true)
                 .exitValues(0);
     }

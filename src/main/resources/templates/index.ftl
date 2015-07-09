@@ -49,7 +49,7 @@
             </div>
             <div class="row">
                 <div class="col-md-8">
-                    <input type="text" class="input-dashed" id="tasks" placeholder=":tasks" value="test" />
+                    <input type="text" class="input-dashed" id="tasks" placeholder=":tasks" value="clean test" />
                 </div>
             </div>
 

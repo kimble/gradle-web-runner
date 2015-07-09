@@ -48,7 +48,7 @@ function createTasks(pubsub) {
 
 
     pubsub.stream("task-state-update")
-        .throttle(500)
+        .throttle(1500)
         .onValue(function(tasks) {
             var queueSelection = queue.selectAll(".task")
                 .data(tasks, namedAttr("path"));
@@ -60,6 +60,7 @@ function createTasks(pubsub) {
             var taskGroup = queueSelection.enter()
                 .append("g")
                 .attr("class", "task")
+                .attr("transform", "translate(0, -200)")
                 .attr("text-anchor", "start");
 
 
@@ -70,18 +71,28 @@ function createTasks(pubsub) {
 
             // enter + update
 
+            var blockedIndex = 0;
             var readyIndex = 0;
             var runningIndex = 0;
 
+            var delayIndex = 0;
+
             queueSelection
                 .transition()
-                .duration(500)
+                .duration(1500)
+                //.delay(function(d, i) { return (++delayIndex) * 10; })
                 .attr("transform", function(t, i) {
-                if (t.isReady && readyIndex < queueCapacity) {
-                    return "translate("+ (queueWidth - ((++readyIndex) * queueItemWidth)) +", 10) rotate(70)";
+                if (t.isReady) {
+                    return "translate(300, " + ((++readyIndex) * runningItemHeight) + ") rotate(0)";
                 }
                 else if (t.isRunning) {
-                    return "translate("+ (queueWidth + 150) +", " + ((++runningIndex) * runningItemHeight) + ") rotate(0)";
+                    return "translate(600, " + ((++runningIndex) * runningItemHeight) + ") rotate(0)";
+                }
+                else if (t.isBlocked) {
+                    return "translate(0, " + ((++blockedIndex) * runningItemHeight) + ") rotate(0)";
+                }
+                else if (t.hasCompleted) {
+                    return "translate(" + (width) + ", 300) rotate(0)";
                 }
                 else {
                     return "translate(0, -200)";
