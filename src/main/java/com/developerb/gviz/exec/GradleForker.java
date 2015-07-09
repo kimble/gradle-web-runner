@@ -40,7 +40,7 @@ public class GradleForker {
         return new ProcessExecutor()
                 .directory(directory)
                 .environment("SPY_PORT", "10000")
-                .command("./gradlew", "--stacktrace", "--no-daemon", "--init-script", gradleInitScript.getAbsolutePath(), tasks)
+                .command("./gradlew", "--stacktrace", "--init-script", gradleInitScript.getAbsolutePath(), tasks)
                 .readOutput(true)
                 .exitValues(0);
     }

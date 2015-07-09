@@ -75,6 +75,23 @@
 
     <body>
 
+
+
+        <!-- Gradle output -->
+        <div id="gradleOutput" class="shy">
+            <div class="page-header">
+                <h3>Gradle <u>o</u>utput <small class="last-line">....</small></h3>
+            </div>
+
+            <div class="output-container"></div>
+        </div>
+
+
+
+
+
+
+
         <div class="container container-full">
             <div class="row">
                 <div id="headerRow" class="col-md-12">
@@ -93,14 +110,6 @@
 
 
 
-        <!-- Gradle output -->
-        <div id="gradleOutput" class="shy">
-            <div class="page-header">
-                <h3>Gradle <u>o</u>utput <small class="last-line">....</small></h3>
-            </div>
-
-            <div class="output-container"></div>
-        </div>
 
 
         <script type="text/javascript">

@@ -23,6 +23,7 @@ function initializeTaskState(pubsub) {
             if (tasks.hasOwnProperty(index)) {
                 var task = tasks[index];
                 task.isBlocked = isBlocked(task);
+                task.isReady = !task.hasCompleted && !task.isRunning && !task.isBlocked;
             }
         }
 

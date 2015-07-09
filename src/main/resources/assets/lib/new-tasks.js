@@ -28,6 +28,8 @@ function createTasks(pubsub) {
     var queueItemWidth = 20;
     var queueCapacity = Math.floor((queueEnd - queueStart) / queueItemWidth);
 
+    var runningItemHeight = 30;
+
 
     var queue =  svg.append("g")
         .attr("class", "queue")
@@ -46,14 +48,10 @@ function createTasks(pubsub) {
 
 
     pubsub.stream("task-state-update")
-        .throttle(100)
+        .throttle(500)
         .onValue(function(tasks) {
-            var ready = tasks.filter(function(t) { return !t.hasCompleted && !t.isRunning && !t.isBlocked; });
-            var display = ready.length < queueCapacity ? ready : ready.slice(0, queueCapacity);
-
-
             var queueSelection = queue.selectAll(".task")
-                .data(display, namedAttr("path"));
+                .data(tasks, namedAttr("path"));
 
 
             queueSelection.exit().remove();
@@ -72,8 +70,22 @@ function createTasks(pubsub) {
 
             // enter + update
 
-            queueSelection.attr("transform", function(t, i) {
-                return "translate("+ (queueWidth - (i * queueItemWidth)) +", 10) rotate(40)";
+            var readyIndex = 0;
+            var runningIndex = 0;
+
+            queueSelection
+                .transition()
+                .duration(500)
+                .attr("transform", function(t, i) {
+                if (t.isReady && readyIndex < queueCapacity) {
+                    return "translate("+ (queueWidth - ((++readyIndex) * queueItemWidth)) +", 10) rotate(70)";
+                }
+                else if (t.isRunning) {
+                    return "translate("+ (queueWidth + 150) +", " + ((++runningIndex) * runningItemHeight) + ") rotate(0)";
+                }
+                else {
+                    return "translate(0, -200)";
+                }
             });
 
             // taskGroup...
