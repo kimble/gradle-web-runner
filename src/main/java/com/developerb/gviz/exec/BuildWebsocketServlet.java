@@ -60,17 +60,22 @@ public class BuildWebsocketServlet extends WebSocketServlet {
                 while (!done) {
                     head = eventStore.head();
 
-                    if (head > clientPosition) {
+                    if ((head - 1) > clientPosition) {
                         List<Event> newEvents = eventStore.read(clientPosition, head - 1);
+                        System.out.println("Sending: " + clientPosition + " to " + (head - 1) + " (" + newEvents.size() + ")");
+
+
                         for (Event newEvent : newEvents) {
                             serializeAndSend(remote, newEvent);
+                            remote.flush();
                             ++clientPosition;
 
                             if (newEvent instanceof GradleBuildCompleted) {
                                 log.info("Detected last event, closing down websocket");
-                                remote.flush();
-                                session.close();
                                 done = true;
+
+                                // Hum.. if we close the session here some events will be
+                                // lost even if we flush remote first.. Strange..
                             }
                         }
                     }

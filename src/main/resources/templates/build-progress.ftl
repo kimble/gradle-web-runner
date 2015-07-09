@@ -158,15 +158,26 @@
 
                 initializeTaskState(pubsub);
 
+
+
                 ws.onopen = function() {
                     ws.send(buildNumber);
 
                     ws.onmessage = function(message) {
                         var transfer = JSON.parse(message.data);
                         pubsub.broadcast(transfer);
+
+                        if (transfer.type === 'GradleBuildCompleted') {
+                            console.info("Got last event, closing the websocket");
+                            ws.close();
+                        }
                     }
 
                 };
+
+                ws.onclose = function() {
+                    console.info("Websocket closed");
+                }
 
             })();
         </script>
