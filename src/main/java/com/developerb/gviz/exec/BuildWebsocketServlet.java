@@ -68,6 +68,7 @@ public class BuildWebsocketServlet extends WebSocketServlet {
 
                             if (newEvent instanceof GradleBuildCompleted) {
                                 log.info("Detected last event, closing down websocket");
+                                remote.flush();
                                 session.close();
                                 done = true;
                             }

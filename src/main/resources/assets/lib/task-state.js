@@ -1,22 +1,35 @@
 function initializeTaskState(pubsub) {
     var tasks = [];
+    var mapping = {};
 
-    function broadcastStateUpdate() {
-        pubsub.broadcast({ type: 'task-state-update', event: tasks });
-    }
 
-    function findTask(path) {
-        for (var index in tasks) {
-            if (tasks.hasOwnProperty(index)) {
-                var task = tasks[index];
-                if (task.path === path) {
-                    return task;
+
+    function isBlocked(task) {
+        for (var i in task.dependsOn) {
+            if (task.dependsOn.hasOwnProperty(i)) {
+                var dependencyPath = task.dependsOn[i];
+                var dependency = mapping[dependencyPath];
+                if (!dependency.hasCompleted) {
+                    return true;
                 }
             }
         }
 
-        throw "Unable to find task " + path
+        return false;
     }
+
+    function broadcastStateUpdate() {
+        for (var index in tasks) {
+            if (tasks.hasOwnProperty(index)) {
+                var task = tasks[index];
+                task.isBlocked = isBlocked(task);
+            }
+        }
+
+        pubsub.broadcast({ type: 'task-state-update', event: tasks });
+    }
+
+
 
     pubsub.stream("TaskGraphReady")
         .onValue(function(event) {
@@ -25,6 +38,7 @@ function initializeTaskState(pubsub) {
                 task.isRunning = false;
                 task.hasCompleted = false;
 
+                mapping[task.path] = task;
                 tasks.push(task);
             });
             
@@ -33,7 +47,7 @@ function initializeTaskState(pubsub) {
 
     pubsub.stream("TaskStarting")
         .onValue(function(event) {
-            var task = findTask(event.path);
+            var task = mapping[event.path];
             task.startedAt = event.timestamp;
             task.isRunning = true;
 
@@ -44,7 +58,7 @@ function initializeTaskState(pubsub) {
 
     pubsub.stream("TaskCompleted")
         .onValue(function(event) {
-            var task = findTask(event.path);
+            var task = mapping[event.path];
 
             task.isRunning = false;
             task.hasCompleted = true;

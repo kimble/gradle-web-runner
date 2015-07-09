@@ -86,8 +86,7 @@
 
 
             <div class="row">
-                <div class="col-md-12">
-                    <svg id="tasksScene"></svg>
+                <div class="col-md-12" id="tasksScene">
                 </div>
             </div>
         </div>
