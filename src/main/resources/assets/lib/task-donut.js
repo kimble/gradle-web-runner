@@ -91,8 +91,6 @@ function createTaskDonut() {
                 }
             ];
 
-            console.log("Summary: ", summary);
-
             path.data(pie(summary));
             path.transition().duration(2000).attrTween("d", arcTween); // redraw the arcs
         }

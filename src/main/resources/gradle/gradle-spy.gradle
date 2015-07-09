@@ -32,7 +32,7 @@ class BuildSpy {
             // Thread.sleep(20); // REMOVE ME
         }
         catch (Exception ex) {
-            throw new BuildCancelledException("failed to send message", ex)
+            throw new GradleException("failed to send message", ex)
         }
     }
 
@@ -66,6 +66,8 @@ gradle.addListener(new BuildListener() {
     void projectsLoaded(Gradle gradle) {
         println "Halla, I'm loaded!"
 
+        def testOutput = [:]
+
 
         gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
             def tasks = graph.allTasks.collect { Task task ->
@@ -82,6 +84,22 @@ gradle.addListener(new BuildListener() {
 
             graph.allTasks.forEach { Task task ->
                 if (task instanceof Test) {
+                    task.addTestOutputListener(new TestOutputListener() {
+
+                        @Override
+                        void onOutput(TestDescriptor testDescriptor, TestOutputEvent outputEvent) {
+                            synchronized (testOutput) {
+                                def key = testDescriptor.className + ":" + testDescriptor.name
+                                if (!testOutput.containsKey(key)) {
+                                    testOutput[key] = []
+                                }
+
+                                testOutput[key] << outputEvent.destination.name() + ": " + outputEvent.message
+                            }
+                        }
+
+                    })
+
                     task.addTestListener(new TestListener() {
                         @Override
                         void beforeSuite(TestDescriptor suite) { }
@@ -99,13 +117,16 @@ gradle.addListener(new BuildListener() {
 
                         @Override
                         void afterTest(TestDescriptor testDescriptor, TestResult result) {
-                            spy.send("after-test", [
-                                    name: testDescriptor.name,
-                                    className: testDescriptor.className,
-                                    result: result.resultType.name(),
-                                    duration: result.endTime - result.startTime,
-                                    exception: result.exception?.message
-                            ])
+                            synchronized (testOutput) {
+                                spy.send("after-test", [
+                                        name: testDescriptor.name,
+                                        className: testDescriptor.className,
+                                        result: result.resultType.name(),
+                                        duration: result.endTime - result.startTime,
+                                        exception: result.exception?.message,
+                                        output: testOutput.remove(testDescriptor.className + ":" + testDescriptor.name)
+                                ])
+                            }
                         }
 
                     })

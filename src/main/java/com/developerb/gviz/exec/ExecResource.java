@@ -157,7 +157,7 @@ public class ExecResource {
             try {
                 ProcessExecutor executor = new ProcessExecutor()
                         .directory(directory)
-                        .environment("GRADLE_USER_HOME", "/tmp")
+                        // .environment("GRADLE_USER_HOME", "/tmp")
                         .environment("SPY_PORT", "10000")
                         .command("./gradlew", "--stacktrace", "--no-daemon", "--init-script", gradleInitScript.getAbsolutePath(), tasks)
                         .readOutput(true)
@@ -265,8 +265,9 @@ public class ExecResource {
                 case "after-test":
                     MapPayload afterTestPayload = new MapPayload(payload);
                     TestState test = state.test(afterTestPayload.str("className"), afterTestPayload.str("name"));
-                    test.finished(afterTestPayload.str("result"), afterTestPayload.lng("duration"));
+                    test.finished(afterTestPayload.str("result"), afterTestPayload.lng("duration"), afterTestPayload.strList("output"));
                     break;
+
 
                 default:
                     log.warn("Unprocessed message {}: {}", message, payload);
@@ -297,11 +298,15 @@ public class ExecResource {
             }
         }
 
+        List<String> strList(String key) {
+            return (List<String>) payload.get(key);
+        }
+
     }
 
     public static class BuildState {
 
-        private final EvictingQueue<String> consoleBuffer = EvictingQueue.create(20);
+        private final EvictingQueue<String> consoleBuffer = EvictingQueue.create(50);
 
         @JsonProperty String projectName;
         @JsonProperty Integer maxWorkerCount;
@@ -370,14 +375,17 @@ public class ExecResource {
         @JsonProperty String result;
         @JsonProperty Long duration;
 
+        @JsonProperty List<String> output = Lists.newArrayList();
+
         public TestState(String className, String name) {
             this.className = className;
             this.name = name;
         }
 
-        void finished(String result, Long duration) {
+        void finished(String result, Long duration, List<String> output) {
             this.result = result;
             this.duration = duration;
+            this.output = output;
         }
 
     }
