@@ -9,11 +9,9 @@ class BuildSpy {
     BuildSpy(int port) {
         try {
             serverSocket = new ServerSocket(port);
-            println "Gradle build spy started on port $port"
-            println "I'll be hanging around waiting for the g-viz to connect.."
         }
         catch (IOException ex) {
-            throw new BuildCancelledException("Unable to listen to port " + port, ex)
+            throw new GradleException("Unable to listen to port " + port, ex)
         }
 
         socket = serverSocket.accept()
@@ -23,12 +21,11 @@ class BuildSpy {
     synchronized void send(String key, Object payload) {
         try {
             socketWriter.write(JsonOutput.toJson([
-                    message: key,
-                    payload: payload
+                    type: key,
+                    event: payload
             ]) + "\n")
 
-            socketWriter.flush()
-
+            // socketWriter.flush() // Unødvendig?
             // Thread.sleep(20); // REMOVE ME
         }
         catch (Exception ex) {
@@ -38,7 +35,17 @@ class BuildSpy {
 
 }
 
-BuildSpy spy = null
+
+String spyPort = System.getenv("SPY_PORT")
+
+if (!spyPort) {
+    throw new GradleException("No environment variable SPY_PORT set")
+}
+
+
+logger.lifecycle "Gradle build spy started on port $spyPort"
+logger.lifecycle "I'll be hanging around waiting for the g-viz to connect.."
+BuildSpy spy = new BuildSpy(Integer.parseInt(spyPort))
 
 
 
@@ -46,42 +53,45 @@ BuildSpy spy = null
 gradle.addListener(new BuildListener() {
 
     void buildStarted(Gradle gradle) {
-        println "\nBuild started!\n"
+        logger.lifecycle "BUILD STARTED"
     }
 
     void settingsEvaluated(Settings settings) {
-        logger.lifecycle "Settings evaluated"
+        logger.lifecycle "SETTINGS EVALUATED"
 
-        String spyPort = System.getenv("SPY_PORT")
-
-        if (!spyPort) {
-            throw new BuildCancelledException("No environment variable SPY_PORT set")
-        }
-
-        spy = new BuildSpy(Integer.parseInt(spyPort))
-        spy.send "project-name", settings.rootProject.name
-        spy.send "max-worker-count", settings.startParameter.maxWorkerCount
+        spy.send("settings-ready", [
+                projectName: settings.rootProject.name,
+                parallelProjectExecutionEnabled: settings.startParameter.parallelProjectExecutionEnabled,
+                maxWorkerCount: settings.startParameter.maxWorkerCount,
+                configureOnDemand: settings.startParameter.configureOnDemand,
+                gradleUserHomeDir: settings.startParameter.gradleUserHomeDir,
+                projectDir: settings.startParameter.projectDir,
+                gradleVersion: settings.gradle.gradleVersion
+        ]);
     }
 
     void projectsLoaded(Gradle gradle) {
-        println "Halla, I'm loaded!"
+        logger.lifecycle "PROJECTS LOADED"
 
+
+        // Used to store test output as we receive it
         def testOutput = [:]
 
 
         gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-            def tasks = graph.allTasks.collect { Task task ->
-                return [
+            spy.send("task-graph-ready", graph.allTasks.collect { Task task ->
+                [
                         name: task.name,
                         path: task.path,
                         description: task.description,
                         dependsOn: task.taskDependencies.getDependencies(task).collect { it.path }
                 ]
-            }
+            })
 
-            spy.send "task-list", tasks
-
-
+            /**
+             * Attach listeners for test execution and output
+             * (leveraging Gradle's framework agnostic api)
+             */
             graph.allTasks.forEach { Task task ->
                 if (task instanceof Test) {
                     task.addTestOutputListener(new TestOutputListener() {
@@ -101,6 +111,7 @@ gradle.addListener(new BuildListener() {
                     })
 
                     task.addTestListener(new TestListener() {
+
                         @Override
                         void beforeSuite(TestDescriptor suite) { }
 
@@ -122,8 +133,8 @@ gradle.addListener(new BuildListener() {
                                         name: testDescriptor.name,
                                         className: testDescriptor.className,
                                         result: result.resultType.name(),
-                                        duration: result.endTime - result.startTime,
-                                        exception: result.exception?.message,
+                                        durationMillis: result.endTime - result.startTime,
+                                        exceptionMessage: result.exception?.message,
                                         output: testOutput.remove(testDescriptor.className + ":" + testDescriptor.name)
                                 ])
                             }
@@ -146,16 +157,14 @@ gradle.addListener(new BuildListener() {
                 taskStartTime[task.path] = System.currentTimeMillis()
 
                 spy.send("before-task", [
-                        name: task.name,
                         path: task.path,
-                        started: taskStartTime[task.path]
+                        timestamp: taskStartTime[task.path]
                 ])
             }
 
             @Override
             void afterExecute(Task task, TaskState state) {
                 spy.send("after-task", [
-                        name: task.name,
                         path: task.path,
                         didWork: state.didWork,
                         executed: state.executed,
@@ -170,11 +179,16 @@ gradle.addListener(new BuildListener() {
     }
 
     void projectsEvaluated(Gradle gradle) {
-        println "Projects evaluated!"
+        logger.lifecycle "PROJECTS EVALUATED"
     }
 
     void buildFinished(BuildResult result) {
-        println "Finished"
+        logger.lifecycle "BUILD FINISHED"
+
+        spy.send("build-finished", [
+                failureMessage: result.failure?.message,
+                timestamp: System.currentTimeMillis()
+        ]);
     }
 
 })
