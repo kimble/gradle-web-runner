@@ -17,6 +17,10 @@
         <script src="/assets/lib/gradle-output.js"></script>
 
         <style type="text/css">
+            body {
+                overflow: hidden;
+            }
+
             .container-full {
                 margin: 0 auto;
                 width: 95%;
@@ -34,6 +38,12 @@
 
                 border: 1px solid #eee;
                 box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
+
+                transition: bottom 0.7s;
+            }
+
+            #gradleOutput .page-header {
+                cursor: pointer;
             }
 
             #gradleOutput .output-container>div {
