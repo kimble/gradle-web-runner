@@ -87,9 +87,9 @@
 
 
         <!-- Gradle output -->
-        <div id="gradleOutput">
+        <div id="gradleOutput" class="shy">
             <div class="page-header">
-                <h3>Gradle output <small class="last-line">....</small></h3>
+                <h3>Gradle <u>o</u>utput <small class="last-line">....</small></h3>
             </div>
 
             <div class="output-container"></div>
@@ -120,6 +120,11 @@
 
                 var pubsub = (function() {
                     var bus = new Bacon.Bus();
+
+                    $(document).keydown(function(event) {
+                        var key = String.fromCharCode(event.keyCode);
+                        bus.push({type: "key-down-" + key, event: {}})
+                    });
 
                     return {
                         broadcast: function(event) {

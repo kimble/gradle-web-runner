@@ -7,9 +7,12 @@ function createGradleOutputConsole(pubsub) {
     var $header = $gradleOutputContainer.find(".page-header");
 
 
-    $header.on("click", function() {
+    var toggleShyness = function() {
         $gradleOutputContainer.toggleClass("shy");
-    });
+    };
+
+    $header.on("click", toggleShyness);
+    pubsub.stream("key-down-O").onValue(toggleShyness);
 
 
     pubsub.stream("OutputWrittenFromGradle")
