@@ -13,6 +13,7 @@
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
+        <script src="/assets/lib/gradle-settings.js"></script>
         <script src="/assets/lib/gradle-output.js"></script>
 
         <style type="text/css">
@@ -25,7 +26,7 @@
 
             #gradleOutput {
                 position: absolute;
-                bottom: 10px;
+                bottom: 20px;
                 right: 20px;
 
                 width: 60%;
@@ -122,6 +123,7 @@
 
 
                 createGradleOutputConsole(pubsub);
+                createGradleSettings(pubsub);
 
 
                 ws.onopen = function() {
