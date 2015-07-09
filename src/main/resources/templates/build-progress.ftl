@@ -13,8 +13,7 @@
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
-        <script src="/assets/lib/task-donut.js"></script>
-        <script src="/assets/lib/test-list.js"></script>
+        <script src="/assets/lib/gradle-output.js"></script>
 
         <style type="text/css">
             .container-full {
@@ -23,6 +22,33 @@
             }
 
 
+
+            #gradleOutput {
+                position: absolute;
+                top: 98px;
+                left: 10%;
+
+                width: 80%;
+                height: 400px;
+
+                border: 1px solid #eee;
+                box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
+            }
+
+            #gradleOutput .output-container>div {
+                padding: 0 1em 0 1em;
+            }
+
+            #gradleOutput .output-container {
+                font-family: monospace;
+                height: 300px;
+                width: 99%;
+                overflow: auto;
+            }
+
+            #gradleOutput .page-header {
+                margin: 0 1em 1em 1em;
+            }
 
 
         </style>
@@ -41,6 +67,17 @@
 
 
 
+        </div>
+
+
+
+        <!-- Gradle output -->
+        <div id="gradleOutput">
+            <div class="page-header">
+                <h3>Gradle output <small class="last-line">....</small></h3>
+            </div>
+
+            <div class="output-container"></div>
         </div>
 
 
@@ -64,12 +101,37 @@
                 var buildNumber = ${buildNumber};
                 var ws = new WebSocket("ws://localhost:8080/ws/build");
 
+
+
+                var pubsub = (function() {
+                    var bus = new Bacon.Bus();
+
+                    return {
+                        broadcast: function(event) {
+                            bus.push(event);
+                        },
+                        stream: function(type) {
+                            return bus.filter(function (transfer) {
+                                return transfer.type == type;
+                            }).map(function(transfer) {
+                                return transfer.event;
+                            });
+                        }
+                    }
+                })();
+
+
+                createGradleOutputConsole(pubsub);
+
+
                 ws.onopen = function() {
                     ws.send(buildNumber);
 
                     ws.onmessage = function(message) {
-                        console.log (" << " + message.data);
+                        var transfer = JSON.parse(message.data);
+                        pubsub.broadcast(transfer);
                     }
+
                 };
 
             })();
