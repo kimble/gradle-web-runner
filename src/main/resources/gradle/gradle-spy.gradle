@@ -90,14 +90,18 @@ gradle.addListener(new BuildListener() {
 
 
         gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-            spy.send("task-graph-ready", graph.allTasks.collect { Task task ->
-                [
-                        name: task.name,
-                        path: task.path,
-                        description: task.description,
-                        dependsOn: task.taskDependencies.getDependencies(task).collect { it.path }
+            spy.send("task-graph-ready",
+                    [
+                        tasks: graph.allTasks.collect { Task task ->
+                            [
+                                    name: task.name,
+                                    path: task.path,
+                                    description: task.description,
+                                    dependsOn: task.taskDependencies.getDependencies(task).collect { it.path }
+                            ]
+                    }
                 ]
-            })
+            )
 
             /**
              * Attach listeners for test execution and output
@@ -167,7 +171,7 @@ gradle.addListener(new BuildListener() {
             void beforeExecute(Task task) {
                 taskStartTime[task.path] = System.currentTimeMillis()
 
-                spy.send("before-task", [
+                spy.send("task-before", [
                         path: task.path,
                         timestamp: taskStartTime[task.path]
                 ])
@@ -175,14 +179,14 @@ gradle.addListener(new BuildListener() {
 
             @Override
             void afterExecute(Task task, TaskState state) {
-                spy.send("after-task", [
+                spy.send("task-after", [
                         path: task.path,
                         didWork: state.didWork,
                         executed: state.executed,
                         skipped: state.skipped,
                         skippedMessage: state.skipMessage,
                         failureMessage: state.failure?.message,
-                        duration: System.currentTimeMillis() - taskStartTime[task.path]
+                        durationMillis: System.currentTimeMillis() - taskStartTime[task.path]
                 ])
             }
 

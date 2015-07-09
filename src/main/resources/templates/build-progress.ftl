@@ -13,8 +13,11 @@
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
+        <script src="/assets/lib/task-state.js"></script>
+
         <script src="/assets/lib/gradle-settings.js"></script>
         <script src="/assets/lib/gradle-output.js"></script>
+        <script src="/assets/lib/new-tasks.js"></script>
 
         <style type="text/css">
             body {
@@ -82,7 +85,11 @@
             </div>
 
 
-
+            <div class="row">
+                <div class="col-md-12">
+                    <svg id="tasksScene"></svg>
+                </div>
+            </div>
         </div>
 
 
@@ -142,9 +149,15 @@
                 })();
 
 
+                // Interface
+
                 createGradleOutputConsole(pubsub);
                 createGradleSettings(pubsub);
+                createTasks(pubsub);
 
+                // State
+
+                initializeTaskState(pubsub);
 
                 ws.onopen = function() {
                     ws.send(buildNumber);

@@ -72,9 +72,22 @@ public class Build {
                                     handleEvent(json, SettingsReady.class);
                                     break;
 
+                                case "task-graph-ready":
+                                    handleEvent(json, TaskGraphReady.class);
+                                    break;
+
+                                case "task-before":
+                                    handleEvent(json, TaskStarting.class);
+                                    break;
+
+                                case "task-after":
+                                    handleEvent(json, TaskCompleted.class);
+                                    break;
+
                                 case "build-completed":
                                     handleEvent(json, GradleBuildCompleted.class);
                                     break;
+
 
                                 default:
                                     log.warn("Received message of unknown type: {}", type);

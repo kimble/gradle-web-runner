@@ -8,13 +8,13 @@ import java.util.Date;
 /**
  * @author Kim A. Betti
  */
-public class TaskStarted extends Event {
+public class TaskStarting extends Event {
 
     private final String path;
     private final Date timestamp;
 
     @JsonCreator
-    public TaskStarted(@JsonProperty("path") String path, @JsonProperty("timestamp") Date timestamp) {
+    public TaskStarting(@JsonProperty("path") String path, @JsonProperty("timestamp") Date timestamp) {
         this.path = path;
         this.timestamp = timestamp;
     }
