@@ -1,4 +1,4 @@
-function initializeTaskState(pubsub) {
+function initializeTaskState(pubsub, buildNumber) {
     var tasks = [];
     var mapping = {};
 
@@ -32,6 +32,24 @@ function initializeTaskState(pubsub) {
     }
 
 
+    function fetchEstimates() {
+        console.log("Fetching estimates");
+
+        jQuery.getJSON("/api/build/" + buildNumber + "/estimates", function(estimates) {
+            for (var key in estimates) {
+                if (estimates.hasOwnProperty(key)) {
+                    if (mapping.hasOwnProperty(key)) {
+                        var task = mapping[key];
+                        task.estimateMillis = estimates[key];
+                    }
+                }
+            }
+
+            console.log("Tasks updated with estimates, ", tasks);
+            broadcastStateUpdate();
+        });
+    }
+
 
     pubsub.stream("TaskGraphReady")
         .onValue(function(event) {
@@ -45,6 +63,7 @@ function initializeTaskState(pubsub) {
             });
             
             broadcastStateUpdate();
+            fetchEstimates();
         });
 
     pubsub.stream("TaskStarting")

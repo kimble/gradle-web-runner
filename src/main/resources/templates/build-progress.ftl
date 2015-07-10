@@ -237,7 +237,7 @@
 
                 // State
 
-                initializeTaskState(pubsub);
+                initializeTaskState(pubsub, buildNumber);
 
 
 
