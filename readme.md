@@ -22,7 +22,7 @@ web interface over web sockets.
 
 Screenshot
 ----------
-![Screenshot](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v1.png)
+![Screenshot](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2.png)
 
 
 Give it a spin
