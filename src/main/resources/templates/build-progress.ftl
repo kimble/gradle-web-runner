@@ -181,6 +181,10 @@
                 border-left: 5px solid rgb(244, 229, 69);
             }
 
+            #fullTestReport h4 .glyphicon {
+                font-size: 0.9em;
+            }
+
 
 
             #fullTestReport .individual-test.success {

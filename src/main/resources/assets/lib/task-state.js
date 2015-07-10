@@ -45,7 +45,6 @@ function initializeTaskState(pubsub, buildNumber) {
                 }
             }
 
-            console.log("Tasks updated with estimates, ", tasks);
             pubsub.broadcast({ type: 'tasks-estimated', event: tasks });
             broadcastStateUpdate();
         });

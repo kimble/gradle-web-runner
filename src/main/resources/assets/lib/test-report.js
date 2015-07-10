@@ -19,7 +19,7 @@ function createTestReport(pubsub) {
     $showSuccessful.asEventStream("change")
         .map(".target.checked")
         .onValue(function(show) {
-            $container.find(".individual-tests").toggleClass("show-successful", show);
+            $container.find(".individual-tests").toggleClass("show-successful", show); // Todo: Replace with d3
         });
 
 
@@ -103,14 +103,22 @@ function createTestReport(pubsub) {
 
             var test = tests.enter()
                 .append("div")
-                .attr("class", "individual-test");
+                .attr("class", "individual-test")
+                .on("click", function(d) {
+                    console.log(d.output);
+                });
 
 
-            test.append("h4")
+            var header = test.append("h4")
                 .attr("class", "test-name")
                 .text(function(d) {
-                    return d.name;
+                    return d.name + " ";
                 });
+
+            header.append("span")
+                .attr("class", "glyphicon glyphicon-paperclip")
+                .attr("title", "Contains test output")
+                .classed("hidden", function(d) { return d.output == null; });
 
 
             // Update test status class
@@ -177,7 +185,7 @@ function createTestReport(pubsub) {
 
             test.isRunning = false;
             test.result = event.result;
-            test.output = event.output;
+            test.output = event.output != null ? event.output.join("") : null;
             test.durationMillis = event.durationMillis;
             test.exceptionMessage = event.exceptionMessage;
 

@@ -113,7 +113,8 @@ gradle.addListener(new BuildListener() {
                                     testOutput[key] = []
                                 }
 
-                                testOutput[key] << outputEvent.destination.name() + ": " + outputEvent.message
+                                // Todo: Store outputEvent.destination somehow? (keep track of output to std.err)
+                                testOutput[key] << outputEvent.message
                             }
                         }
 
