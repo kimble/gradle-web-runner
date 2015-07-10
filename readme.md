@@ -29,12 +29,18 @@ Give it a spin
 --------------
 Check out the source code then run the following command that'll download Gradle, build the project and start it up (gotta love Gradle wrapper!).
 
+    git clone git@github.com:kimble/gradle-web-runner.git
+    cd gradle-web-runner
     ./gradlew run
 
 Then navigate to [http://localhost:8080/](http://localhost:8080/]) in your web browser.
 
 Btw, I use Chrome during development so no guaranties regarding other browsers.
 
+
+Known restrictions
+------------------
+No windows support (people using Windows does not deserve nice things anyway).
 
 Things I might do
 -----------------
@@ -47,3 +53,4 @@ As this is just a summer pet projects I'll probably never get around to do half 
 - Feature: Visualize test results
 - Cleanup: Move css out into separate .css files
 - Cleanup: Replace js dependencies with webjars
+- Improvement: Windows support (use ./gradlew.bat instead of ./gradlew and so on..)
