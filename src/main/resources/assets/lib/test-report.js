@@ -1,18 +1,26 @@
 function createTestReport(pubsub) {
     "use strict";
 
-    var $gradleOutputContainer = $("#testReport");
-    var $small = $gradleOutputContainer.find(".page-header small");
-    var $outputContainer = $gradleOutputContainer.find(".test-container");
-    var $header = $gradleOutputContainer.find(".page-header h3");
+    var $container = $("#testReport");
+    var $small = $container.find(".page-header small");
+    var $outputContainer = $container.find(".test-container");
+    var $header = $container.find(".page-header h3");
+    var $showSuccessful = $container.find("#showSuccessfulTests");
 
 
     var toggleShyness = function () {
-        $gradleOutputContainer.toggleClass("shy");
+        $container.toggleClass("shy");
     };
 
     $header.on("click", toggleShyness);
     pubsub.stream("key-down-T").onValue(toggleShyness);
+
+
+    $showSuccessful.asEventStream("change")
+        .map(".target.checked")
+        .onValue(function(show) {
+            $container.find(".individual-tests").toggleClass("show-successful", show);
+        });
 
 
     // D3 state
@@ -29,9 +37,6 @@ function createTestReport(pubsub) {
     pubsub.stream("test-list-updated")
         .throttle(1000)
         .onValue(function(packages) {
-
-            console.log(packages);
-
 
             var packagesSelection = d3.select("#fullTestReport")
                 .selectAll(".test-package")

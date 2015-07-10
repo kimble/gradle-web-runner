@@ -156,12 +156,26 @@
             }
 
             #fullTestReport .individual-tests.success {
+                display: none;
+            }
+
+            #fullTestReport .individual-tests.show-successful {
+                display: block;
+            }
+
+            #fullTestReport .individual-tests.success {
                 border-left: 5px solid rgb(202, 215, 94);
             }
             #fullTestReport .individual-tests.fail {
                 border-left: 5px solid rgb(244, 117, 51);
             }
 
+            #testReport .filter-container {
+                margin: 0.5em;
+                padding: 0.5em;
+                min-height: 200px;
+                background-color: #F6F7F4;
+            }
 
 
 
@@ -301,7 +315,23 @@
             </div>
 
             <div class="test-container">
-                <div id="fullTestReport"></div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="filter-container form-group">
+                            <h2>Filter</h2>
+                            <hr/>
+
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="showSuccessfulTests"> Show successful
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div id="fullTestReport"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
