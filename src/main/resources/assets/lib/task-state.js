@@ -46,6 +46,7 @@ function initializeTaskState(pubsub, buildNumber) {
             }
 
             console.log("Tasks updated with estimates, ", tasks);
+            pubsub.broadcast({ type: 'tasks-estimated', event: tasks });
             broadcastStateUpdate();
         });
     }
@@ -57,6 +58,7 @@ function initializeTaskState(pubsub, buildNumber) {
 
                 task.isRunning = false;
                 task.hasCompleted = false;
+                task.estimateMillis = null;
 
                 mapping[task.path] = task;
                 tasks.push(task);

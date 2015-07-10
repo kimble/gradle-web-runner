@@ -61,12 +61,9 @@ BuildSpy spy = new BuildSpy(Integer.parseInt(spyPort))
 gradle.addListener(new BuildListener() {
 
     void buildStarted(Gradle gradle) {
-        logger.lifecycle "BUILD STARTED"
     }
 
     void settingsEvaluated(Settings settings) {
-        logger.lifecycle "SETTINGS EVALUATED"
-
         spy.send("settings-ready", [
                 settings: [
                     projectName: settings.rootProject.name,
@@ -81,9 +78,6 @@ gradle.addListener(new BuildListener() {
     }
 
     void projectsLoaded(Gradle gradle) {
-        logger.lifecycle "PROJECTS LOADED"
-
-
         // Used to store test output as we receive it
         // Replace this with a Task metaclass property?
         def testOutput = [:]
@@ -193,13 +187,9 @@ gradle.addListener(new BuildListener() {
         })
     }
 
-    void projectsEvaluated(Gradle gradle) {
-        logger.lifecycle "PROJECTS EVALUATED"
-    }
+    void projectsEvaluated(Gradle gradle) { }
 
     void buildFinished(BuildResult result) {
-        logger.lifecycle "BUILD FINISHED"
-
         spy.send("build-completed", [
                 failureMessage: result.failure?.message,
                 timestamp: System.currentTimeMillis()

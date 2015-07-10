@@ -24,7 +24,7 @@
         <script src="/assets/lib/gradle-settings.js"></script>
         <script src="/assets/lib/gradle-output.js"></script>
         <script src="/assets/lib/build-details.js"></script>
-        <script src="/assets/lib/new-tasks.js"></script>
+        <script src="/assets/lib/running-tasks.js"></script>
         <script src="/assets/lib/task-donut.js"></script>
         <script src="/assets/lib/counters.js"></script>
 
@@ -37,6 +37,7 @@
                 margin: 0 auto;
                 width: 95%;
             }
+
 
 
 
@@ -121,12 +122,37 @@
             }
 
 
+            /* Counters */
+
+            .counter-container h3 {
+                font-family: 'Architects Daughter', cursive;
+                margin-left: 1em;
+            }
+
 
             /* Task donut */
 
             #taskDonut text {
                 font-family: 'Architects Daughter', cursive;
                 font-size: 1.5em;
+            }
+
+
+            /* Running tasks */
+
+            .running-tasks .task-path {
+                font-weight: bold;
+            }
+
+            .running-tasks .task-description {
+                font-family: 'Architects Daughter', cursive;
+                color: #555;
+            }
+
+            .running-tasks .task-estimate {
+                fill: #eee;
+                rx: 5;
+                ry: 5;
             }
 
         </style>
@@ -153,8 +179,8 @@
 
 
             <div class="row">
-                <div class="col-md-4" id="taskDonut"></div>
-                <div class="col-md-8" id="tasksScene"></div>
+                <div class="col-md-3" id="taskDonut"></div>
+                <div class="col-md-9" id="tasksScene"></div>
             </div>
 
             <div class="row">
@@ -255,7 +281,7 @@
 
                 createGradleOutputConsole(pubsub);
                 createGradleSettings(pubsub);
-                createTasks(pubsub);
+                createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 createTaskDonut(pubsub);
                 createCounters(pubsub);
