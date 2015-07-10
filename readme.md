@@ -2,11 +2,11 @@ Gradle Web Task Runner
 ======================
 Interactive, web based Gradle task runner.
 
-[#Gradle](http://gradle.org/)
-[#Dropwizard](http://dropwizard.io/)
-[#Websockets](https://developer.mozilla.org/en/docs/WebSockets)
+[#gradle](http://gradle.org/)
+[#dropwizard](http://dropwizard.io/)
+[#websockets](https://developer.mozilla.org/en/docs/WebSockets)
 [#d3js](http://d3js.org)
-[#Bacon.js](https://baconjs.github.io/)
+[#bacon.js](https://baconjs.github.io/)
 
 
 Introduction
@@ -31,5 +31,6 @@ Check out the source code then run the following command that'll download Gradle
 
     ./gradlew run
 
-Then navigate to [http://localhost:8080/](http://localhost:8080/]) in your web browser
-(I use Chrome during development so no guaranties regarding other browsers).
+Then navigate to [http://localhost:8080/](http://localhost:8080/]) in your web browser.
+
+Btw, I use Chrome during development so no guaranties regarding other browsers.
