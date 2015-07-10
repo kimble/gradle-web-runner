@@ -17,7 +17,7 @@ project.ext {
     jettyVersion = '9.2.9.v20150224' // sync with dropwizard
 }
 
-mainClassName = 'com.developerb.GVizApplication'
+mainClassName = 'com.developerb.gviz.GVizApplication'
 
 repositories {
     jcenter()
@@ -54,8 +54,13 @@ shadowJar {
     exclude 'META-INF/*.DSA'
     exclude 'META-INF/*.RSA'
 }
+
 jar {
     manifest {
         attributes 'Main-Class': mainClassName
     }
+}
+
+run {
+    args 'server'
 }
