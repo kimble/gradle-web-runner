@@ -21,4 +21,9 @@ public class UnknownErrorOccurred extends Event {
         return message;
     }
 
+    @Override
+    protected String describe() {
+        return String.format("Unexpected error of type %s occurred with message: %s", type, message);
+    }
+
 }

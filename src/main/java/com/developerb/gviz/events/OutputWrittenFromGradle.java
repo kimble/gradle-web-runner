@@ -23,4 +23,9 @@ public class OutputWrittenFromGradle extends Event {
         return line;
     }
 
+    @Override
+    protected String describe() {
+        return "GRADLE: " + line;
+    }
+
 }

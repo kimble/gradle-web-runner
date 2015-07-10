@@ -2,6 +2,7 @@ package com.developerb.gviz.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Joiner;
 
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,10 @@ public class TaskGraphReady extends Event {
         return tasks;
     }
 
+    @Override
+    protected String describe() {
+        return "Task graph consisting of " + tasks.size() + " tasks completed";
+    }
 
     public static class Task {
 
@@ -56,6 +61,11 @@ public class TaskGraphReady extends Event {
 
         public Set<String> getDependsOn() {
             return dependsOn;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s - %s (%s) depending on [%s]", path, name, description, Joiner.on(", ").join(dependsOn));
         }
 
     }

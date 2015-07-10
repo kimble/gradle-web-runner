@@ -8,23 +8,23 @@ import java.util.Date;
 /**
  * @author Kim A. Betti
  */
-public class TaskStarting extends Event {
+public class TaskStarting extends TaskEvent {
 
-    private final String path;
     private final Date timestamp;
 
     @JsonCreator
     public TaskStarting(@JsonProperty("path") String path, @JsonProperty("timestamp") Date timestamp) {
-        this.path = path;
+        super(path);
         this.timestamp = timestamp;
-    }
-
-    public String getPath() {
-        return path;
     }
 
     public Date getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    protected String describeTaskEvent() {
+        return "Starting";
     }
 
 }

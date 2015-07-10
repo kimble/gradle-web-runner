@@ -33,10 +33,8 @@ public class Build {
 
 
     public void onConsoleOutput(String line) {
-        log.info(" >> {}", line);
-
         if (line.contains("I'll be hanging around waiting for the g-viz to connect..")) {
-            connectoToSpyWithinBuild();
+            connectToSpyWithinBuild();
         }
 
         Date timestamp = new Date();
@@ -45,7 +43,7 @@ public class Build {
         eventStore.push(event);
     }
 
-    private void connectoToSpyWithinBuild() {
+    private void connectToSpyWithinBuild() {
         log.info("Kicking off thread to listen for socket messages");
         new Thread(Build.this::listen).start();
     }
@@ -62,8 +60,6 @@ public class Build {
                     try (BufferedReader in = new BufferedReader(reader)) {
                         String userInput;
                         while ((userInput = in.readLine()) != null) {
-                            log.info(" >> {}", userInput);
-
                             final JsonNode json = jackson.readTree(userInput);
                             final String type = json.get("type").asText();
 
@@ -103,8 +99,10 @@ public class Build {
     }
 
     private void handleEvent(JsonNode json, Class<? extends Event> eventType) throws com.fasterxml.jackson.core.JsonProcessingException {
-        Event settingsEvent = jackson.treeToValue(json.path("event"), eventType);
-        eventStore.push(settingsEvent);
+        Event event = jackson.treeToValue(json.path("event"), eventType);
+        log.info("Event: {}", event);
+
+        eventStore.push(event);
     }
 
     public void onUnknownFailure(String message, Exception ex) {

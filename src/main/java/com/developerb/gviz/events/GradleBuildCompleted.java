@@ -29,4 +29,9 @@ public class GradleBuildCompleted extends Event {
         return timestamp;
     }
 
+    @Override
+    protected String describe() {
+        return "Gradle build completed." + (failureMessage != null ? "Failure message: " + failureMessage : "No failure message");
+    }
+
 }

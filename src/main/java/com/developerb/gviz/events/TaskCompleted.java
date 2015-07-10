@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Kim A. Betti
  */
-public class TaskCompleted extends Event {
-
-    private final String path;
+public class TaskCompleted extends TaskEvent {
 
     private final boolean didWork;
     private final boolean executed;
@@ -26,17 +24,14 @@ public class TaskCompleted extends Event {
                          @JsonProperty("skippedMessage") String skippedMessage,
                          @JsonProperty("failureMessage") String failureMessage,
                          @JsonProperty("durationMillis") Integer durationMillis) {
-        this.path = path;
+        super(path);
+
         this.didWork = didWork;
         this.executed = executed;
         this.skipped = skipped;
         this.skippedMessage = skippedMessage;
         this.failureMessage = failureMessage;
         this.durationMillis = durationMillis;
-    }
-
-    public String getPath() {
-        return path;
     }
 
     public boolean isDidWork() {
@@ -61,6 +56,11 @@ public class TaskCompleted extends Event {
 
     public Integer getDurationMillis() {
         return durationMillis;
+    }
+
+    @Override
+    protected String describeTaskEvent() {
+        return "Completed after " + durationMillis + " milliseconds";
     }
 
 }

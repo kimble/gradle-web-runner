@@ -6,28 +6,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Kim A. Betti
  */
-public class TestStarted extends Event {
-
-    private final String className;
-    private final String name;
+public class TestStarted extends TestEvent {
 
     @JsonCreator
     public TestStarted(@JsonProperty("className") String className, @JsonProperty("name") String name) {
-        this.className = className;
-        this.name = name;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public String getName() {
-        return name;
+        super(className, name);
     }
 
     @Override
-    public String toString() {
-        return String.format("Starting test %s : %s", className, name);
+    protected String describeTestEvent() {
+        return "Starting";
     }
 
 }

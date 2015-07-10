@@ -61,9 +61,7 @@ public class BuildWebsocketServlet extends WebSocketServlet {
                     head = eventStore.head();
 
                     if ((head - 1) > clientPosition) {
-                        List<Event> newEvents = eventStore.read(clientPosition, head - 1);
-                        System.out.println("Sending: " + clientPosition + " to " + (head - 1) + " (" + newEvents.size() + ")");
-
+                        final List<Event> newEvents = eventStore.read(clientPosition, head - 1);
 
                         for (Event newEvent : newEvents) {
                             serializeAndSend(remote, newEvent);

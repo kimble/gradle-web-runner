@@ -8,10 +8,7 @@ import java.util.List;
 /**
  * @author Kim A. Betti
  */
-public class TestCompleted extends Event {
-
-    private final String className;
-    private final String name;
+public class TestCompleted extends TestEvent {
 
     private final ResultType result;
     private final Integer durationMillis;
@@ -30,20 +27,12 @@ public class TestCompleted extends Event {
             @JsonProperty("exceptionMessage") String exceptionMessage,
             @JsonProperty("output") List<String> output) {
 
-        this.className = className;
-        this.name = name;
+        super(className, name);
+
         this.result = result;
         this.durationMillis = durationMillis;
         this.exceptionMessage = exceptionMessage;
         this.output = output;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public ResultType getResult() {
@@ -64,6 +53,11 @@ public class TestCompleted extends Event {
 
     public enum ResultType {
         SUCCESS, FAILURE, SKIPPED
+    }
+
+    @Override
+    protected String describeTestEvent() {
+        return "Completed with result " + result +  " after " + durationMillis + " milliseconds.";
     }
 
 }

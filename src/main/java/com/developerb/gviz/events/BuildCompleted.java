@@ -15,4 +15,9 @@ public class BuildCompleted extends Event {
         return exitValue;
     }
 
+    @Override
+    protected String describe() {
+        return "Build process completed with exit value: " + exitValue;
+    }
+
 }
