@@ -40,13 +40,22 @@
 
 
 
+            svg {
+                z-index: 0;
+            }
 
+            .counter-container {
+                position: relative;
+                z-index: 10;
+            }
 
             .moving-panel {
                 position: absolute;
+                z-index: 100;
 
                 border: 1px solid #eee;
                 box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
+                background-color: #fefefe;
 
                 transition-property: bottom, right, left;
                 transition-duration: 0.7s;
@@ -127,24 +136,6 @@
 
 
 
-        <!-- Gradle output -->
-        <div id="gradleOutput" class="moving-panel shy">
-            <div class="page-header">
-                <h3>Gradle <u>o</u>utput <small class="last-line">....</small></h3>
-            </div>
-
-            <div class="output-container"></div>
-        </div>
-
-        <!-- Details -->
-        <div id="buildDetails" class="moving-panel shy">
-            <div class="page-header">
-                <h3>Build <u>d</u>etails <small class="project-name">....</small></h3>
-            </div>
-
-            <dl class="details-container">
-        </div>
-
 
 
 
@@ -167,7 +158,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4 counter-container">
                     <h3>Remaining tasks</h3>
                     <div id="taskCountdown"></div>
 
@@ -176,6 +167,40 @@
                 </div>
             </div>
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Gradle output -->
+        <div id="gradleOutput" class="moving-panel shy">
+            <div class="page-header">
+                <h3>Gradle <u>o</u>utput <small class="last-line">....</small></h3>
+            </div>
+
+            <div class="output-container"></div>
+        </div>
+
+        <!-- Details -->
+        <div id="buildDetails" class="moving-panel shy">
+            <div class="page-header">
+                <h3>Build <u>d</u>etails <small class="project-name">....</small></h3>
+            </div>
+
+            <dl class="details-container">
+        </div>
+
+
 
 
 
