@@ -23,7 +23,7 @@ public abstract class TestEvent extends Event {
 
     @Override
     protected final String describe() {
-        return className + " / " + name + ": " + describeTestEvent();
+        return String.format("Test: %s / %s: %s", className, name, describeTestEvent());
     }
 
     protected abstract String describeTestEvent();

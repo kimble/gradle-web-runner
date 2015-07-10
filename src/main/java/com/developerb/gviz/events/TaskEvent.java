@@ -17,7 +17,7 @@ public abstract class TaskEvent extends Event {
 
     @Override
     protected final String describe() {
-        return path + ": " + describeTaskEvent();
+        return "Task: " + path + ": " + describeTaskEvent();
     }
 
     protected abstract String describeTaskEvent();

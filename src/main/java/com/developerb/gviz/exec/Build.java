@@ -80,6 +80,14 @@ public class Build {
                                     handleEvent(json, TaskCompleted.class);
                                     break;
 
+                                case "before-test":
+                                    handleEvent(json, TestStarted.class);
+                                    break;
+
+                                case "after-test":
+                                    handleEvent(json, TestCompleted.class);
+                                    break;
+
                                 case "build-completed":
                                     handleEvent(json, GradleBuildCompleted.class);
                                     break;
