@@ -34,3 +34,13 @@ Check out the source code then run the following command that'll download Gradle
 Then navigate to [http://localhost:8080/](http://localhost:8080/]) in your web browser.
 
 Btw, I use Chrome during development so no guaranties regarding other browsers.
+
+
+Things I might do
+-----------------
+As this is just a summer pet projects I'll probably never get around to do half of these things.
+
+- Bugfix: Doesn't work with Gradle daemon (server socket lifecycle)
+- Feature: Visualize task dependencies
+- Feature: Visualize how tasks run in parallel
+- Feature: Visualize test results 
