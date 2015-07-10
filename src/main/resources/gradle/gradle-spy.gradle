@@ -70,7 +70,7 @@ gradle.addListener(new BuildListener() {
         spy.send("settings-ready", [
                 settings: [
                     projectName: settings.rootProject.name,
-                    parallelProjectExecutionEnabled: settings.startParameter.parallelProjectExecutionEnabled,
+                    parallelProjectExecution: settings.startParameter.parallelProjectExecutionEnabled,
                     maxWorkerCount: settings.startParameter.maxWorkerCount,
                     configureOnDemand: settings.startParameter.configureOnDemand,
                     gradleUserHomeDir: settings.startParameter.gradleUserHomeDir?.absolutePath,

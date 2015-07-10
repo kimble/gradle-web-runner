@@ -24,6 +24,7 @@ function initializeTaskState(pubsub) {
                 var task = tasks[index];
                 task.isBlocked = isBlocked(task);
                 task.isReady = !task.hasCompleted && !task.isRunning && !task.isBlocked;
+                task.shortendPath = task.path.length > 30 ? "..." + task.path.substring(task.path.length - 30) : task.path;
             }
         }
 

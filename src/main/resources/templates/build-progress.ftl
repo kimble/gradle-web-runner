@@ -8,6 +8,9 @@
 
         <title>G-Viz - Build - ${buildNumber}</title>
 
+        <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+
+
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
@@ -17,7 +20,9 @@
 
         <script src="/assets/lib/gradle-settings.js"></script>
         <script src="/assets/lib/gradle-output.js"></script>
+        <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/new-tasks.js"></script>
+        <script src="/assets/lib/task-donut.js"></script>
 
         <style type="text/css">
             body {
@@ -31,31 +36,68 @@
 
 
 
-            #gradleOutput {
+
+
+            .moving-panel {
                 position: absolute;
+
+                border: 1px solid #eee;
+                box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
+
+                transition-property: bottom, right, left;
+                transition-duration: 0.7s;
+            }
+
+            .moving-panel .page-header {
+                cursor: pointer;
+            }
+
+            .moving-panel .output-container>div {
+                padding: 0 1em 0 1em;
+            }
+
+            .moving-panel .page-header {
+                margin: 0 1em 1em 1em;
+            }
+
+            /* Details */
+
+            #buildDetails {
+                bottom: 20px;
+                left: 30px;
+
+                width: 400px;
+                height: 400px;
+            }
+
+            #buildDetails.shy {
+                bottom: -340px;
+                left: 30px;
+            }
+
+            #buildDetails .details-container {
+                padding-left: 1em;
+            }
+
+            #buildDetails dd {
+                padding-left: 0.5em;
+                padding-bottom: 0.25em;
+            }
+
+
+            /* Output */
+
+            #gradleOutput {
                 bottom: 20px;
                 right: 20px;
 
                 width: 60%;
                 height: 400px;
-
-                border: 1px solid #eee;
-                box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
-
-                transition: bottom 0.7s, right 0.7s;
             }
 
             #gradleOutput.shy {
                 bottom: -340px;
                 right: -300px;
-            }
-
-            #gradleOutput .page-header {
-                cursor: pointer;
-            }
-
-            #gradleOutput .output-container>div {
-                padding: 0 1em 0 1em;
             }
 
             #gradleOutput .output-container {
@@ -65,10 +107,14 @@
                 overflow: auto;
             }
 
-            #gradleOutput .page-header {
-                margin: 0 1em 1em 1em;
-            }
 
+
+            /* Task donut */
+
+            #taskDonut text {
+                font-family: 'Architects Daughter', cursive;
+                font-size: 1.5em;
+            }
 
         </style>
     </head>
@@ -78,12 +124,21 @@
 
 
         <!-- Gradle output -->
-        <div id="gradleOutput" class="shy">
+        <div id="gradleOutput" class="moving-panel shy">
             <div class="page-header">
                 <h3>Gradle <u>o</u>utput <small class="last-line">....</small></h3>
             </div>
 
             <div class="output-container"></div>
+        </div>
+
+        <!-- Details -->
+        <div id="buildDetails" class="moving-panel shy">
+            <div class="page-header">
+                <h3>Build <u>d</u>etails <small class="project-name">....</small></h3>
+            </div>
+
+            <dl class="details-container">
         </div>
 
 
@@ -103,8 +158,8 @@
 
 
             <div class="row">
-                <div class="col-md-12" id="tasksScene">
-                </div>
+                <div class="col-md-4" id="taskDonut"></div>
+                <div class="col-md-8" id="tasksScene"></div>
             </div>
         </div>
 
@@ -162,6 +217,8 @@
                 createGradleOutputConsole(pubsub);
                 createGradleSettings(pubsub);
                 createTasks(pubsub);
+                createBuildDetailsTab(pubsub);
+                createTaskDonut(pubsub);
 
                 // State
 

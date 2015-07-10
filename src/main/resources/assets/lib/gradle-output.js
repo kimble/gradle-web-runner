@@ -4,7 +4,7 @@ function createGradleOutputConsole(pubsub) {
     var $gradleOutputContainer = $("#gradleOutput");
     var $lastLine = $gradleOutputContainer.find(".last-line");
     var $outputContainer = $gradleOutputContainer.find(".output-container");
-    var $header = $gradleOutputContainer.find(".page-header");
+    var $header = $gradleOutputContainer.find(".page-header h3");
 
 
     var toggleShyness = function() {

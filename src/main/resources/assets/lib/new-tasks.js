@@ -66,7 +66,7 @@ function createTasks(pubsub) {
 
 
             taskGroup.append("text")
-                .text(namedAttr("path"));
+                .text(namedAttr("shortendPath"));
 
 
             // enter + update
