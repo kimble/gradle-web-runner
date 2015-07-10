@@ -9,18 +9,18 @@ function createTaskDonut(pubsub) {
 
     var width = 300,
         height = 300,
-        radius = Math.min(width, height) / 2.5;
+        radius = Math.min(width, height) / 2;
 
-    var labelr = 100;
+    var labelr = 80;
 
 
     var color = d3.scale.ordinal()
         .domain(["Completed", "Ready", "Blocked", "Running"])
-        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b"]);
+        .range(["#C3F7A8", "#CBD0FA", "#FFD081", "#98CCBD"]);
 
     var arc = d3.svg.arc()
-        .outerRadius(radius - 10)
-        .innerRadius(radius - 60);
+        .outerRadius(radius - 80)
+        .innerRadius(radius - 100);
 
     var pie = d3.layout.pie()
         .sort(null)
