@@ -24,6 +24,8 @@ Screenshot
 ----------
 ![Screenshot](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2.png)
 
+![Screenshot](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2-output.png)
+
 
 Give it a spin
 --------------
