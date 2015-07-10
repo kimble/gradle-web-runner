@@ -22,9 +22,9 @@ function createTestReport(pubsub) {
     var skippedCounter = 0;
 
 
-    function updateTestList() {
-
-
+    pubsub.stream("test-list-updated")
+        .throttle(1000)
+        .onValue(function() {
         var d3classes = d3.select("#unorderedTestList")
             .selectAll(".test-class")
             .data(classes, namedAttr("className"));
@@ -32,24 +32,43 @@ function createTestReport(pubsub) {
 
         var enterClass = d3classes.enter()
             .append("li")
-            .attr("class", "test-class")
-            ;
+                .attr("class", "test-class")
+                ;
 
         enterClass.append("span")
             .text(function(cls) {
-                return cls.className.length > 30 ? ".." + cls.className.substring(cls.className.length - 30) : cls.className;
+                return cls.className.length > 45 ? ".." + cls.className.substring(cls.className.length - 45) : cls.className;
             });
 
-    }
+        var enterUl = enterClass.append("ul");
+
+
+
+        // enter + update
+
+        // Tests
+
+        d3classes.classed("success", function(t) { return !t.failed; })
+            .classed("fail", function(t) { return t.failed; });
+
+        d3classes.selectAll(".test")
+            .classed("success", function(t) { return !t.failed; })
+            .classed("fail", function(t) { return t.failed; })
+            .data(namedAttr("tests"), namedAttr("name"))
+            .enter()
+                .append("li")
+                    .attr("class", "test")
+                    .text(namedAttr("name"));
+    });
 
 
 
     pubsub.stream("TestStarted")
         .onValue(function(event) {
             if (!classMapping.hasOwnProperty(event.className)) {
-                console.log("Adding clsas for " + event.className + ": ", classMapping);
                 classMapping[event.className] = {
                     className: event.className,
+                    failed: false,
                     testMapping: { },
                     tests: []
                 };
@@ -67,7 +86,7 @@ function createTestReport(pubsub) {
             cls.testMapping[event.name] = test;
             cls.tests.push(test);
 
-            updateTestList();
+            pubsub.broadcast({ type: "test-list-updated", event: classes });
         });
 
     pubsub.stream("TestCompleted")
@@ -81,20 +100,27 @@ function createTestReport(pubsub) {
             test.durationMillis = event.durationMillis;
             test.exceptionMessage = event.exceptionMessage;
 
-            if (test.result === "SUCCESS") {
-                successCounter++;
-            }
-            if (test.result === "FAILURE") {
-                failureCounter++;
+            if (test.result === "FAILURE" && !cls.failed) {
+                cls.failed = true;
             }
 
-            if (test.result === "SKIPPED") {
+            pubsub.broadcast({ type: "test-list-updated", event: classes });
+        });
+
+
+    pubsub.stream("TestCompleted")
+        .onValue(function(event) {
+            if (event.result === "SUCCESS") {
+                successCounter++;
+            }
+            if (event.result === "FAILURE") {
+                failureCounter++;
+            }
+            if (event.result === "SKIPPED") {
                 skippedCounter++;
             }
 
             $small.html(successCounter + " successful, " + failureCounter + " failed and " + skippedCounter + " skipped tests executed");
-
-            updateTestList();
         });
 
 }

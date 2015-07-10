@@ -59,8 +59,12 @@
                 box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
                 background-color: #fefefe;
 
-                transition-property: top, bottom, right, left;
+                transition-property: background-color, top, bottom, right, left;
                 transition-duration: 0.7s;
+            }
+
+            .moving-panel.shy {
+                background-color: #fafafa;
             }
 
             .moving-panel .page-header {
@@ -126,6 +130,28 @@
                 height: 530px;
                 overflow: auto;
                 overflow-x: hidden;
+            }
+
+            #testReport #unorderedTestList {
+                padding-left: 0;
+            }
+
+            #testReport .test-container li {
+                font-family: "Ubuntu Mono", monospace;
+                list-style: none;
+                padding: 5px;
+                margin: 5px 0;
+            }
+
+            #testReport .test-container li.test {
+                margin-left: 1em;
+            }
+
+            #testReport .test-container li.success {
+                background-color: rgb(234, 242, 211);
+            }
+            #testReport .test-container li.fail {
+                background-color: rgb(242, 232, 211);
             }
 
 
