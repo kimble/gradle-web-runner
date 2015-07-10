@@ -57,11 +57,18 @@ function createTestReport(pubsub) {
                 .attr("class", "classes");
 
 
+            packagesSelection.classed("success", function(d) { return !d.failed; })
+                .classed("fail", function(d) { return d.failed; });
+
             // classes
+
 
             var testClasses = packagesSelection.select(".classes")
                 .selectAll(".test-class")
                 .data(namedAttr("classes"), namedAttr("className"));
+
+
+
 
             var testClass = testClasses.enter()
                     .append("div")
@@ -74,7 +81,15 @@ function createTestReport(pubsub) {
                 });
 
             testClass.append("div")
-                .attr("class", "individual-tests")
+                .attr("class", "individual-tests");
+
+
+            // Update status of test class
+
+            testClasses.classed("success", function(d) { return !d.failed; })
+                .classed("fail", function(d) { return d.failed; });
+
+            testClasses.selectAll(".individual-tests")
                 .classed("success", function (t) { return !t.failed; })
                 .classed("fail", function (t) { return t.failed; });
 
@@ -98,12 +113,10 @@ function createTestReport(pubsub) {
                 });
 
 
-
-
-
-
-
-
+            // Update test status class
+            tests.classed("success", function(d) { return d.result === "SUCCESS"; })
+                .classed("skipped", function(d) { return d.result === "SKIPPED"; })
+                .classed("fail", function(d) { return d.result === "FAILURE"; });
 
 
 
@@ -118,6 +131,7 @@ function createTestReport(pubsub) {
             if (!packageMapping.hasOwnProperty(packageName)) {
                 packageMapping[packageName] = {
                     packageName: packageName,
+                    failed: false,
                     classes: [],
                     classMapping: {}
                 };
@@ -167,8 +181,10 @@ function createTestReport(pubsub) {
             test.durationMillis = event.durationMillis;
             test.exceptionMessage = event.exceptionMessage;
 
-            if (test.result === "FAILURE" && !cls.failed) {
+            if (test.result === "FAILURE") {
+                testPackage.failed = true;
                 cls.failed = true;
+                test.failed = true;
             }
 
             pubsub.broadcast({type: "test-list-updated", event: packages});

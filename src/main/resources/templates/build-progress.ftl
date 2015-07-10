@@ -139,6 +139,14 @@
                 margin-top: 2em;
             }
 
+            #fullTestReport .test-package.fail .package-name {
+                color: rgb(244, 117, 51);
+            }
+
+            #fullTestReport .test-class.fail .class-name {
+                color: rgb(244, 117, 51);
+            }
+
             #fullTestReport .class-name {
                 font-family: 'Ubuntu Mono', monospace;
                 font-weight: bold;
@@ -168,6 +176,19 @@
             }
             #fullTestReport .individual-tests.fail {
                 border-left: 5px solid rgb(244, 117, 51);
+            }
+            #fullTestReport .individual-tests.skipped {
+                border-left: 5px solid rgb(244, 229, 69);
+            }
+
+
+
+            #fullTestReport .individual-test.success {
+
+            }
+            #fullTestReport .individual-test.fail {
+                font-weight: bold;
+                color: rgb(244, 117, 51);
             }
 
             #testReport .filter-container {
