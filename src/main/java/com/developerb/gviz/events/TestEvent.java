@@ -21,6 +21,10 @@ public abstract class TestEvent extends Event {
         return name;
     }
 
+    public String key() {
+        return String.format("%s/%s", className, name);
+    }
+
     @Override
     protected final String describe() {
         return String.format("Test: %s / %s: %s", className, name, describeTestEvent());

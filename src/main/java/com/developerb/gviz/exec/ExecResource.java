@@ -7,7 +7,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -51,6 +55,45 @@ public class ExecResource {
             return Response.ok()
                     .entity(view)
                     .build();
+        }
+        else {
+            return Response.status(NOT_FOUND)
+                    .entity("No such build: " + nr)
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("build/{nr}/estimates")
+    @Produces(APPLICATION_JSON)
+    public Response estimates(@PathParam("nr") Integer nr) {
+        Optional<Build> optionalBuild = buildRepository.get(nr);
+
+        if (optionalBuild.isPresent()) {
+            try {
+                Stream<Build> buildStream = buildRepository.streamSimilarBuilds(nr);
+                List<Build> similarBuilds = buildStream.collect(Collectors.toList());
+
+                if (similarBuilds.isEmpty()) {
+                    return Response.noContent()
+                            .entity("No similar builds found")
+                            .build();
+                }
+                else {
+                    Build lastSimilarBuild = similarBuilds.get(similarBuilds.size() - 1);
+                    BuildStatistics statistics = lastSimilarBuild.getStatistics();
+                    ConcurrentMap<String, Long> estimates = statistics.getDurations(); // Use last durations as estimates
+
+                    return Response.ok()
+                            .entity(estimates)
+                            .build();
+                }
+            }
+            catch (BuildRepository.CantFindSimilarBuilds ex) {
+                return Response.noContent()
+                        .entity(ex.getMessage())
+                        .build();
+            }
         }
         else {
             return Response.status(NOT_FOUND)

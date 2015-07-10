@@ -12,18 +12,21 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Kim A. Betti
  */
-public class Build {
+public class Build implements Comparable<Build> {
 
     private final Logger log;
 
     private final Integer buildNumber;
     private final GradleForker gradleForker;
     private final ObjectMapper jackson;
+
     private final EventStore eventStore = new EventStore();
+    private final BuildStatistics statistics = new BuildStatistics();
 
     private volatile BuildContext buildContext;
 
@@ -81,7 +84,8 @@ public class Build {
                                     break;
 
                                 case "task-after":
-                                    handleEvent(json, TaskCompleted.class);
+                                    TaskCompleted taskCompleted = handleEvent(json, TaskCompleted.class);
+                                    statistics.reportDuration(taskCompleted.getPath(), taskCompleted.getDurationMillis());
                                     break;
 
                                 case "before-test":
@@ -89,7 +93,8 @@ public class Build {
                                     break;
 
                                 case "after-test":
-                                    handleEvent(json, TestCompleted.class);
+                                    TestCompleted testCompleted = handleEvent(json, TestCompleted.class);
+                                    statistics.reportDuration(testCompleted.key(), testCompleted.getDurationMillis());
                                     break;
 
                                 case "build-completed":
@@ -110,11 +115,12 @@ public class Build {
         }
     }
 
-    private void handleEvent(JsonNode json, Class<? extends Event> eventType) throws com.fasterxml.jackson.core.JsonProcessingException {
-        Event event = jackson.treeToValue(json.path("event"), eventType);
+    private <T extends Event> T handleEvent(JsonNode json, Class<T> eventType) throws com.fasterxml.jackson.core.JsonProcessingException {
+        T event = jackson.treeToValue(json.path("event"), eventType);
         log.info("Event: {}", event);
 
         eventStore.push(event);
+        return event;
     }
 
     public void onUnknownFailure(String message, Exception ex) {
@@ -143,8 +149,16 @@ public class Build {
         return buildNumber;
     }
 
-    public BuildContext getBuildContext() {
-        return buildContext;
+    public Optional<BuildContext> getBuildContext() {
+        return Optional.of(buildContext);
+    }
+
+    public BuildStatistics getStatistics() {
+        return statistics;
+    }
+
+    public boolean hasMatchingContext(BuildContext other) {
+        return buildContext != null && buildContext.equals(other);
     }
 
     @Override
@@ -154,6 +168,11 @@ public class Build {
 
     public EventStore getEventStore() {
         return eventStore;
+    }
+
+    @Override
+    public int compareTo(Build o) {
+        return buildNumber - o.buildNumber;
     }
 
 }
