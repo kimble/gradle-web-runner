@@ -12,7 +12,10 @@
 
 
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/assets/flipclock/flipclock.css" rel="stylesheet">
+
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
+        <script src="/assets/flipclock/flipclock.min.js"></script>
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
@@ -23,6 +26,7 @@
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/new-tasks.js"></script>
         <script src="/assets/lib/task-donut.js"></script>
+        <script src="/assets/lib/counters.js"></script>
 
         <style type="text/css">
             body {
@@ -161,6 +165,16 @@
                 <div class="col-md-4" id="taskDonut"></div>
                 <div class="col-md-8" id="tasksScene"></div>
             </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>Remaining tasks</h3>
+                    <div id="taskCountdown"></div>
+
+                    <h3>Executed tests</h3>
+                    <div id="testCounter"></div>
+                </div>
+            </div>
         </div>
 
 
@@ -219,6 +233,7 @@
                 createTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 createTaskDonut(pubsub);
+                createCounters(pubsub);
 
                 // State
 
