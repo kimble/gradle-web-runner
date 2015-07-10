@@ -198,8 +198,8 @@
             #testReport .filter-container {
                 margin: 0.5em;
                 padding: 0.5em;
-                min-height: 200px;
-                background-color: #F6F7F4;
+                height: 525px;
+                background-color: #fafafa;
             }
 
 

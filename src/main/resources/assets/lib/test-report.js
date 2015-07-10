@@ -105,7 +105,10 @@ function createTestReport(pubsub) {
                 .append("div")
                 .attr("class", "individual-test")
                 .on("click", function(d) {
-                    console.log(d.output);
+                    var $el = $(this);
+                    if (d.output !== null && $el.find("pre").length === 0) {
+                        $el.append("<pre>" + d.output + "</pre>");
+                    }
                 });
 
 
