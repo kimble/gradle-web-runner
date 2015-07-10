@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
+import org.zeroturnaround.exec.StartedProcess;
 import org.zeroturnaround.exec.stream.LogOutputStream;
 
 import java.io.File;
@@ -26,9 +27,14 @@ public class GradleForker {
 
     public void execute(Build build, File directory, String tasks) {
         try {
-            ProcessExecutor executor = configureExecutor(directory, tasks);
+            List<String> command = createCommandLine(tasks);
+            ProcessExecutor executor = configureExecutor(directory, command);
             redirectOutputToBuild(build, executor);
-            ProcessResult result = executor.executeNoTimeout(); // Blocking..
+
+            StartedProcess process = executor.start();
+            build.onGradleProcessForked(directory, command);
+            ProcessResult result = process.getFuture().get();
+
             build.onCompletion(result.getExitValue());
         }
         catch (InvalidExitValueException ex) {
@@ -39,16 +45,20 @@ public class GradleForker {
         }
     }
 
-    private ProcessExecutor configureExecutor(File directory, String tasks) {
-        List<String> command = Lists.newArrayList("./gradlew", "--stacktrace", "--no-daemon", "--init-script", gradleInitScript.getAbsolutePath());
-        Collections.addAll(command, tasks.split(" "));
-
+    private ProcessExecutor configureExecutor(File directory, List<String> command) {
         return new ProcessExecutor()
                 .directory(directory)
                 .environment("SPY_PORT", "10000")
                 .command(command)
                 .readOutput(true)
-                .exitValues(0);
+                .destroyOnExit()
+                .exitValue(0);
+    }
+
+    private List<String> createCommandLine(String tasks) {
+        List<String> command = Lists.newArrayList("./gradlew", "--stacktrace", "--no-daemon", "--init-script", gradleInitScript.getAbsolutePath());
+        Collections.addAll(command, tasks.split(" "));
+        return command;
     }
 
     /**

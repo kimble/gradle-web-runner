@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Kim A. Betti
@@ -23,6 +24,9 @@ public class Build {
     private final GradleForker gradleForker;
     private final ObjectMapper jackson;
     private final EventStore eventStore = new EventStore();
+
+    private volatile BuildContext buildContext;
+
 
     public Build(Integer buildNumber, GradleForker gradleForker, ObjectMapper jackson) {
         this.log  = LoggerFactory.getLogger("build-" + buildNumber);
@@ -124,6 +128,12 @@ public class Build {
         gradleForker.execute(this, directory, tasks);
     }
 
+    public void onGradleProcessForked(File directory, List<String> command) {
+        GradleProcessForked event = new GradleProcessForked(directory, command);
+        buildContext = new BuildContext(event.getPath(), event.getCommandLine());
+        eventStore.push(event);
+    }
+
     public void onCompletion(int exitValue) {
         Event completionEvent = new BuildCompleted(exitValue);
         eventStore.push(completionEvent);
@@ -133,12 +143,17 @@ public class Build {
         return buildNumber;
     }
 
+    public BuildContext getBuildContext() {
+        return buildContext;
+    }
+
     @Override
     public String toString() {
-        return "Build #" + buildNumber;
+        return "Build #" + buildNumber + " -- " + (buildContext != null ? buildContext : "Not forked yet");
     }
 
     public EventStore getEventStore() {
         return eventStore;
     }
+
 }
