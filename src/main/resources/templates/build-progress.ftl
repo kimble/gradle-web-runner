@@ -125,34 +125,44 @@
                 right: -600px;
             }
 
-            #testReport .test-container {
-                margin: 0.5em;
+            #testReport #fullTestReport {
+                margin: 0.5em 1em;
                 height: 530px;
                 overflow: auto;
                 overflow-x: hidden;
             }
 
-            #testReport #unorderedTestList {
-                padding-left: 0;
+            #fullTestReport .package-name {
+                font-family: 'Ubuntu Mono', monospace;
+                font-weight: bold;
+                font-size: 1.4em;
+                margin-top: 2em;
             }
 
-            #testReport .test-container li {
-                font-family: "Ubuntu Mono", monospace;
-                list-style: none;
-                padding: 5px;
-                margin: 5px 0;
+            #fullTestReport .class-name {
+                font-family: 'Ubuntu Mono', monospace;
+                font-weight: bold;
+                font-size: 1.3em;
             }
 
-            #testReport .test-container li.test {
-                margin-left: 1em;
+            #fullTestReport .test-name {
+                font-family: 'Ubuntu Mono', monospace;
+                font-size: 1.1em;
             }
 
-            #testReport .test-container li.success {
-                background-color: rgb(234, 242, 211);
+            #fullTestReport .individual-tests {
+                padding-left: 0.5em;
+                font-size: 0.9em;
             }
-            #testReport .test-container li.fail {
-                background-color: rgb(242, 232, 211);
+
+            #fullTestReport .individual-tests.success {
+                border-left: 5px solid rgb(202, 215, 94);
             }
+            #fullTestReport .individual-tests.fail {
+                border-left: 5px solid rgb(244, 117, 51);
+            }
+
+
 
 
 
@@ -291,14 +301,7 @@
             </div>
 
             <div class="test-container">
-                <div class="row">
-                    <div class="col-md-4">
-                        <ul id="unorderedTestList"></ul>
-                    </div>
-                    <div class="col-md-8">
-                        report
-                    </div>
-                </div>
+                <div id="fullTestReport"></div>
             </div>
         </div>
 

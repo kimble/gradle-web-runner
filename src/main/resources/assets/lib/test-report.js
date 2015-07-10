@@ -7,7 +7,7 @@ function createTestReport(pubsub) {
     var $header = $gradleOutputContainer.find(".page-header h3");
 
 
-    var toggleShyness = function() {
+    var toggleShyness = function () {
         $gradleOutputContainer.toggleClass("shy");
     };
 
@@ -15,8 +15,12 @@ function createTestReport(pubsub) {
     pubsub.stream("key-down-T").onValue(toggleShyness);
 
 
-    var classes = [];
-    var classMapping = { };
+    // D3 state
+    var packages = [];
+
+    // Helper
+    var packageMapping = {};
+
     var successCounter = 0;
     var failureCounter = 0;
     var skippedCounter = 0;
@@ -24,56 +28,111 @@ function createTestReport(pubsub) {
 
     pubsub.stream("test-list-updated")
         .throttle(1000)
-        .onValue(function() {
-        var d3classes = d3.select("#unorderedTestList")
-            .selectAll(".test-class")
-            .data(classes, namedAttr("className"));
+        .onValue(function(packages) {
+
+            console.log(packages);
 
 
-        var enterClass = d3classes.enter()
-            .append("li")
-                .attr("class", "test-class")
-                ;
-
-        enterClass.append("span")
-            .text(function(cls) {
-                return cls.className.length > 45 ? ".." + cls.className.substring(cls.className.length - 45) : cls.className;
-            });
-
-        var enterUl = enterClass.append("ul");
+            var packagesSelection = d3.select("#fullTestReport")
+                .selectAll(".test-package")
+                .data(packages, namedAttr("packageName"));
 
 
+            var testPackage = packagesSelection.enter()
+                .append("div")
+                .attr("class", "test-package");
 
-        // enter + update
+            testPackage.append("h2")
+                .attr("class", "package-name")
+                .text(namedAttr("packageName"));
 
-        // Tests
+            testPackage.append("hr");
 
-        d3classes.classed("success", function(t) { return !t.failed; })
-            .classed("fail", function(t) { return t.failed; });
+            var classes = testPackage.append("div")
+                .attr("class", "classes");
 
-        d3classes.selectAll(".test")
-            .classed("success", function(t) { return !t.failed; })
-            .classed("fail", function(t) { return t.failed; })
-            .data(namedAttr("tests"), namedAttr("name"))
-            .enter()
-                .append("li")
-                    .attr("class", "test")
-                    .text(namedAttr("name"));
-    });
 
+            // classes
+
+            var testClasses = packagesSelection.select(".classes")
+                .selectAll(".test-class")
+                .data(namedAttr("classes"), namedAttr("className"));
+
+            var testClass = testClasses.enter()
+                    .append("div")
+                    .attr("class", "test-class");
+
+            testClass.append("h3")
+                .attr("class", "class-name")
+                .text(function(d) {
+                    return d.simpleClassName;
+                });
+
+            testClass.append("div")
+                .attr("class", "individual-tests")
+                .classed("success", function (t) { return !t.failed; })
+                .classed("fail", function (t) { return t.failed; });
+
+
+            // tests (methods)
+
+            var tests = testClasses.select(".individual-tests")
+                .selectAll(".individual-test")
+                .data(namedAttr("tests"), namedAttr("name"));
+
+
+            var test = tests.enter()
+                .append("div")
+                .attr("class", "individual-test");
+
+
+            test.append("h4")
+                .attr("class", "test-name")
+                .text(function(d) {
+                    return d.name;
+                });
+
+
+
+
+
+
+
+
+
+
+
+        });
 
 
     pubsub.stream("TestStarted")
-        .onValue(function(event) {
-            if (!classMapping.hasOwnProperty(event.className)) {
-                classMapping[event.className] = {
+        .onValue(function (event) {
+            var simpleClassName = event.className.substring(event.className.lastIndexOf('.') + 1);
+            var packageName = event.className.substring(0, event.className.lastIndexOf('.'));
+
+            if (!packageMapping.hasOwnProperty(packageName)) {
+                packageMapping[packageName] = {
+                    packageName: packageName,
+                    classes: [],
+                    classMapping: {}
+                };
+
+                packages.push(packageMapping[packageName]);
+            }
+
+            var classPackage = packageMapping[packageName];
+
+            if (!classPackage.classMapping.hasOwnProperty(event.className)) {
+                classPackage.classMapping[event.className] = {
+                    packageName: packageName,
+                    simpleClassName: simpleClassName,
                     className: event.className,
                     failed: false,
-                    testMapping: { },
+                    testMapping: {},
                     tests: []
                 };
 
-                classes.push(classMapping[event.className]);
+                classPackage.classes.push(classPackage.classMapping[event.className]);
             }
 
             // Add the test to the class
@@ -82,16 +141,19 @@ function createTestReport(pubsub) {
                 isRunning: true
             };
 
-            var cls = classMapping[event.className];
+            var cls = classPackage.classMapping[event.className];
             cls.testMapping[event.name] = test;
             cls.tests.push(test);
 
-            pubsub.broadcast({ type: "test-list-updated", event: classes });
+            pubsub.broadcast({type: "test-list-updated", event: packages});
         });
 
     pubsub.stream("TestCompleted")
-        .onValue(function(event) {
-            var cls = classMapping[event.className];
+        .onValue(function (event) {
+            var packageName = event.className.substring(0, event.className.lastIndexOf('.'));
+
+            var testPackage = packageMapping[packageName];
+            var cls = testPackage.classMapping[event.className];
             var test = cls.testMapping[event.name];
 
             test.isRunning = false;
@@ -104,12 +166,12 @@ function createTestReport(pubsub) {
                 cls.failed = true;
             }
 
-            pubsub.broadcast({ type: "test-list-updated", event: classes });
+            pubsub.broadcast({type: "test-list-updated", event: packages});
         });
 
 
     pubsub.stream("TestCompleted")
-        .onValue(function(event) {
+        .onValue(function (event) {
             if (event.result === "SUCCESS") {
                 successCounter++;
             }
