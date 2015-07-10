@@ -41,6 +41,9 @@ Things I might do
 As this is just a summer pet projects I'll probably never get around to do half of these things.
 
 - Bugfix: Doesn't work with Gradle daemon (server socket lifecycle)
+- Bugfix: Increase websocket idle timeout (java.util.concurrent.TimeoutException: Idle timeout expired: 10003/10000 ms)
 - Feature: Visualize task dependencies
 - Feature: Visualize how tasks run in parallel
-- Feature: Visualize test results 
+- Feature: Visualize test results
+- Cleanup: Move css out into separate .css files
+- Cleanup: Replace js dependencies with webjars

@@ -26,6 +26,7 @@
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/running-tasks.js"></script>
         <script src="/assets/lib/task-donut.js"></script>
+        <script src="/assets/lib/test-report.js"></script>
         <script src="/assets/lib/counters.js"></script>
 
         <style type="text/css">
@@ -58,7 +59,7 @@
                 box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
                 background-color: #fefefe;
 
-                transition-property: bottom, right, left;
+                transition-property: top, bottom, right, left;
                 transition-duration: 0.7s;
             }
 
@@ -74,7 +75,13 @@
                 margin: 0 1em 1em 1em;
             }
 
-            /* Details */
+            .moving-panel.upside-down .page-header {
+                position: absolute;
+                bottom: -20px;
+                width: 95%;
+            }
+
+            /* Build details */
 
             #buildDetails {
                 bottom: 20px;
@@ -97,6 +104,30 @@
                 padding-left: 0.5em;
                 padding-bottom: 0.25em;
             }
+
+
+            /* Test reports */
+
+            #testReport {
+                top: 20px;
+                right: 30px;
+
+                width: 1200px;
+                height: 600px;
+            }
+
+            #testReport.shy {
+                top: -540px;
+                right: -600px;
+            }
+
+            #testReport .test-container {
+                margin: 0.5em;
+                height: 530px;
+                overflow: auto;
+                overflow-x: hidden;
+            }
+
 
 
             /* Output */
@@ -217,13 +248,32 @@
             <div class="output-container"></div>
         </div>
 
-        <!-- Details -->
+        <!-- Build details -->
         <div id="buildDetails" class="moving-panel shy">
             <div class="page-header">
                 <h3>Build <u>d</u>etails <small class="project-name">....</small></h3>
             </div>
 
             <dl class="details-container">
+        </div>
+
+        <!-- Tests -->
+        <div id="testReport" class="moving-panel upside-down shy">
+            <div class="page-header">
+                <hr/>
+                <h3><u>T</u>est report <small> - Awaiting test results..</small></h3>
+            </div>
+
+            <div class="test-container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <ul id="unorderedTestList"></ul>
+                    </div>
+                    <div class="col-md-8">
+                        report
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -285,6 +335,7 @@
                 createBuildDetailsTab(pubsub);
                 createTaskDonut(pubsub);
                 createCounters(pubsub);
+                createTestReport(pubsub);
 
                 // State
 
