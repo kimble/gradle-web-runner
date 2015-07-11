@@ -43,9 +43,7 @@ Then navigate to [http://localhost:8080/](http://localhost:8080/]) in your web b
 Btw, I use Chrome during development so no guaranties regarding other browsers.
 
 
-Known restrictions
-------------------
-No windows support (people using Windows does not deserve nice things anyway).
+
 
 Things I might do
 -----------------
