@@ -55,7 +55,7 @@ As this is just a summer pet projects I'll probably never get around to do half 
 - **Bugfix:** Increase websocket idle timeout (java.util.concurrent.TimeoutException: Idle timeout expired: 10003/10000 ms)
 - **Feature:** Visualize task dependencies
 - **Feature:** Visualize how tasks run in parallel
-- **Feature:** Visualize test results
+- **Improvement:** Filter / search test reports
 - **Cleanup:** Move css out into separate .css files
 - **Cleanup:** Replace js dependencies with webjars
 - **Improvement:** Windows support (use ./gradlew.bat instead of ./gradlew and so on..)
