@@ -1,6 +1,8 @@
 package com.developerb.gviz.exec;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import io.dropwizard.views.View;
 
 import javax.ws.rs.*;
@@ -33,9 +35,9 @@ public class ExecResource {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response exec(ExecRequest request) {
-        Build build = buildRepository.create();
+        Build build = buildRepository.create(request.asParameters());
 
-        new Thread(() -> build.execute(request.directory(), request.tasks)).start();
+        new Thread(build::execute).start(); // Todo: Be a bit more clever about this..?
 
         return Response.ok()
                 .entity(ImmutableMap.of("number", build.getBuildNumber()))
@@ -108,6 +110,35 @@ public class ExecResource {
         public String path;
         public String tasks;
 
+        public boolean configureOnDemand;
+        public boolean buildInParallel;
+        public boolean allowDaemon;
+
+        public int maximumWorkers;
+
+        public BuildParameters asParameters() {
+            File directory = directory();
+            List<BuildParameters.BuildFeature> features = features();
+
+            return new BuildParameters(directory, tasks, features);
+        }
+
+        private List<BuildParameters.BuildFeature> features() {
+            List<BuildParameters.BuildFeature> features = Lists.newArrayList();
+
+            if (configureOnDemand) {
+                features.add(new BuildParameters.ConfigureOnDemand());
+            }
+            if (allowDaemon) {
+                features.add(new BuildParameters.EnableDaemon());
+            }
+            if (buildInParallel) {
+                features.add(new BuildParameters.BuildInParallel(maximumWorkers));
+            }
+
+            return features;
+        }
+
         public File directory() {
             return new File(path);
         }
@@ -122,6 +153,10 @@ public class ExecResource {
         public BuildView(Build build) {
             super("/templates/build-progress.ftl", UTF_8);
             this.build = build;
+        }
+
+        public String getCommandLine() {
+            return Joiner.on(" ").join(build.buildParameters().createCommandLine());
         }
 
         public Integer getBuildNumber() {

@@ -284,7 +284,7 @@
             <div class="row">
                 <div id="headerRow" class="col-md-12">
                     <div class="page-header">
-                        <h1>#${buildNumber} <span id="projectName">Loading data...</span></h1>
+                        <h1>#${buildNumber} <span id="projectName">Loading data...</span> <small>${commandLine}</small></h1>
                     </div>
                 </div>
             </div>
@@ -397,11 +397,14 @@
                 var pubsub = (function() {
                     var bus = new Bacon.Bus();
 
+                    // Create a stream of simple keyboard commands
                     $(document).keydown(function(event) {
                         var key = String.fromCharCode(event.keyCode);
                         bus.push({type: "key-down-" + key, event: {}})
                     });
 
+                    // Dead simple pubsub event-bus with reactive
+                    // capabilities provided by Bacon.js
                     return {
                         broadcast: function(event) {
                             bus.push(event);

@@ -7,8 +7,14 @@
 
         <title>G-Viz</title>
 
-        <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/mdl/material.min.css">
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
+        <script src="/assets/mdl/material.min.js"></script>
+        <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
 
         <style type="text/css">
             .input-dashed {
@@ -28,6 +34,30 @@
             #headerRow {
                 margin-top: 4em;
             }
+
+            body {
+                background-color: #FAFAFA;
+            }
+
+            .container {
+                background-color: white;
+                border: 1px solid #fefefe;
+                box-shadow: 0 0 50px rgba(100, 100, 100, 0.05);
+                border-radius: 2px;
+                margin-top: 10%;
+                padding-bottom: 2em;
+            }
+
+            .container h1 {
+                margin-top: 5px;
+                font-size: 3em;
+            }
+
+            .container h2 {
+                font-family: 'Architects Daughter', cursive;
+                font-size: 3em;
+                margin: 0.3em 0 0.5em 0;
+            }
         </style>
     </head>
 
@@ -35,30 +65,89 @@
 
         <div class="container">
             <div class="row">
-                <div id="headerRow" class="col-md-12">
-                    <div class="page-header">
-                        <h1>G-VIZ <small> - Gradle web executor</small></h1>
+                <div class="col-md-12">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <h2>Build</h2>
+
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 700px">
+                        <input class="mdl-textfield__input" type="text" id="path" value="/home/kim/development/mine-pasientreiser/pro-ng" autofocus />
+                        <label class="mdl-textfield__label" for="sample3">/path/to/project</label>
+                    </div>
+
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 400px">
+                        <input class="mdl-textfield__input" type="text" id="tasks" value="clean test" />
+                        <label class="mdl-textfield__label" for="sample3">:tasks</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h2>Configuration</h2>
+
+                    <div>
+                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="configureOnDemand">
+                            <input type="checkbox" id="configureOnDemand" class="mdl-checkbox__input" />
+                            <span class="mdl-checkbox__label">Configure on demand</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="useDaemon">
+                            <input type="checkbox" id="useDaemon" class="mdl-checkbox__input" />
+                            <span class="mdl-checkbox__label">Enable daemon</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="parallelBuild">
+                            <input type="checkbox" id="parallelBuild" class="mdl-checkbox__input" />
+                            <span class="mdl-checkbox__label">Build in parallel <span id="maxWorkerCountLabel"></span></span>
+                        </label>
+
+                        <label class="hidden" for="maxWorkers" id="maxWorkersLabel">
+                            <p style="width: 300px; text-align: center; font-style: italic; margin-top: 1em;">
+                                <input class="mdl-slider mdl-js-slider" type="range" id="maxWorkers" min="0" max="30" value="4" step="1" />
+
+                                Using a maximum of <span id="maximumNumberOfWorkers" style="font-weight: bold"></span> workers.
+                            </p>
+                        </label>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <input type="text" class="input-dashed" id="path" placeholder="/path/to/project" value="/home/kim/development/mine-pasientreiser/pro-ng" autofocus />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-8">
-                    <input type="text" class="input-dashed" id="tasks" placeholder=":tasks" value="clean test" />
-                </div>
-            </div>
 
             <div class="row">
                 <div class="col-md-12">
-                    <input type="button" id="go" value="GO!" class="btn btn-success btn-lg" />
+                    <button id="go" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                        Execute!
+                    </button>
                 </div>
             </div>
         </div>
+
+
+        <script type="text/javascript">
+
+
+/*
+            (function() {
+                "use strict";
+
+                $("#go").on("click", function() {
+                    var path = $("#path").val();
+                    var tasks = $("#tasks").val();
+
+
+                    console.log("Posting..");
+                    $.postJSON('/api/exec', { path: path, tasks: tasks }, function(response) {
+                        window.location = "/api/build/" + response.number
+                    });
+
+                });
+            })();*/
+        </script>
 
 
         <script type="text/javascript">
@@ -80,19 +169,62 @@
             (function() {
                 "use strict";
 
-                $("#go").on("click", function() {
-                    var path = $("#path").val();
-                    var tasks = $("#tasks").val();
+                function createCheckboxStream(selector) {
+                    var $el = $(selector);
+                    return $el.asEventStream("change").map(".target.checked").toProperty($el.is(":checked"));
+                }
+
+                function createInputStream(selector) {
+                    var $el = $(selector);
+                    return $el.asEventStream("change").map(".target.value").toProperty($el.val());
+                }
 
 
-                    console.log("Posting..");
-                    $.postJSON('/api/exec', { path: path, tasks: tasks }, function(response) {
+                // Build
+                var path = createInputStream("#path");
+                var tasks = createInputStream("#tasks");
+
+
+
+                // Options
+
+                var toggleConfigureOnDemand = createCheckboxStream("#configureOnDemand");
+                var toggleDaemon = createCheckboxStream("#useDaemon");
+                var toggleParallelBuild = createCheckboxStream("#parallelBuild");
+
+
+                toggleParallelBuild.not().assign($("#maxWorkersLabel"), "toggleClass", "hidden");
+
+                var maxWorkerCount = createInputStream("#maxWorkers");
+                maxWorkerCount.assign($("#maximumNumberOfWorkers"), "html");
+
+
+
+                // All together now
+
+                var requestTemplate = Bacon.combineTemplate({
+                    path: path,
+                    tasks: tasks,
+
+                    configureOnDemand: toggleConfigureOnDemand,
+                    buildInParallel: toggleParallelBuild,
+                    maximumWorkers: maxWorkerCount,
+                    allowDaemon: toggleDaemon
+                });
+
+
+                // Send request
+
+                var requestStream = $("#go").asEventStream("click");
+                requestTemplate.sampledBy(requestStream).onValue(function(requestPayload) {
+                    $.postJSON('/api/exec', requestPayload, function(response) {
                         window.location = "/api/build/" + response.number
                     });
-
                 });
+
             })();
         </script>
+
 
     </body>
 </html>

@@ -8,12 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Kim A. Betti
@@ -29,14 +27,15 @@ public class Build implements Comparable<Build> {
     private final EventStore eventStore = new EventStore();
     private final BuildStatistics statistics = new BuildStatistics();
 
-    private volatile BuildContext buildContext;
+    private final BuildParameters buildParameters;
 
 
-    public Build(Integer buildNumber, GradleForker gradleForker, ObjectMapper jackson) {
+    public Build(Integer buildNumber, BuildParameters parameters, GradleForker gradleForker, ObjectMapper jackson) {
         this.log  = LoggerFactory.getLogger("build-" + buildNumber);
         this.gradleForker = gradleForker;
-        this.jackson = jackson;
+        this.buildParameters = parameters;
         this.buildNumber = buildNumber;
+        this.jackson = jackson;
     }
 
 
@@ -136,13 +135,12 @@ public class Build implements Comparable<Build> {
         eventStore.push(event);
     }
 
-    public void execute(File directory, String tasks) {
-        gradleForker.execute(this, directory, tasks);
+    public void execute() {
+        gradleForker.execute(this, buildParameters);
     }
 
-    public void onGradleProcessForked(File directory, List<String> command) {
-        GradleProcessForked event = new GradleProcessForked(directory, command);
-        buildContext = new BuildContext(event.getPath(), event.getCommandLine());
+    public void onGradleProcessForked(BuildParameters parameters, List<String> finalCommandLine) {
+        GradleProcessForked event = new GradleProcessForked(parameters.projectDirectory(), finalCommandLine);
         eventStore.push(event);
     }
 
@@ -155,30 +153,29 @@ public class Build implements Comparable<Build> {
         return buildNumber;
     }
 
-    public Optional<BuildContext> getBuildContext() {
-        return Optional.of(buildContext);
-    }
-
     public BuildStatistics getStatistics() {
         return statistics;
     }
 
-    public boolean hasMatchingContext(BuildContext other) {
-        return buildContext != null && buildContext.equals(other);
+    public boolean hasMatchingContext(BuildParameters other) {
+        return buildParameters != null && buildParameters.equals(other);
     }
 
     @Override
     public String toString() {
-        return "Build #" + buildNumber + " -- " + (buildContext != null ? buildContext : "Not forked yet");
+        return "Build #" + buildNumber + " -- " + (buildParameters != null ? buildParameters : "Not forked yet");
     }
 
     public EventStore getEventStore() {
         return eventStore;
     }
 
+    public BuildParameters buildParameters() {
+        return buildParameters;
+    }
+
     @Override
     public int compareTo(Build o) {
         return buildNumber - o.buildNumber;
     }
-
 }

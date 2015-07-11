@@ -3,7 +3,6 @@ package com.developerb.gviz.exec;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,9 +24,9 @@ public class BuildRepository {
         this.jackson = jackson;
     }
 
-    public Build create() {
+    public Build create(BuildParameters parameters) {
         Integer buildNumber = sequence.incrementAndGet();
-        Build build = new Build(buildNumber, gradleForker, jackson);
+        Build build = new Build(buildNumber, parameters, gradleForker, jackson);
         builds.put(buildNumber, build);
 
         return build;
@@ -46,20 +45,13 @@ public class BuildRepository {
         }
         else {
             Build build = optionalBuild.get();
-            Optional<BuildContext> optionalBuildContext = build.getBuildContext();
+            BuildParameters buildParameters = build.buildParameters();
 
-            if (optionalBuildContext.isPresent()) {
-                BuildContext buildContext = optionalBuildContext.get();
-
-                return builds.keySet().stream()
-                        .map(builds::get)
-                        .filter(b -> !buildNumber.equals(b.getBuildNumber()))
-                        .filter(b -> b.hasMatchingContext(buildContext))
-                        .sorted();
-            }
-            else {
-                throw new CantFindSimilarBuilds("No build context yet for " + buildNumber);
-            }
+            return builds.keySet().stream()
+                    .map(builds::get)
+                    .filter(b -> !buildNumber.equals(b.getBuildNumber()))
+                    .filter(b -> b.hasMatchingContext(buildParameters))
+                    .sorted();
         }
     }
 
