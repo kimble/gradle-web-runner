@@ -24,7 +24,7 @@ Screenshots
 ------------------------
 
 ### Configuration page
-![Configuration page](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/configuraiton-page.png)
+![Configuration page](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/configuration-page.png)
 
 ### Test report
 ![Test report](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2.png)
