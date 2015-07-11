@@ -21,20 +21,25 @@ class BuildSpy {
         socketWriter = bufferedSocketOutputStream.newWriter("utf-8")
     }
 
-    synchronized void send(String key, Object payload) {
+    synchronized void send(String type, Object payload) {
         try {
             socketWriter.write(JsonOutput.toJson([
-                    type: key,
+                    type: type,
                     event: payload
             ]) + "\n")
         }
         catch (Exception ex) {
-            throw new GradleException("failed to send message", ex)
+            throw new GradleException("failed to send message '$type': <$payload>", ex)
         }
     }
 
     void terminate() {
-        socketWriter.close()
+        try {
+            socketWriter.close()
+        }
+        finally {
+            serverSocket.close()
+        }
     }
 
 }
@@ -49,7 +54,8 @@ if (!spyPort) {
 
 logger.lifecycle "Gradle build spy starting on port $spyPort"
 new Thread({
-    Thread.sleep(500) // Gi litt tid til å åpne porten
+    Thread.sleep(500) // Give some time for the port to open
+    // - The client on the other end will listen for the following message.
     logger.lifecycle "I'll be hanging around waiting for the g-viz to connect.."
 }).start()
 
@@ -58,14 +64,97 @@ BuildSpy spy = new BuildSpy(Integer.parseInt(spyPort))
 
 
 
-gradle.addListener(new BuildListener() {
 
-    void buildStarted(Gradle gradle) {
+// Gradle event listeners
+
+gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
+    spy.send("task-graph-ready",
+            [
+                    tasks: graph.allTasks.collect { Task task ->
+                        [
+                                name: task.name,
+                                path: task.path,
+                                description: task.description,
+                                dependsOn: task.taskDependencies.getDependencies(task).collect { it.path }
+                        ]
+                    }
+            ]
+    )
+
+    /**
+     * Attach listeners for test execution and output
+     * (leveraging Gradle's framework agnostic api)
+     */
+    graph.allTasks.forEach { Task task ->
+        if (task instanceof Test) {
+
+            task.doFirst {
+                task.ext.testOutput = [:]
+            }
+
+            task.doLast {
+                task.ext.testOutput = null
+            }
+
+            // Before
+            task.beforeTest { TestDescriptor test ->
+                spy.send("before-test", [
+                        name: test.name,
+                        className: test.className
+                ])
+            }
+
+            // During
+            task.onOutput { TestDescriptor test, TestOutputEvent outputEvent ->
+                final id = test.className + ":" + test.name
+
+                if (!task.testOutput[id]) {
+                    task.testOutput[id] = []
+                }
+
+                task.testOutput[id] << outputEvent.message // Todo: Store outputEvent.destination somehow? (keep track of output to std.err)
+            }
+
+            // After
+            task.afterTest { TestDescriptor test, TestResult result ->
+                spy.send("after-test", [
+                        name: test.name,
+                        className: test.className,
+                        result: result.resultType.name(),
+                        durationMillis: result.endTime - result.startTime,
+                        exceptionMessage: result.exception?.message,
+                        output: task.testOutput[test.className + ":" + test.name]
+                ])
+            }
+        }
     }
 
-    void settingsEvaluated(Settings settings) {
-        spy.send("settings-ready", [
-                settings: [
+    graph.beforeTask { Task task ->
+        task.ext.startTime = System.currentTimeMillis()
+
+        spy.send("task-before", [
+                path: task.path,
+                timestamp: task.ext.startTime
+        ])
+    }
+
+    graph.afterTask { Task task, TaskState state ->
+        spy.send("task-after", [
+                path: task.path,
+                didWork: state.didWork,
+                executed: state.executed,
+                skipped: state.skipped,
+                skippedMessage: state.skipMessage,
+                failureMessage: state.failure?.message,
+                durationMillis: System.currentTimeMillis() - task.ext.startTime
+        ])
+    }
+}
+
+
+gradle.settingsEvaluated { Settings settings ->
+    spy.send("settings-ready", [
+            settings: [
                     projectName: settings.rootProject.name,
                     parallelProjectExecution: settings.startParameter.parallelProjectExecutionEnabled,
                     maxWorkerCount: settings.startParameter.maxWorkerCount,
@@ -73,133 +162,24 @@ gradle.addListener(new BuildListener() {
                     gradleUserHomeDir: settings.startParameter.gradleUserHomeDir?.absolutePath,
                     projectDir: settings.startParameter.projectDir?.absolutePath,
                     gradleVersion: settings.gradle.gradleVersion
-                ]
-        ])
-    }
-
-    void projectsLoaded(Gradle gradle) {
-        // Used to store test output as we receive it
-        // Replace this with a Task metaclass property?
-        def testOutput = [:]
+            ]
+    ])
+}
 
 
-        gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
-            spy.send("task-graph-ready",
-                    [
-                        tasks: graph.allTasks.collect { Task task ->
-                            [
-                                    name: task.name,
-                                    path: task.path,
-                                    description: task.description,
-                                    dependsOn: task.taskDependencies.getDependencies(task).collect { it.path }
-                            ]
-                    }
-                ]
-            )
-
-            /**
-             * Attach listeners for test execution and output
-             * (leveraging Gradle's framework agnostic api)
-             */
-            graph.allTasks.forEach { Task task ->
-                if (task instanceof Test) {
-                    task.addTestOutputListener(new TestOutputListener() {
-
-                        @Override
-                        void onOutput(TestDescriptor testDescriptor, TestOutputEvent outputEvent) {
-                            synchronized (testOutput) {
-                                def key = testDescriptor.className + ":" + testDescriptor.name
-                                if (!testOutput.containsKey(key)) {
-                                    testOutput[key] = []
-                                }
-
-                                // Todo: Store outputEvent.destination somehow? (keep track of output to std.err)
-                                testOutput[key] << outputEvent.message
-                            }
-                        }
-
-                    })
-
-                    task.addTestListener(new TestListener() {
-
-                        @Override
-                        void beforeSuite(TestDescriptor suite) { }
-
-                        @Override
-                        void afterSuite(TestDescriptor suite, TestResult result) { }
-
-                        @Override
-                        void beforeTest(TestDescriptor testDescriptor) {
-                            spy.send("before-test", [
-                                    name: testDescriptor.name,
-                                    className: testDescriptor.className
-                            ])
-                        }
-
-                        @Override
-                        void afterTest(TestDescriptor testDescriptor, TestResult result) {
-                            synchronized (testOutput) {
-                                spy.send("after-test", [
-                                        name: testDescriptor.name,
-                                        className: testDescriptor.className,
-                                        result: result.resultType.name(),
-                                        durationMillis: result.endTime - result.startTime,
-                                        exceptionMessage: result.exception?.message,
-                                        output: testOutput.remove(testDescriptor.className + ":" + testDescriptor.name)
-                                ])
-                            }
-                        }
-
-                    })
-                }
-            }
-        }
-
-
-
-
-        gradle.taskGraph.addTaskExecutionListener(new TaskExecutionListener() {
-
-            Map<String, Long> taskStartTime = [:]
-
-            @Override
-            void beforeExecute(Task task) {
-                taskStartTime[task.path] = System.currentTimeMillis()
-
-                spy.send("task-before", [
-                        path: task.path,
-                        timestamp: taskStartTime[task.path]
-                ])
-            }
-
-            @Override
-            void afterExecute(Task task, TaskState state) {
-                spy.send("task-after", [
-                        path: task.path,
-                        didWork: state.didWork,
-                        executed: state.executed,
-                        skipped: state.skipped,
-                        skippedMessage: state.skipMessage,
-                        failureMessage: state.failure?.message,
-                        durationMillis: System.currentTimeMillis() - taskStartTime[task.path]
-                ])
-            }
-
-        })
-    }
-
-    void projectsEvaluated(Gradle gradle) { }
-
-    void buildFinished(BuildResult result) {
+gradle.buildFinished { BuildResult result ->
+    try {
         spy.send("build-completed", [
                 failureMessage: result.failure?.message,
                 timestamp: System.currentTimeMillis()
         ]);
-
-
+    }
+    finally {
         logger.lifecycle "Terminating build spy"
         spy.terminate()
     }
+}
 
-})
+
+
 
