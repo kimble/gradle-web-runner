@@ -6,7 +6,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>G-Viz - Build - ${buildNumber}</title>
+        <title>Gradle Web Runner - Build - ${buildNumber}</title>
 
         <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
 
@@ -284,7 +284,7 @@
             <div class="row">
                 <div id="headerRow" class="col-md-12">
                     <div class="page-header">
-                        <h1>#${buildNumber} <span id="projectName">Loading data...</span> <small>${commandLine}</small></h1>
+                        <h1>#${buildNumber} <span id="projectName">Loading data...</span> <small>./gradlew ${commandLine}</small></h1>
                     </div>
                 </div>
             </div>
