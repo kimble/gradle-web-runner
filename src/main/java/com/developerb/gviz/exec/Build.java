@@ -1,6 +1,7 @@
 package com.developerb.gviz.exec;
 
 import com.developerb.gviz.events.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -70,40 +71,45 @@ public class Build implements Comparable<Build> {
                             final JsonNode json = jackson.readTree(userInput);
                             final String type = json.get("type").asText();
 
-                            switch (type) {
-                                case "settings-ready":
-                                    handleEvent(json, SettingsReady.class);
-                                    break;
+                            try {
+                                switch (type) {
+                                    case "settings-ready":
+                                        handleEvent(json, SettingsReady.class);
+                                        break;
 
-                                case "task-graph-ready":
-                                    handleEvent(json, TaskGraphReady.class);
-                                    break;
+                                    case "task-graph-ready":
+                                        handleEvent(json, TaskGraphReady.class);
+                                        break;
 
-                                case "task-before":
-                                    handleEvent(json, TaskStarting.class);
-                                    break;
+                                    case "task-before":
+                                        handleEvent(json, TaskStarting.class);
+                                        break;
 
-                                case "task-after":
-                                    TaskCompleted taskCompleted = handleEvent(json, TaskCompleted.class);
-                                    statistics.reportDuration(taskCompleted.getPath(), taskCompleted.getDurationMillis());
-                                    break;
+                                    case "task-after":
+                                        TaskCompleted taskCompleted = handleEvent(json, TaskCompleted.class);
+                                        statistics.reportDuration(taskCompleted.getPath(), taskCompleted.getDurationMillis());
+                                        break;
 
-                                case "before-test":
-                                    handleEvent(json, TestStarted.class);
-                                    break;
+                                    case "before-test":
+                                        handleEvent(json, TestStarted.class);
+                                        break;
 
-                                case "after-test":
-                                    TestCompleted testCompleted = handleEvent(json, TestCompleted.class);
-                                    statistics.reportDuration(testCompleted.key(), testCompleted.getDurationMillis());
-                                    break;
+                                    case "after-test":
+                                        TestCompleted testCompleted = handleEvent(json, TestCompleted.class);
+                                        statistics.reportDuration(testCompleted.key(), testCompleted.getDurationMillis());
+                                        break;
 
-                                case "build-completed":
-                                    handleEvent(json, GradleBuildCompleted.class);
-                                    break;
+                                    case "build-completed":
+                                        handleEvent(json, GradleBuildCompleted.class);
+                                        break;
 
 
-                                default:
-                                    log.warn("Received message of unknown type: {}", type);
+                                    default:
+                                        log.warn("Received message of unknown type: {}", type);
+                                }
+                            }
+                            catch (JsonProcessingException ex) {
+                                throw new IllegalStateException("Failed to deserialize '" + type + "': " + userInput, ex);
                             }
                         }
                     }
@@ -115,7 +121,7 @@ public class Build implements Comparable<Build> {
         }
     }
 
-    private <T extends Event> T handleEvent(JsonNode json, Class<T> eventType) throws com.fasterxml.jackson.core.JsonProcessingException {
+    private <T extends Event> T handleEvent(JsonNode json, Class<T> eventType) throws JsonProcessingException {
         T event = jackson.treeToValue(json.path("event"), eventType);
         log.info("Event: {}", event);
 
