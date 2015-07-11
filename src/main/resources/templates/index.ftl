@@ -83,12 +83,12 @@
                     <h2>Build</h2>
 
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 700px">
-                        <input class="mdl-textfield__input" type="text" id="path" value="/home/kim/development/mine-pasientreiser/pro-ng" tabindex="1" autofocus />
+                        <input class="mdl-textfield__input" type="text" id="path" tabindex="1" autofocus />
                         <label class="mdl-textfield__label" for="sample3">/path/to/project</label>
                     </div>
 
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 400px">
-                        <input class="mdl-textfield__input" type="text" id="tasks" value="clean test" tabindex="2" />
+                        <input class="mdl-textfield__input" type="text" id="tasks" tabindex="2" />
                         <label class="mdl-textfield__label" for="sample3">:tasks</label>
                     </div>
 
