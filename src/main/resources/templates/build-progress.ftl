@@ -195,6 +195,12 @@
                 color: rgb(244, 117, 51);
             }
 
+            #fullTestReport pre {
+                font-family: "Ubuntu Mono", monospace;
+                font-size: 0.9em;
+                width: 9p%;
+            }
+
             #testReport .filter-container {
                 margin: 0.5em;
                 padding: 0.5em;
