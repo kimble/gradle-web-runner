@@ -20,14 +20,18 @@ open a server socket, wait for the backend to connect and then use the connectio
 various events to the backend which in turn is able to process and stream these events to the
 web interface over web sockets.
 
-Screenshot - Test report
+Screenshots
 ------------------------
-![Screenshot](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2.png)
+
+### Configuration page
+![Configuration page](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/configuraiton-page.png)
+
+### Test report
+![Test report](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2.png)
 
 
-Screenshot - Gradle output
---------------------------
-![Screenshot](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2-output.png)
+### Gradle output
+![Gradle output](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2-output.png)
 
 
 Give it a spin
