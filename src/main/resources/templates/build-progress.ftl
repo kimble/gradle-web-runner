@@ -196,6 +196,10 @@
                 text-decoration: underline;
             }
 
+            #gradleOutput .output-container .intro {
+                color: white;
+                margin-bottom: 1em;
+            }
 
             /* Counters */
 
@@ -302,7 +306,9 @@
 
         <!-- Gradle output -->
         <div id="gradleOutput" class="moving-panel shy">
-            <div class="output-container"></div>
+            <div class="output-container">
+                <div class="intro">Waiting to receive output from forked Gradle process.<br/>Hit [O] to expand this panel.<br/></div>
+            </div>
         </div>
 
         <!-- Build details -->
