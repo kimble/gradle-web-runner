@@ -1,106 +1,66 @@
 function createRunningTasks(pubsub) {
     "use strict";
 
-    function namedAttr(name) {
-        return function(obj) {
-            return obj[name];
-        };
-    }
 
 
+    var $tasksScene2 = $("#tasksScene2");
 
-    var width = $("#tasksScene").width();
-    var height = 400;
+    var taskData = [ ];
+    var taskDataMap = { };
 
-
-
-    var svg = d3.select("#tasksScene")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-
-
-
-
-
-    var tasksContainer =  svg.append("g")
-        .attr("class", "running-tasks")
-        .attr("transform", "translate(0, 20)");
-
-
-
-
-    var taskHeight = 50;
-
-
-    var runningTasks = [];
-
-
-    pubsub.stream("task-state-update")
-        .throttle(1000)
+    pubsub.stream("TaskGraphReady")
+        .map(".tasks")
         .onValue(function(tasks) {
-            runningTasks = tasks.filter(function(t) { return t.isRunning; });
-
-
-            var runningTask = tasksContainer.selectAll(".running-task")
-                .data(runningTasks, namedAttr("path"));
-
-
-            // enter
-            var runningTaskEnter = runningTask.enter()
-                .append("g")
-                .attr("transform", function(t, i) {
-                    return "translate(0, " + (i * taskHeight) + ")";
-                })
-                .attr("class", "running-task");
-
-            runningTaskEnter.append("text")
-                .attr("class", "task-path")
-                .text(namedAttr("path"))
-                .each(function(d) {
-                    d._svg_width = this.getBBox().width; // Used to create "progress bar" for estimates
-                });
-
-            runningTaskEnter.append("rect")
-                .attr("visible", function(t) { return t.estimateMillis !== null ? "visible" : "hidden"; })
-                .attr("class", "task-estimate")
-                .attr("x", 2)
-                .attr("y", 5)
-                .attr("height", 20)
-                .attr("width", namedAttr("_svg_width"))
-                .transition()
-                    .attr("transform", function(t, i) {
-                        return "translate(0, " + (i * taskHeight) + ")";
-                    });
-
-            runningTaskEnter.append("text")
-                .attr("class", "task-description")
-                .attr("transform", "translate(5, 20)")
-                .text(function(t) {
-                    return t.description != null ? t.description : "No description";
-                });
-
-            // enter + update
-
-            runningTask.select(".task-estimate")
-                .transition()
-                .duration(function(t) {
-                    return t.estimateMillis;
-                })
-                .attr("width", 0);
-
-            runningTask.attr("transform", function(t, i) {
-                    return "translate(0, " + (i * taskHeight) + ")";
-                });
-
-            // exit
-            runningTask.exit().remove();
-
+            taskData = tasks;
+            taskData.forEach(function(task) {
+                taskDataMap[task.path] = task;
+            });
         });
 
 
+    pubsub.stream('tasks-estimated')
+        .onValue(function (tasks) {
+            tasks.forEach(function(estimatedTask) {
+                taskDataMap[estimatedTask.path].estimateMillis = estimatedTask.estimateMillis;
+            });
+        });
+
+    pubsub.stream("TaskStarting")
+        .onValue(function (event) {
+            var task = taskDataMap[event.path];
+            var description = task.description != null ? task.description : "No description";
+
+            if (task.estimateMillis != null) {
+                description += "<br/>Estimate: " + (Math.ceil(task.estimateMillis / 1000)) + " seconds";
+            }
+
+            // var css = "width: 300px; transition: width " + task.estimateMillis + "ms;";
+
+            var $el = $("<div class='task-running'><h3>" + task.path + "</h3><div class='task-progress-bar hidden'></div><p>" + description + "</p></div>");
+            $el.appendTo($tasksScene2);
 
 
+            if (task.estimateMillis != null) {
+                $el.find(".task-progress-bar")
+                    .removeClass("hidden")
+                    .css("transition", "width " + task.estimateMillis + "ms");
+
+                setTimeout(function() {
+                    $el.find(".task-progress-bar").addClass("started");
+                }, 10);
+            }
+
+            taskDataMap[event.path].$el = $el;
+        });
+
+    pubsub.stream("TaskCompleted")
+        .onValue(function (task) {
+            var $el = taskDataMap[task.path].$el;
+            $el.addClass("done");
+
+            setTimeout(function() {
+                $el.remove();
+            }, 300);
+        });
 
 }

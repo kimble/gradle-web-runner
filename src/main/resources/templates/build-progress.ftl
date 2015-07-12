@@ -9,7 +9,7 @@
         <title>Gradle Web Runner - Build - ${buildNumber}</title>
 
         <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-        <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
 
 
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -272,23 +272,42 @@
 
 
 
+
             /* Running tasks */
 
-            .running-tasks .task-path {
+            #tasksScene2 .task-running {
+                font-family: 'Oswald', sans-serif;
+                opacity: 1;
+
+                transition-property: opacity;
+                transition-duration: 0.3s;
+            }
+
+            #tasksScene2 .task-running.done {
+                opacity: 0;
+            }
+
+            #tasksScene2 .task-running h3 {
+                font-size: 1.0em;
                 font-weight: bold;
+                margin-bottom: 2px;
             }
 
-            .running-tasks .task-description {
-                font-family: 'Architects Daughter', cursive;
-                color: #555;
+            #tasksScene2 .task-running p {
+                font-size: 0.8em;
             }
 
-            .running-tasks .task-estimate {
-                fill: #eee;
-                rx: 5;
-                ry: 5;
+            #tasksScene2 .task-progress-bar {
+                background-color: #555;
+                width: 300px;
+                height: 3px;
+
+                transition-property: width;
             }
 
+            #tasksScene2 .task-progress-bar.started {
+                width: 0px;
+            }
 
 
             /* Counter panel */
@@ -327,7 +346,9 @@
             </div>
 
             <div class="row">
-                <div class="col-md-9" id="tasksScene"></div>
+                <div class="col-md-6">
+                    <div id="tasksScene2"></div>
+                </div>
             </div>
         </div>
 

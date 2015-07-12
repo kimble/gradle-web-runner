@@ -49,7 +49,7 @@ function createTaskPanel(pubsub) {
 
 
     pubsub.stream("task-state-update")
-        .throttle(1000)
+        .throttle(500)
         .onValue(function(tasks) {
             var taskCount = tasks.length;
             var taskHeight = height / taskCount;
