@@ -79,7 +79,13 @@
             }
 
             .moving-panel .page-header {
-                margin: 0 1em 1em 1em;
+                background-color: rgb(174, 199, 59);
+                padding: 0.1em 1em 1em 1em;
+                margin: 0;
+                color: white;
+            }
+            .moving-panel .page-header  small {
+                color: white;
             }
 
             .moving-panel.upside-down .page-header {
@@ -91,17 +97,20 @@
             /* Build details */
 
             #buildDetails {
-                bottom: 20px;
+                bottom: 0;
                 left: 50px;
 
                 width: 400px;
-                height: 400px;
+                height: 300px;
             }
 
             #buildDetails.shy {
-                bottom: -340px;
+                bottom: -240px;
             }
 
+            #buildDetails .page-header {
+                background-color: rgb(174, 199, 59);
+            }
 
 
 
@@ -322,7 +331,12 @@
 
             /* Settings */
 
+            #buildDetailsContainer td,th {
+                border-top: 0;
+            }
+
             .setting-property .key {
+                padding-left: 1em;
                 font-weight: bold;
                 color: #444;
             }
