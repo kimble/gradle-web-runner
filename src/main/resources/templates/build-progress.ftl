@@ -22,7 +22,6 @@
 
         <script src="/assets/lib/task-state.js"></script>
 
-        <script src="/assets/lib/gradle-settings.js"></script>
         <script src="/assets/lib/gradle-output.js"></script>
         <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
@@ -94,7 +93,7 @@
 
             #buildDetails {
                 bottom: 20px;
-                left: 30px;
+                left: 50px;
 
                 width: 400px;
                 height: 400px;
@@ -102,17 +101,9 @@
 
             #buildDetails.shy {
                 bottom: -340px;
-                left: 100px;
             }
 
-            #buildDetails .details-container {
-                padding-left: 1em;
-            }
 
-            #buildDetails dd {
-                padding-left: 0.5em;
-                padding-bottom: 0.25em;
-            }
 
 
             /* Test reports */
@@ -281,13 +272,6 @@
             }
 
 
-            /* Task donut */
-
-            #taskDonut text {
-                font-family: 'Architects Daughter', cursive;
-                font-size: 1.5em;
-            }
-
 
             /* Running tasks */
 
@@ -320,6 +304,18 @@
             #counterPanel .flip-clock-label {
                 display: none;
             }
+
+
+            /* Settings */
+
+            .setting-property .key {
+                font-weight: bold;
+                color: #444;
+            }
+
+            .setting-property .value {
+                color: #888;
+            }
         </style>
     </head>
 
@@ -335,18 +331,15 @@
             <div class="row">
                 <div id="headerRow" class="col-md-12">
                     <div class="page-header">
-                        <h1>#${buildNumber} <span id="projectName">Loading data...</span> <small>./gradlew ${commandLine}</small></h1>
+                        <h1>#${buildNumber} <span class="project-name">Loading data...</span> <small>./gradlew ${commandLine}</small></h1>
                     </div>
                 </div>
             </div>
-
 
             <div class="row">
                 <div class="col-md-3" id="taskDonut"></div>
                 <div class="col-md-9" id="tasksScene"></div>
             </div>
-
-
         </div>
 
 
@@ -400,7 +393,9 @@
                 <h3>Build <u>d</u>etails <small class="project-name">....</small></h3>
             </div>
 
-            <dl class="details-container">
+            <table id="buildDetailsContainer" class="table table-hover">
+                <tbody></tbody>
+            </table>
         </div>
 
         <!-- Tests -->
@@ -489,7 +484,6 @@
                 // Interface
 
                 createGradleOutputConsole(pubsub);
-                createGradleSettings(pubsub);
                 createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 // createTaskDonut(pubsub);

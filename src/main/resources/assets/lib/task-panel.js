@@ -47,6 +47,7 @@ function createTaskPanel(pubsub) {
     var stackGroup = svg.append("g");
 
 
+
     pubsub.stream("task-state-update")
         .throttle(1000)
         .onValue(function(tasks) {
@@ -81,8 +82,9 @@ function createTaskPanel(pubsub) {
             // Drop into place
             stackedTask.transition()
                 .delay(function(d, i) { return 10 * i; })
-                .attr("transform", function(d, i) { return "translate(0, " + y(i) + ")"; })
-                .select("rect")
+                .attr("transform", function(d, i) { return "translate(0, " + y(i) + ")"; });
+
+            stackedTask.select("rect")
                     .attr("opacity", function(d) { return d.hasCompleted ? 1 : 0.2; });
         });
 

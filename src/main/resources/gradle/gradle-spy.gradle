@@ -161,11 +161,9 @@ gradle.settingsEvaluated { Settings settings ->
     spy.send("settings-ready", [
             settings: [
                     projectName: settings.rootProject.name,
-                    parallelProjectExecution: settings.startParameter.parallelProjectExecutionEnabled,
+                    parallelExecution: settings.startParameter.parallelProjectExecutionEnabled,
                     maxWorkerCount: settings.startParameter.maxWorkerCount,
                     configureOnDemand: settings.startParameter.configureOnDemand,
-                    gradleUserHomeDir: settings.startParameter.gradleUserHomeDir?.absolutePath,
-                    projectDir: settings.startParameter.projectDir?.absolutePath,
                     gradleVersion: settings.gradle.gradleVersion
             ]
     ])

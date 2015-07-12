@@ -3,9 +3,13 @@ function createBuildDetailsTab(pubsub) {
 
     var $buildDetails = $("#buildDetails");
     var $header = $buildDetails.find(".page-header h3");
-    var $detailsContainer = $buildDetails.find(".details-container");
-    var $projectName = $buildDetails.find(".project-name");
+    var $projectName = $(".project-name");
 
+
+    // Update project name
+    pubsub.stream("SettingsReady")
+        .map(".settings.projectName")
+        .assign($projectName, "html");
 
 
     var toggleShyness = function() {
@@ -16,16 +20,41 @@ function createBuildDetailsTab(pubsub) {
     pubsub.stream("key-down-D").onValue(toggleShyness);
 
 
-    pubsub.stream("SettingsReady")
-        .onValue(function(event) {
-            $projectName.html(event.settings.projectName);
 
-            for (var key in event.settings) {
-                if (event.settings.hasOwnProperty(key)) {
-                    var value = event.settings[key];
-                    $detailsContainer.append("<dt>"+ key +"</dt><dd>"+ value + "</dd>");
-                }
-            }
+    function splitCamelCaseToString(s) {
+        return s.split(/(?=[A-Z])/).join(' ');
+    }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    pubsub.stream("SettingsReady")
+        .map(".settings")
+        .map(function(settingsMap) {
+            return Object.keys(settingsMap).map(function(key) {
+                return {
+                    key: key,
+                    value: settingsMap[key]
+                };
+            });
+        })
+        .onValue(function(settingsList) {
+            var buildProperty = d3.select("#buildDetailsContainer tbody")
+                .selectAll('tr')
+                .data(settingsList);
+
+            var enterProperty = buildProperty.enter()
+                .append("tr")
+                .attr("class", "setting-property");
+
+            enterProperty.append("td")
+                .attr("class", "key")
+                .text(function(d) { return capitalizeFirstLetter(splitCamelCaseToString(d.key).toLowerCase()) + ": "; });
+
+            enterProperty.append("td")
+                .attr("class", "value")
+                .text(function(d) { return d.value; });
         });
 
 
