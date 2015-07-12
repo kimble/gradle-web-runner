@@ -60,7 +60,7 @@
 
                 border: 1px solid #eee;
                 box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
-                background-color: #fefefe;
+                background-color: #fafafa;
 
                 transition-property: background-color, top, bottom, right, left;
                 transition-duration: 0.7s;
@@ -215,7 +215,7 @@
 
                 height: calc(100% + 4px);
 
-                box-shadow: inset -6px 0px 23px -2px rgba(0,0,0,1);
+                box-shadow: 0 0 15px rgba(50, 50, 50, 0.5);
                 background-color: #242320;
 
                 color: rgb(201, 208, 194);
