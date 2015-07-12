@@ -172,8 +172,6 @@ gradle.settingsEvaluated { Settings settings ->
 
 
 gradle.buildFinished { BuildResult result ->
-    println "XX: " + result.gradle.getProperties().keySet()
-
     try {
         spy.send("build-completed", [
                 failureMessage: result.failure?.message,
