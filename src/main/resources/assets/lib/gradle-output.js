@@ -23,14 +23,10 @@ function createGradleOutputConsole(pubsub) {
                 return "<div>" + linkedLine + "</div>";
             });
 
-
-
             var html = htmlLines.join("");
             $outputContainer.append(html);
 
             // Scroll
             $outputContainer.prop("scrollTop", $outputContainer.prop("scrollHeight") - $outputContainer.height());
         });
-
-
 }

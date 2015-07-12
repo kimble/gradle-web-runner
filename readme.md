@@ -57,6 +57,7 @@ As this is just a summer pet projects I'll probably never get around to do half 
 - **Feature:** Visualize task dependencies
 - **Feature:** Visualize how tasks run in parallel
 - **Improvement:** Filter / search test reports
+- **Improvement:** Move test reports into a dedicated page
 - **Cleanup:** Move css out into separate .css files
 - **Cleanup:** Replace js dependencies with webjars
 - **Improvement:** Windows support (use ./gradlew.bat instead of ./gradlew and so on..)
