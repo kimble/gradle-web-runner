@@ -25,6 +25,7 @@
         <script src="/assets/lib/gradle-output.js"></script>
         <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
+        <script src="/assets/lib/build-estimate.js"></script>
         <script src="/assets/lib/running-tasks.js"></script>
         <script src="/assets/lib/counters.js"></script>
 
@@ -45,7 +46,7 @@
                 width: 95%;
             }
 
-            .page-header {
+            .page-header, #headerRow {
                 font-family: 'Oswald', sans-serif;
             }
 
@@ -258,6 +259,37 @@
             }
 
 
+            /* Build progress */
+
+            #buildProgress .bar {
+                height: 3px;
+                width: 800px;
+                background-color: #333;
+                margin-top: 10px;
+                float: left;
+
+                transition-property: width;
+            }
+
+            #buildProgress .running {
+                width: 0;
+            }
+
+            #buildProgress.completed .bar {
+                transition-duration: 0.5s;
+                width: 800px;
+            }
+
+            #buildProgress.completed .bar-label {
+                display: none;
+            }
+
+            #buildProgress .bar-label {
+                color: #333;
+                width: 200px;
+                float: left;
+                padding-left: 0.5em;
+            }
 
 
         </style>
@@ -269,8 +301,11 @@
         <div class="container container-full">
             <div class="row">
                 <div id="headerRow" class="col-md-12">
-                    <div class="page-header">
-                        <h1>#${buildNumber} <span class="project-name">Waiting for project name...</span> <small>./gradlew ${commandLine}</small></h1>
+                    <h1>#${buildNumber} <span class="project-name">Waiting for project name...</span> <small>./gradlew ${commandLine}</small></h1>
+
+                    <div id="buildProgress">
+                        <div class="bar"></div>
+                        <div class="bar-label">No estimate..</div>
                     </div>
                 </div>
             </div>
@@ -396,8 +431,9 @@
                 createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 createCounters(pubsub);
-                createRunningTestReport(pubsub)
+                createRunningTestReport(pubsub);
                 createTaskPanel(pubsub);
+                createBuildEstimate(pubsub);
 
                 // State
 

@@ -27,12 +27,9 @@ Screenshots
 ### Configuration page
 ![Configuration page](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/configuration-page.png)
 
-### Test report
-![Test report](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2.png)
+### Building Hibernate
+![Test report](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v3.png)
 
-
-### Gradle output
-![Gradle output](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v2-output.png)
 
 
 Give it a spin

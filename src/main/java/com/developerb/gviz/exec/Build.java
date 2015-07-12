@@ -99,7 +99,8 @@ public class Build implements Comparable<Build> {
                                         break;
 
                                     case "build-completed":
-                                        handleEvent(json, GradleBuildCompleted.class);
+                                        GradleBuildCompleted buildCompleted = handleEvent(json, GradleBuildCompleted.class);
+                                        statistics.reportDuration("build", buildCompleted.getDurationMillis());
                                         break;
 
 
@@ -163,7 +164,7 @@ public class Build implements Comparable<Build> {
 
     @Override
     public String toString() {
-        return "Build #" + buildNumber + " -- " + (buildParameters != null ? buildParameters : "Not forked yet");
+        return String.format("Build #%d -- %s", buildNumber, buildParameters != null ? buildParameters : "Not forked yet");
     }
 
     public EventStore getEventStore() {
