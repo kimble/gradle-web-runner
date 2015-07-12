@@ -37,7 +37,7 @@
 
             .container-full {
                 margin: 0 auto;
-                padding-left: 3em;
+                padding-left: 1em;
                 width: 95%;
             }
 
@@ -301,10 +301,6 @@
                 bottom: 80px;
             }
 
-            #counterPanel .flip-clock-label {
-                display: none;
-            }
-
 
             /* Settings */
 
@@ -318,12 +314,7 @@
             }
         </style>
     </head>
-
     <body>
-
-
-
-
 
 
 
@@ -331,7 +322,7 @@
             <div class="row">
                 <div id="headerRow" class="col-md-12">
                     <div class="page-header">
-                        <h1>#${buildNumber} <span class="project-name">Loading data...</span> <small>./gradlew ${commandLine}</small></h1>
+                        <h1>#${buildNumber} <span class="project-name">Waiting for project name...</span> <small>./gradlew ${commandLine}</small></h1>
                     </div>
                 </div>
             </div>
@@ -348,7 +339,7 @@
         <!-- Counters -->
         <div id="counterPanel">
             <div class="row">
-                <div class="col-md-3 counter-container">
+                <div class="col-md-3 counter-container" id="taskCounterContainer">
                     <h3>Remaining tasks</h3>
                     <div id="taskCountdown"></div>
                 </div>

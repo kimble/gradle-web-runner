@@ -10,7 +10,7 @@ class BuildSpy {
 
     BuildSpy(int port) {
         try {
-            serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(port)
         }
         catch (IOException ex) {
             throw new GradleException("Unable to listen to port " + port, ex)
