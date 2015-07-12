@@ -26,7 +26,7 @@
         <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/running-tasks.js"></script>
-        <script src="/assets/lib/test-report.js"></script>
+        <script src="/assets/lib/tests-running.js"></script>
         <script src="/assets/lib/counters.js"></script>
 
         <style type="text/css">
@@ -112,105 +112,6 @@
                 background-color: rgb(174, 199, 59);
             }
 
-
-
-            /* Test reports */
-
-            #testReport {
-                top: 20px;
-                right: 30px;
-
-                width: 1200px;
-                height: 600px;
-            }
-
-            #testReport.shy {
-                top: -540px;
-                right: -600px;
-            }
-
-            #testReport #fullTestReport {
-                margin: 0.5em 1em;
-                height: 530px;
-                overflow: auto;
-                overflow-x: hidden;
-            }
-
-            #fullTestReport .package-name {
-                font-family: 'Ubuntu Mono', monospace;
-                font-weight: bold;
-                font-size: 1.4em;
-                margin-top: 2em;
-            }
-
-            #fullTestReport .test-package.fail .package-name {
-                color: rgb(244, 117, 51);
-            }
-
-            #fullTestReport .test-class.fail .class-name {
-                color: rgb(244, 117, 51);
-            }
-
-            #fullTestReport .class-name {
-                font-family: 'Ubuntu Mono', monospace;
-                font-weight: bold;
-                font-size: 1.3em;
-            }
-
-            #fullTestReport .test-name {
-                font-family: 'Ubuntu Mono', monospace;
-                font-size: 1.1em;
-            }
-
-            #fullTestReport .individual-tests {
-                padding-left: 0.5em;
-                font-size: 0.9em;
-            }
-
-            #fullTestReport .individual-tests.success {
-                display: none;
-            }
-
-            #fullTestReport .individual-tests.show-successful {
-                display: block;
-            }
-
-            #fullTestReport .individual-tests.success {
-                border-left: 5px solid rgb(202, 215, 94);
-            }
-            #fullTestReport .individual-tests.fail {
-                border-left: 5px solid rgb(244, 117, 51);
-            }
-            #fullTestReport .individual-tests.skipped {
-                border-left: 5px solid rgb(244, 229, 69);
-            }
-
-            #fullTestReport h4 .glyphicon {
-                font-size: 0.9em;
-            }
-
-
-
-            #fullTestReport .individual-test.success {
-
-            }
-            #fullTestReport .individual-test.fail {
-                font-weight: bold;
-                color: rgb(244, 117, 51);
-            }
-
-            #fullTestReport pre {
-                font-family: "Ubuntu Mono", monospace;
-                font-size: 0.9em;
-                width: 9p%;
-            }
-
-            #testReport .filter-container {
-                margin: 0.5em;
-                padding: 0.5em;
-                height: 525px;
-                background-color: #fafafa;
-            }
 
 
 
@@ -349,6 +250,32 @@
             .setting-property .value {
                 color: #888;
             }
+
+            /* Running tests */
+
+            #runningTestsContainer .test {
+                color: #333;
+            }
+
+            #runningTestsContainer .test h3 {
+                font-family: 'Oswald', sans-serif;
+                font-weight: normal;
+                font-size: 0.7em;
+                margin: 2px 0;
+            }
+
+
+            #runningTestsContainer .test.success {
+                color: #AACB72;
+            }
+            #runningTestsContainer .test.failure {
+                font-weight: bold;
+                color: #FB8768;
+            }
+            #runningTestsContainer .test.skipped {
+                font-weight: bold;
+                color: #FBC84A;
+            }
         </style>
     </head>
     <body>
@@ -365,8 +292,11 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div id="tasksScene2"></div>
+                </div>
+                <div class="col-md-4">
+                    <div id="runningTestsContainer"></div>
                 </div>
             </div>
         </div>
@@ -422,34 +352,7 @@
             </table>
         </div>
 
-        <!-- Tests -->
-        <div id="testReport" class="moving-panel upside-down shy hidden">
-            <div class="page-header">
-                <hr/>
-                <h3><u>T</u>est report <small> - Awaiting test results..</small></h3>
-            </div>
-
-            <div class="test-container">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="filter-container form-group">
-                            <h2>Filter</h2>
-                            <hr/>
-
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" id="showSuccessfulTests"> Show successful
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-9">
-                        <div id="fullTestReport"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        
 
 
 
@@ -511,7 +414,7 @@
                 createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 createCounters(pubsub);
-                // createTestReport(pubsub);
+                createRunningTestReport(pubsub)
                 createTaskPanel(pubsub);
 
                 // State
