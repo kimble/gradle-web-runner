@@ -7,7 +7,6 @@
 
         <title>Gradle Web Runner</title>
 
-        <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
 
         <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="/assets/mdl/material.min.css">

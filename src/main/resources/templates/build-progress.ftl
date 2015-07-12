@@ -9,6 +9,7 @@
         <title>Gradle Web Runner - Build - ${buildNumber}</title>
 
         <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
 
 
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -39,7 +40,9 @@
                 width: 95%;
             }
 
-
+            .page-header {
+                font-family: 'Oswald', sans-serif;
+            }
 
 
             svg {
@@ -214,21 +217,25 @@
             /* Output */
 
             #gradleOutput {
-                bottom: 20px;
-                right: 20px;
+                top: 0;
+                right: -10px;
 
                 width: 60%;
-                height: 400px;
+                height: 100%;
+
+                box-shadow: inset 6px 0px 23px -2px rgba(0,0,0,1);
+                background-color: #242320;
+
+                color: rgb(201, 208, 194);
             }
 
             #gradleOutput.shy {
-                bottom: -340px;
                 right: -300px;
             }
 
             #gradleOutput .output-container {
                 font-family: "Ubuntu Mono", monospace;
-                height: 300px;
+                height: 100%;
                 width: 99%;
                 overflow: auto;
             }
@@ -322,10 +329,6 @@
 
         <!-- Gradle output -->
         <div id="gradleOutput" class="moving-panel shy">
-            <div class="page-header">
-                <h3>Gradle <u>o</u>utput <small class="last-line">....</small></h3>
-            </div>
-
             <div class="output-container"></div>
         </div>
 
@@ -339,7 +342,7 @@
         </div>
 
         <!-- Tests -->
-        <div id="testReport" class="moving-panel upside-down shy">
+        <div id="testReport" class="moving-panel upside-down shy hidden">
             <div class="page-header">
                 <hr/>
                 <h3><u>T</u>est report <small> - Awaiting test results..</small></h3>
