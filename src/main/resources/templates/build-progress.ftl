@@ -26,7 +26,6 @@
         <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/running-tasks.js"></script>
-        <script src="/assets/lib/task-donut.js"></script>
         <script src="/assets/lib/test-report.js"></script>
         <script src="/assets/lib/counters.js"></script>
 
@@ -328,7 +327,6 @@
             </div>
 
             <div class="row">
-                <div class="col-md-3" id="taskDonut"></div>
                 <div class="col-md-9" id="tasksScene"></div>
             </div>
         </div>
@@ -472,7 +470,6 @@
                 createGradleOutputConsole(pubsub);
                 createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
-                // createTaskDonut(pubsub);
                 createCounters(pubsub);
                 // createTestReport(pubsub);
                 createTaskPanel(pubsub);
