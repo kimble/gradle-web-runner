@@ -271,6 +271,11 @@
                 overflow: auto;
             }
 
+            #gradleOutput .output-container a {
+                color: white;
+                text-decoration: underline;
+            }
+
 
             /* Counters */
 

@@ -19,8 +19,11 @@ function createGradleOutputConsole(pubsub) {
         .bufferWithTime(200)
         .onValue(function(lines) {
             var htmlLines = lines.map(function(line) {
-                return "<div>" + line + "</div>";
+                var linkedLine = line.replace(/((file|http|https|ftp|ftps):\/\/[^\s]+)/, '<a href="$1" target="_blank">$1</a>');
+                return "<div>" + linkedLine + "</div>";
             });
+
+
 
             var html = htmlLines.join("");
             $outputContainer.append(html);
