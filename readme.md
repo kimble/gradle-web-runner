@@ -78,4 +78,5 @@ As this is just a summer pet projects I'll probably never get around to do half 
 
 ### General improvements
 
+- Fetch estimates before forking the build (so the first tasks can get a progress bar)
 - Windows support (use ./gradlew.bat instead of ./gradlew and so on..)
