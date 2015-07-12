@@ -328,7 +328,10 @@
                 <h3><u>T</u>est report <small class="summary">Awaiting test results..</small></h3>
             </div>
 
-            <div class="panel-container"></div>
+            <div class="panel-container">
+                <p>Yet to be implemented!</p>
+                <p>This panel should contain a simple summary<br/>+ a link to a complete and interactive report page.</p>
+            </div>
         </div>
 
 
