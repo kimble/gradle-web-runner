@@ -20,6 +20,7 @@ open a server socket, wait for the backend to connect and then use the connectio
 various events to the backend which in turn is able to process and stream these events to the
 web interface over web sockets.
 
+
 Screenshots
 ------------------------
 
@@ -53,11 +54,28 @@ Things I might do
 -----------------
 As this is just a summer pet projects I'll probably never get around to do half of these things.
 
-- **Bugfix:** Increase websocket idle timeout (java.util.concurrent.TimeoutException: Idle timeout expired: 10003/10000 ms)
-- **Feature:** Visualize task dependencies
-- **Feature:** Visualize how tasks run in parallel
-- **Improvement:** Filter / search test reports
-- **Improvement:** Move test reports into a dedicated page
-- **Cleanup:** Move css out into separate .css files
-- **Cleanup:** Replace js dependencies with webjars
-- **Improvement:** Windows support (use ./gradlew.bat instead of ./gradlew and so on..)
+
+### Bugfixes
+
+- Increase websocket idle timeout (java.util.concurrent.TimeoutException: Idle timeout expired: 10003/10000 ms)
+
+### Build features
+
+- Abort running build
+- Re-run
+
+### Reporting
+
+- Visualize task dependencies
+- Visualize how tasks run in parallel
+- Filter / search test reports
+- Move test reports into a dedicated page
+
+### Code cleanup
+
+- Move css out into separate .css files
+- Replace js dependencies with webjars
+
+### General improvements
+
+- Windows support (use ./gradlew.bat instead of ./gradlew and so on..)
