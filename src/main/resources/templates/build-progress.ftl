@@ -221,7 +221,7 @@
             #taskPanel {
                 left: -2px;
                 top: -2px;
-                width: 25px;
+                width: 10px;
 
                 height: calc(100% + 4px);
 
@@ -233,9 +233,6 @@
                 border-right: 2px solid #222;
             }
 
-            #taskPanel.shy {
-                right: -20px;
-            }
 
             #taskStack {
                 height: 100%;
@@ -309,6 +306,20 @@
                 ry: 5;
             }
 
+
+
+            /* Counter panel */
+
+            #counterPanel {
+                position: absolute;
+                width: 1400px;
+                left: 50px;
+                bottom: 50px;
+            }
+
+            #counterPanel .flip-clock-label {
+                display: none;
+            }
         </style>
     </head>
 
@@ -335,19 +346,31 @@
                 <div class="col-md-9" id="tasksScene"></div>
             </div>
 
+
+        </div>
+
+
+
+
+        <!-- Counters -->
+        <div id="counterPanel">
             <div class="row">
-                <div class="col-md-4 counter-container">
+                <div class="col-md-3 counter-container">
+                    <h3>Elapsed time</h3>
+                    <div id="durationClock"></div>
+                </div>
+
+                <div class="col-md-3 counter-container">
                     <h3>Remaining tasks</h3>
                     <div id="taskCountdown"></div>
+                </div>
 
+                <div class="col-md-3 counter-container">
                     <h3>Executed tests</h3>
                     <div id="testCounter"></div>
                 </div>
             </div>
         </div>
-
-
-
 
 
 
@@ -470,7 +493,7 @@
                 createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 // createTaskDonut(pubsub);
-                createCounters(pubsub);
+                // createCounters(pubsub);
                 // createTestReport(pubsub);
                 createTaskPanel(pubsub);
 

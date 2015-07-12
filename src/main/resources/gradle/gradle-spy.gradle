@@ -67,6 +67,10 @@ BuildSpy spy = new BuildSpy(Integer.parseInt(spyPort))
 
 // Gradle event listeners
 
+gradle.projectsLoaded { gradle ->
+    gradle.ext.buildStarted = System.currentTimeMillis()
+}
+
 gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
     spy.send("task-graph-ready",
             [
@@ -168,10 +172,14 @@ gradle.settingsEvaluated { Settings settings ->
 }
 
 
+
 gradle.buildFinished { BuildResult result ->
+    println "XX: " + result.gradle.getProperties().keySet()
+
     try {
         spy.send("build-completed", [
                 failureMessage: result.failure?.message,
+                durationMillis: System.currentTimeMillis() - result.gradle.buildStarted,
                 timestamp: System.currentTimeMillis()
         ]);
     }

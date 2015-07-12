@@ -3,12 +3,19 @@ function createCounters(pubsub) {
 
     var testCounter = $('#testCounter').FlipClock(0, {
         clockFace: 'Counter',
-        minimumDigits: 4
+        minimumDigits: 4,
+        animationRate: 100
     });
 
     var taskCountdown = $('#taskCountdown').FlipClock(0, {
         clockFace: 'Counter',
-        minimumDigits: 4
+        minimumDigits: 4,
+        animationRate: 100
+    });
+
+    var durationClock = $('#durationClock').FlipClock(0, {
+        clockFace: 'MinuteCounter',
+        animationRate: 100
     });
 
 
@@ -29,6 +36,11 @@ function createCounters(pubsub) {
             taskCountdown.setValue(taskCount - tasksCompleted);
         });
 
+    pubsub.stream("GradleBuildCompleted")
+        .onValue(function(event) {
+            durationClock.stop();
+            durationClock.setTime(Math.ceil(event.durationMillis / 1000));
+        });
 
     var testCount = 0;
     pubsub.stream("TestCompleted")

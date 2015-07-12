@@ -5,14 +5,6 @@ function createTaskPanel(pubsub) {
     var $container = $taskPanel.find("#taskStack");
 
 
-    var toggleShyness = function() {
-        $taskPanel.toggleClass("shy");
-    };
-
-    pubsub.stream("key-down-T").onValue(toggleShyness);
-
-
-
 
     function namedAttr(name) {
         return function(obj) {
@@ -25,12 +17,12 @@ function createTaskPanel(pubsub) {
 
     var colors = {
         ProcessResources: '#F7E61C',
-        JavaCompile: '#CBD0FA',
+        JavaCompile: '#9FD51F',
         Jar: '#CB59CF',
         Test: '#4180CF',
-        DefaultTask: '#CCAB79',
+        DefaultTask: '#6F4379',
         Delete: '#B21347',
-        Exec: '#99CEFF'
+        Exec: '#6F99FB'
     };
 
     function colorFor(task) {
@@ -75,7 +67,7 @@ function createTaskPanel(pubsub) {
             var enter = stackedTask.enter()
                 .append("g")
                 .attr("class", "stacked-task")
-                .attr("transform", "translate(0, -10) rotate(-30)"); // Start position for transition
+                .attr("transform", "translate(0, -10)"); // Start position for transition
 
             enter.append("rect")
                 .attr("fill", function(d) { return d3.rgb(colorFor(d)); })
@@ -89,9 +81,9 @@ function createTaskPanel(pubsub) {
             // Drop into place
             stackedTask.transition()
                 .delay(function(d, i) { return 10 * i; })
-                .attr("transform", function(d, i) { return "translate(0, " + y(i) + ") rotate(0)"; })
+                .attr("transform", function(d, i) { return "translate(0, " + y(i) + ")"; })
                 .select("rect")
-                    .attr("opacity", function(d) { console.log(d.hasCompleted); return d.hasCompleted ? 1 : 0.2; });
+                    .attr("opacity", function(d) { return d.hasCompleted ? 1 : 0.2; });
         });
 
 }
