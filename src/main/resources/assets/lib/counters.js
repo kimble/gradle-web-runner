@@ -3,10 +3,6 @@ function createCounters(pubsub) {
 
     var $taskCounterContainer = $("#taskCounterContainer");
 
-    var testCounter = $('#testCounter').FlipClock(0, {
-        clockFace: 'Counter',
-        minimumDigits: 4
-    });
 
     var taskCountdown = $('#taskCountdown').FlipClock(0, {
         clockFace: 'Counter',
@@ -15,7 +11,6 @@ function createCounters(pubsub) {
 
 
     var tasksCompleted = 0;
-    var testCount = 0;
     var taskCount = 0;
 
     var buildCompleted = pubsub.stream("GradleBuildCompleted")
@@ -34,13 +29,6 @@ function createCounters(pubsub) {
         .onValue(function(event) {
             tasksCompleted += event.length;
             taskCountdown.setValue(taskCount - tasksCompleted);
-        });
-
-    pubsub.stream("TestCompleted")
-        .bufferWithTime(1500)
-        .onValue(function(event) {
-            testCount += event.length;
-            testCounter.setValue(testCount);
         });
 
     pubsub.stream("GradleBuildCompleted")

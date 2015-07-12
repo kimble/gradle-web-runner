@@ -1,0 +1,58 @@
+/* Mini test report */
+
+#miniTestReport {
+    bottom: 0;
+    left: 500px;
+
+    width: 600px;
+    height: 500px;
+
+}
+
+#miniTestReport.shy {
+    bottom: -440px;
+}
+
+
+#miniTestReport .page-header {
+    transition-property: background-color;
+    transition-duration: 0.7s;
+}
+
+#miniTestReport.success .page-header {
+    background-color: rgb(174, 199, 59);
+}
+#miniTestReport.failure .page-header {
+    background-color: #FB8768;
+}
+
+#miniTestReport .panel-container {
+    padding: 1em;
+}
+
+
+/* Running tests
+
+#runningTestsContainer .test {
+    color: #333;
+}
+
+#runningTestsContainer .test h3 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: normal;
+    font-size: 0.7em;
+    margin: 2px 0;
+}
+
+
+#runningTestsContainer .test.success {
+    color: #AACB72;
+}
+#runningTestsContainer .test.failure {
+    font-weight: bold;
+    color: #FB8768;
+}
+#runningTestsContainer .test.skipped {
+    font-weight: bold;
+    color: #FBC84A;
+}*/

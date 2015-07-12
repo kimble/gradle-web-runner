@@ -26,8 +26,13 @@
         <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/running-tasks.js"></script>
-        <script src="/assets/lib/tests-running.js"></script>
         <script src="/assets/lib/counters.js"></script>
+
+
+
+        <script src="/assets/page/mini-test-report/mini-test-report.js"></script>
+        <link href="/assets/page/mini-test-report/mini-test-report.css" rel="stylesheet">
+
 
         <style type="text/css">
             body {
@@ -110,6 +115,20 @@
 
             #buildDetails .page-header {
                 background-color: rgb(174, 199, 59);
+            }
+
+            #buildDetailsContainer td,th {
+                border-top: 0;
+            }
+
+            .setting-property .key {
+                padding-left: 1em;
+                font-weight: bold;
+                color: #444;
+            }
+
+            .setting-property .value {
+                color: #888;
             }
 
 
@@ -230,52 +249,13 @@
             #counterPanel {
                 position: absolute;
                 width: 1400px;
-                left: 50px;
-                bottom: 80px;
+                left: 40px;
+                bottom: 100px;
             }
 
 
-            /* Settings */
-
-            #buildDetailsContainer td,th {
-                border-top: 0;
-            }
-
-            .setting-property .key {
-                padding-left: 1em;
-                font-weight: bold;
-                color: #444;
-            }
-
-            .setting-property .value {
-                color: #888;
-            }
-
-            /* Running tests */
-
-            #runningTestsContainer .test {
-                color: #333;
-            }
-
-            #runningTestsContainer .test h3 {
-                font-family: 'Oswald', sans-serif;
-                font-weight: normal;
-                font-size: 0.7em;
-                margin: 2px 0;
-            }
 
 
-            #runningTestsContainer .test.success {
-                color: #AACB72;
-            }
-            #runningTestsContainer .test.failure {
-                font-weight: bold;
-                color: #FB8768;
-            }
-            #runningTestsContainer .test.skipped {
-                font-weight: bold;
-                color: #FBC84A;
-            }
         </style>
     </head>
     <body>
@@ -295,9 +275,6 @@
                 <div class="col-md-4">
                     <div id="tasksScene2"></div>
                 </div>
-                <div class="col-md-4">
-                    <div id="runningTestsContainer"></div>
-                </div>
             </div>
         </div>
 
@@ -311,21 +288,8 @@
                     <h3>Remaining tasks</h3>
                     <div id="taskCountdown"></div>
                 </div>
-
-                <div class="col-md-3 counter-container">
-                    <h3>Executed tests</h3>
-                    <div id="testCounter"></div>
-                </div>
             </div>
         </div>
-
-
-
-
-
-
-
-
 
 
 
@@ -352,7 +316,16 @@
             </table>
         </div>
 
-        
+        <!-- Mini test report -->
+        <div id="miniTestReport" class="moving-panel shy">
+            <div class="page-header">
+                <h3><u>T</u>est report <small class="summary">Awaiting test results..</small></h3>
+            </div>
+
+            <div class="panel-container"></div>
+        </div>
+
+
 
 
 
