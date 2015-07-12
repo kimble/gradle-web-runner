@@ -56,7 +56,7 @@ logger.lifecycle "Gradle build spy starting on port $spyPort"
 new Thread({
     Thread.sleep(500) // Give some time for the port to open
     // - The client on the other end will listen for the following message.
-    logger.lifecycle "I'll be hanging around waiting for the g-viz to connect.."
+    logger.lifecycle "I'll be hanging around waiting for the backend to connect.."
 }).start()
 
 BuildSpy spy = new BuildSpy(Integer.parseInt(spyPort))
@@ -72,6 +72,7 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
             [
                     tasks: graph.allTasks.collect { Task task ->
                         [
+                                type: task.class.simpleName.replace("_Decorated", ""),
                                 name: task.name,
                                 path: task.path,
                                 description: task.description,

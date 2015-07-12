@@ -24,6 +24,7 @@
 
         <script src="/assets/lib/gradle-settings.js"></script>
         <script src="/assets/lib/gradle-output.js"></script>
+        <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/running-tasks.js"></script>
         <script src="/assets/lib/task-donut.js"></script>
@@ -37,6 +38,7 @@
 
             .container-full {
                 margin: 0 auto;
+                padding-left: 3em;
                 width: 95%;
             }
 
@@ -100,7 +102,7 @@
 
             #buildDetails.shy {
                 bottom: -340px;
-                left: 30px;
+                left: 100px;
             }
 
             #buildDetails .details-container {
@@ -214,23 +216,56 @@
 
 
 
+            /* Task panel */
+
+            #taskPanel {
+                left: -2px;
+                top: -2px;
+                width: 25px;
+
+                height: calc(100% + 4px);
+
+                box-shadow: inset -6px 0px 23px -2px rgba(0,0,0,1);
+                background-color: #242320;
+
+                color: rgb(201, 208, 194);
+
+                border-right: 2px solid #222;
+            }
+
+            #taskPanel.shy {
+                right: -20px;
+            }
+
+            #taskStack {
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+
+
+
+
+
             /* Output */
 
             #gradleOutput {
-                top: 0;
+                top: -2px;
                 right: -10px;
 
                 width: 60%;
-                height: 100%;
+                height: calc(100% + 4px);
 
                 box-shadow: inset 6px 0px 23px -2px rgba(0,0,0,1);
                 background-color: #242320;
 
                 color: rgb(201, 208, 194);
+
+                border-left: 2px solid #222;
             }
 
             #gradleOutput.shy {
-                right: -300px;
+                right: -500px;
             }
 
             #gradleOutput .output-container {
@@ -285,8 +320,6 @@
 
 
 
-
-
         <div class="container container-full">
             <div class="row">
                 <div id="headerRow" class="col-md-12">
@@ -325,6 +358,12 @@
 
 
 
+
+
+        <!-- Tasks -->
+        <div id="taskPanel" class="moving-panel shy">
+            <div id="taskStack"></div>
+        </div>
 
 
         <!-- Gradle output -->
@@ -368,6 +407,7 @@
                 </div>
             </div>
         </div>
+
 
 
 
@@ -429,9 +469,10 @@
                 createGradleSettings(pubsub);
                 createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
-                createTaskDonut(pubsub);
+                // createTaskDonut(pubsub);
                 createCounters(pubsub);
-                createTestReport(pubsub);
+                // createTestReport(pubsub);
+                createTaskPanel(pubsub);
 
                 // State
 

@@ -40,7 +40,7 @@ public class Build implements Comparable<Build> {
 
 
     public void onConsoleOutput(String line) {
-        if (line.contains("I'll be hanging around waiting for the g-viz to connect..")) {
+        if (line.contains("I'll be hanging around waiting for the backend to connect..")) {
             connectToSpyWithinBuild();
         }
 
