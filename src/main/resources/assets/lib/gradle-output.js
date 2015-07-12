@@ -15,9 +15,19 @@ function createGradleOutputConsole(pubsub) {
 
 
     pubsub.stream("OutputWrittenFromGradle")
-        .onValue(function(event) {
-            $outputContainer.append("<div>" + event.line + "</div>");
+        .map(".line")
+        .bufferWithTime(200)
+        .onValue(function(lines) {
+            var htmlLines = lines.map(function(line) {
+                return "<div>" + line + "</div>";
+            });
+
+            var html = htmlLines.join("");
+            $outputContainer.append(html);
+
+            // Scroll
             $outputContainer.prop("scrollTop", $outputContainer.prop("scrollHeight") - $outputContainer.height());
         });
+
 
 }
