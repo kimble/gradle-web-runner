@@ -1,5 +1,7 @@
 package com.developerb.gviz.events;
 
+import java.util.Date;
+
 /**
  * @author Kim A. Betti
  */
@@ -7,7 +9,8 @@ public abstract class TaskEvent extends Event {
 
     private final String path;
 
-    protected TaskEvent(String path) {
+    protected TaskEvent(Date timestamp, String path) {
+        super(timestamp);
         this.path = path;
     }
 

@@ -3,6 +3,7 @@ package com.developerb.gviz.events;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,16 +21,16 @@ public class TestCompleted extends TestEvent {
 
 
     @JsonCreator
-    public TestCompleted (
-            @JsonProperty("className") String className,
-            @JsonProperty("name") String name,
-            @JsonProperty("result") ResultType result,
-            @JsonProperty("durationMillis") Integer durationMillis,
-            @JsonProperty("exceptionMessage") String exceptionMessage,
-            @JsonProperty("exceptionStacktrace") String exceptionStacktrace,
-            @JsonProperty("output") List<String> output) {
+    public TestCompleted(@JsonProperty("timestamp") Date timestamp,
+                         @JsonProperty("className") String className,
+                         @JsonProperty("name") String name,
+                         @JsonProperty("result") ResultType result,
+                         @JsonProperty("durationMillis") Integer durationMillis,
+                         @JsonProperty("exceptionMessage") String exceptionMessage,
+                         @JsonProperty("exceptionStacktrace") String exceptionStacktrace,
+                         @JsonProperty("output") List<String> output) {
 
-        super(className, name);
+        super(timestamp, className, name);
 
         this.result = result;
         this.durationMillis = durationMillis;

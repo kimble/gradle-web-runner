@@ -1,5 +1,7 @@
 package com.developerb.gviz.events;
 
+import java.util.Date;
+
 /**
  * @author Kim A. Betti
  */
@@ -8,7 +10,8 @@ public abstract class TestEvent extends Event {
     private final String className;
     private final String name;
 
-    protected TestEvent(String className, String name) {
+    protected TestEvent(Date timestamp, String className, String name) {
+        super(timestamp);
         this.className = className;
         this.name = name;
     }

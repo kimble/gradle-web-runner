@@ -27,6 +27,8 @@
 }
 
 #buildProgress .bar-label {
+    border-left: 3px solid #333;
+    background-color: #fafafa;
     color: #333;
     width: 200px;
     float: left;

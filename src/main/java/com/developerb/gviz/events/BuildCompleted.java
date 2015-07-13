@@ -1,5 +1,7 @@
 package com.developerb.gviz.events;
 
+import java.util.Date;
+
 /**
  * @author Kim A. Betti
  */
@@ -8,6 +10,7 @@ public class BuildCompleted extends Event {
     private final int exitValue;
 
     public BuildCompleted(int exitValue) {
+        super(new Date());
         this.exitValue = exitValue;
     }
 

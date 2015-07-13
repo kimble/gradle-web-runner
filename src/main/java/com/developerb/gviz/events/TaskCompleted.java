@@ -3,6 +3,8 @@ package com.developerb.gviz.events;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
+
 /**
  * @author Kim A. Betti
  */
@@ -18,13 +20,14 @@ public class TaskCompleted extends TaskEvent {
 
     @JsonCreator
     public TaskCompleted(@JsonProperty("path") String path,
+                         @JsonProperty("timestamp") Date timestamp,
                          @JsonProperty("didWork") boolean didWork,
                          @JsonProperty("executed") boolean executed,
                          @JsonProperty("skipped") boolean skipped,
                          @JsonProperty("skippedMessage") String skippedMessage,
                          @JsonProperty("failureMessage") String failureMessage,
                          @JsonProperty("durationMillis") Integer durationMillis) {
-        super(path);
+        super(timestamp, path);
 
         this.didWork = didWork;
         this.executed = executed;

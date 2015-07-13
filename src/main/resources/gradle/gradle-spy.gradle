@@ -149,14 +149,17 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
     }
 
     graph.afterTask { Task task, TaskState state ->
+        long timestamp = System.currentTimeMillis()
+
         spy.send("task-after", [
                 path: task.path,
+                timestamp: timestamp,
                 didWork: state.didWork,
                 executed: state.executed,
                 skipped: state.skipped,
                 skippedMessage: state.skipMessage,
                 failureMessage: state.failure?.message,
-                durationMillis: System.currentTimeMillis() - task.ext.startTime
+                durationMillis: timestamp - task.ext.startTime
         ])
     }
 }
@@ -164,6 +167,7 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
 
 gradle.settingsEvaluated { Settings settings ->
     spy.send("settings-ready", [
+            timestamp: System.currentTimeMillis(),
             settings: [
                     projectName: settings.rootProject.name,
                     parallelExecution: settings.startParameter.parallelProjectExecutionEnabled,

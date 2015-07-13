@@ -1,7 +1,7 @@
 /* Running tasks */
 
 #tasksScene2 {
-    margin-top: 2em;
+    margin-top: 3em;
 }
 
 #tasksScene2 .task-running {
@@ -11,7 +11,7 @@
     float: left;
     width: 400px;
 
-    background-color: rgb(58, 124, 165);
+    background-color: rgb(132, 132, 132);
     padding: 5px 10px;
     margin: 5px 10px 5px 0;
     color: white;
@@ -22,12 +22,11 @@
 
 #tasksScene2 .task-running.success {
     background-color: rgb(174, 199, 59);
-    opacity: 0;
 }
 
 
 #tasksScene2 .task-running h3 {
-    margin: 7px 0 2px 0;
+    margin: 7px 0 4px 0;
     font-size: 1.1em;
     font-weight: bold;
 }

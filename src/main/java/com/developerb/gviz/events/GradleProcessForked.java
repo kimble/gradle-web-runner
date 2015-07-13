@@ -14,24 +14,19 @@ public class GradleProcessForked extends Event {
 
     private final String path;
     private final String commandLine;
-    private final Date timestamp;
 
     public GradleProcessForked(File directory, List<String> command) {
         this(directory.getAbsolutePath(), Joiner.on(" ").join(command), new Date());
     }
 
     public GradleProcessForked(String path, String commandLine, Date timestamp) {
+        super(timestamp);
         this.commandLine = commandLine;
-        this.timestamp = timestamp;
         this.path = path;
     }
 
     public String getCommandLine() {
         return commandLine;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
     }
 
     public String getPath() {

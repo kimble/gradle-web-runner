@@ -7,16 +7,11 @@ import java.util.Date;
  */
 public class OutputWrittenFromGradle extends Event {
 
-    private final Date timestamp;
     private final String line;
 
     public OutputWrittenFromGradle(Date timestamp, String line) {
-        this.timestamp = timestamp;
+        super(timestamp);
         this.line = line;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
     }
 
     public String getLine() {

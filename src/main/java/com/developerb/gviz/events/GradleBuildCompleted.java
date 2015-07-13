@@ -13,7 +13,6 @@ import java.util.Date;
 public class GradleBuildCompleted extends Event {
 
     private final String failureMessage;
-    private final Date timestamp;
     private final long durationMillis;
 
     @JsonCreator
@@ -21,17 +20,13 @@ public class GradleBuildCompleted extends Event {
                                 @JsonProperty("timestamp") Date timestamp,
                                 @JsonProperty("durationMillis") long durationMillis) {
 
+        super(timestamp);
         this.failureMessage = failureMessage;
         this.durationMillis = durationMillis;
-        this.timestamp = timestamp;
     }
 
     public String getFailureMessage() {
         return failureMessage;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
     }
 
     public long getDurationMillis() {

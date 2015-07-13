@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Joiner;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -15,7 +16,8 @@ public class TaskGraphReady extends Event {
     private final List<Task> tasks;
 
     @JsonCreator
-    public TaskGraphReady(@JsonProperty("tasks") List<Task> tasks) {
+    public TaskGraphReady(@JsonProperty("timestamp") Date timestamp, @JsonProperty("tasks") List<Task> tasks) {
+        super(timestamp);
         this.tasks = tasks;
     }
 

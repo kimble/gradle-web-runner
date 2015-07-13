@@ -1,5 +1,7 @@
 package com.developerb.gviz.events;
 
+import java.util.Date;
+
 /**
  * @author Kim A. Betti
  */
@@ -9,6 +11,7 @@ public class UnknownErrorOccurred extends Event {
     private final String message;
 
     public UnknownErrorOccurred(Throwable trouble) {
+        super(new Date());
         type = trouble.getClass().getName();
         message = trouble.getMessage();
     }
