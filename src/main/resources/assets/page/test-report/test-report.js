@@ -35,7 +35,7 @@ function createTestReport(pubsub) {
     }
 
 
-    function createInitialState() {
+    function createInitialState(raiseDirtyFlag) {
         var focus = (function() {
             var focusElements = { };
 
@@ -119,6 +119,7 @@ function createTestReport(pubsub) {
                         focus.take("class");
                         focus.take("test");
                         state.selectedPackage = pkg.name;
+                        raiseDirtyFlag();
                     }
                 };
 
@@ -142,6 +143,7 @@ function createTestReport(pubsub) {
                                 focus.give("class", clazzState.$el);
                                 focus.take("test");
                                 state.selectedClass = clazzState.className;
+                                raiseDirtyFlag();
                             }
                         };
 
@@ -164,6 +166,7 @@ function createTestReport(pubsub) {
                                 if (test.hasOwnProperty("$el")) {
                                     focus.give("test", test.$el);
                                     state.selectedTest = test.name;
+                                    raiseDirtyFlag();
                                 }
                             };
 
@@ -204,9 +207,18 @@ function createTestReport(pubsub) {
 
 
 
+
+    var updateTriggerStream = new Bacon.Bus();
+
+
+    function triggerUpdate() {
+        updateTriggerStream.push("Update requested");
+    }
+
+
     var state = pubsub.stream("TestCompleted")
         .takeUntil(pubsub.stream("GradleBuildCompleted"))
-        .fold(createInitialState(), function(state, completedTest) {
+        .fold(createInitialState(triggerUpdate), function(state, completedTest) {
             var packageName = getPackageName(completedTest.className);
             var pkg = state.ensurePackage(packageName);
             var clazz = pkg.ensureClass(completedTest.className);
@@ -214,6 +226,11 @@ function createTestReport(pubsub) {
 
             return state;
         });
+
+    var stateUpdateStream = state.combine(updateTriggerStream, function(state) {
+        return state;
+    });
+
 
 
     state.log("State");
@@ -225,21 +242,6 @@ function createTestReport(pubsub) {
 
 
 
-
-    var updateTriggerStream = new Bacon.Bus();
-
-    var stateUpdateStream = state.combine(updateTriggerStream, function(state) {
-        return state;
-    });
-
-
-
-
-
-
-    function triggerUpdate() {
-        updateTriggerStream.push("Update requested");
-    }
 
 
 
@@ -258,7 +260,6 @@ function createTestReport(pubsub) {
             .append("div")
             .on("click", function(p) {
                 p.select();
-                triggerUpdate();
             })
             .attr("class", "entity package")
             .classed("failure", greaterThenZero("failures"))
@@ -312,7 +313,6 @@ function createTestReport(pubsub) {
             .classed("failure", greaterThenZero("failures"))
             .on("click", function(c) {
                 c.select();
-                triggerUpdate();
             })
             .each(function(p) {
                 p.$el = $(this);
@@ -366,7 +366,6 @@ function createTestReport(pubsub) {
             .classed("failure", prop("failure"))
             .on("click", function(t) {
                 t.select();
-                triggerUpdate();
             })
             .each(function(t) {
                 t.$el = $(this);
