@@ -42,7 +42,9 @@ function createTestReport(pubsub) {
                     name: packageName,
                     failures: 0,
                     tests: { },
-                    classes: { }
+                    classes: { },
+                    classCount: 0,
+                    testCount: 0
                 }
             }
 
@@ -55,9 +57,11 @@ function createTestReport(pubsub) {
                     packageName: packageName,
                     name: simpleName,
                     failures: 0,
+                    testCount: 0,
                     tests: { }
                 };
 
+                pkg.classCount++;
                 pkg.classes[startedTest.className] = clazzState;
                 state.classes[startedTest.className] = clazzState;
             }
@@ -80,6 +84,10 @@ function createTestReport(pubsub) {
                 clazz.failures++;
                 pkg.failures++;
             }
+
+            // Count
+            clazz.testCount++;
+            pkg.testCount++;
 
             clazz.tests[testName] = test;
             pkg.tests[testName] = test;
@@ -114,7 +122,9 @@ function createTestReport(pubsub) {
 
             enterPackage.append("p")
                 .attr("class", "summary")
-                .text("Her kommer oppsummering");
+                .text(function(p) {
+                    return p.classCount + " classes with a total of " + p.testCount + " tests";
+                });
         });
 
     state.map(".classes")
@@ -138,7 +148,9 @@ function createTestReport(pubsub) {
 
             enterPackage.append("p")
                 .attr("class", "summary")
-                .text("Her kommer oppsummering");
+                .text(function(c) {
+                    return c.testCount + " tests.";
+                });
         });
 
     state.map(".tests")

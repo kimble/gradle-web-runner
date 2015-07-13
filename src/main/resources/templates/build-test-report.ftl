@@ -22,7 +22,7 @@
 
         <link href='/assets/page/test-report/test-report.css' rel='stylesheet' type='text/css'>
 
-        <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700' rel='stylesheet' type='text/css'>
         <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
 
 
@@ -61,19 +61,19 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="page-header">
                         <h2>Packages</h2>
                     </div>
                     <div id="packages"></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="page-header">
                         <h2>Classes</h2>
                     </div>
                     <div id="classes"></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="page-header">
                         <h2>Tests</h2>
                     </div>
