@@ -1,0 +1,31 @@
+/* Build details */
+
+#buildDetails {
+    bottom: 0;
+    left: 50px;
+
+    width: 400px;
+    height: 300px;
+}
+
+#buildDetails.shy {
+    bottom: -240px;
+}
+
+#buildDetails .page-header {
+    background-color: rgb(174, 199, 59);
+}
+
+#buildDetailsContainer td,th {
+    border-top: 0;
+}
+
+.setting-property .key {
+    padding-left: 1em;
+    font-weight: bold;
+    color: #444;
+}
+
+.setting-property .value {
+    color: #888;
+}

@@ -70,7 +70,6 @@ As this is just a summer pet projects I'll probably never get around to do half 
 
 ### Code cleanup
 
-- Move css out into separate .css files
 - Replace js dependencies with webjars
 
 ### General improvements

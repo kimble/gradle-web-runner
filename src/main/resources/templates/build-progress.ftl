@@ -20,9 +20,9 @@
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
-        <script src="/assets/lib/task-state.js"></script>
+        <script src="/assets/page/in-progress/task-state.js"></script>
 
-        <script src="/assets/lib/build-details.js"></script>
+        <script src="/assets/page/in-progress/build-details/build-details.js"></script>
 
 
 
@@ -39,6 +39,7 @@
         <link rel="stylesheet" href="/assets/page/in-progress/gradle-output/gradle-output.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/task-stack-panel/task-panel.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/build-estimate/build-estimate.css" />
+        <link rel="stylesheet" href="/assets/page/in-progress/build-details/build-details.css" />
 
 
         <style type="text/css">
@@ -105,40 +106,6 @@
                 bottom: -20px;
                 width: 95%;
             }
-
-            /* Build details */
-
-            #buildDetails {
-                bottom: 0;
-                left: 50px;
-
-                width: 400px;
-                height: 300px;
-            }
-
-            #buildDetails.shy {
-                bottom: -240px;
-            }
-
-            #buildDetails .page-header {
-                background-color: rgb(174, 199, 59);
-            }
-
-            #buildDetailsContainer td,th {
-                border-top: 0;
-            }
-
-            .setting-property .key {
-                padding-left: 1em;
-                font-weight: bold;
-                color: #444;
-            }
-
-            .setting-property .value {
-                color: #888;
-            }
-
-
 
 
         </style>
