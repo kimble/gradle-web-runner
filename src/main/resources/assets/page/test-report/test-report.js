@@ -35,9 +35,19 @@ function createTestReport(pubsub) {
     }
 
 
+    var initialState = {
+        packages: {},
+        classes: {},
+        tests: {},
+
+        selectedPackage: '',
+        selectedClass: '',
+        selectedTest: ''
+    };
+
     var state = pubsub.stream("TestCompleted")
         .takeUntil(pubsub.stream("GradleBuildCompleted"))
-        .fold({ packages: {}, classes: {}, tests: {} }, function(state, startedTest) {
+        .fold(initialState, function(state, startedTest) {
             var packageName = getPackageName(startedTest.className);
             var simpleName = getSimpleClassName(startedTest.className);
             var testName = startedTest.name;
@@ -50,8 +60,7 @@ function createTestReport(pubsub) {
                     tests: { },
                     classes: { },
                     classCount: 0,
-                    testCount: 0,
-                    selected: true
+                    testCount: 0
                 }
             }
 
@@ -65,8 +74,7 @@ function createTestReport(pubsub) {
                     name: simpleName,
                     failures: 0,
                     testCount: 0,
-                    tests: { },
-                    selected: true
+                    tests: { }
                 };
 
                 pkg.classCount++;
@@ -86,8 +94,7 @@ function createTestReport(pubsub) {
                 success: startedTest.result === "SUCCESS",
                 output: startedTest.output != null ? startedTest.output.join("") : null,
                 durationMillis: startedTest.durationMillis,
-                exceptionMessage: startedTest.exceptionMessage,
-                selected: true
+                exceptionMessage: startedTest.exceptionMessage
             };
 
             // Propagate failure upwards
@@ -127,128 +134,167 @@ function createTestReport(pubsub) {
 
 
 
-    function toggleSelected(entity) {
-        entity.selected = !entity.selected;
-        updateTriggerStream.push("Updated selected element");
+
+
+    function triggerUpdate() {
+        updateTriggerStream.push("Update requested");
     }
 
-    state.map(".packages")
-        .map(objectValues)
-        .onValue(function(packages) {
-            console.log("Packages, ", packages);
+
+    state.onValue(function(state) {
+        var packages = objectValues(state.packages);
+        console.log("Packages, ", packages);
 
 
-            var pkg = d3.select("#packages")
-                .selectAll(".package")
-                .data(packages, prop("name"));
+        var pkg = d3.select("#packages")
+            .selectAll(".package")
+            .data(packages, prop("name"));
 
-            var enterPackage = pkg.enter()
-                .append("div")
-                .on("click", toggleSelected)
-                .attr("class", "entity package")
-                .classed("failure", greaterThenZero("failures"));
+        var enterPackage = pkg.enter()
+            .append("div")
+            .on("click", function(p) {
+                state.selectedPackage = p.name;
+                state.selectedClass = '';
+                state.selectedTest = '';
+                triggerUpdate();
+            })
+            .attr("class", "entity package")
+            .classed("failure", greaterThenZero("failures"));
 
-            enterPackage.append("h3")
-                .text(prop("name"));
+        enterPackage.append("h3")
+            .text(prop("name"));
 
-            enterPackage.append("p")
-                .attr("class", "summary")
-                .text(function(p) {
-                    return p.classCount + " classes with a total of " + p.testCount + " tests";
-                });
-
-
-            // Updates
-
-            stateUpdateStream.map(".packages")
-                .map(objectValues)
-                .onValue(function(updatedPackages) {
-                    var pkg = d3.select("#packages")
-                        .selectAll(".package")
-                        .data(updatedPackages, prop("name"));
+        enterPackage.append("p")
+            .attr("class", "summary")
+            .text(function(p) {
+                return p.classCount + " classes with a total of " + p.testCount + " tests";
+            });
 
 
-                    pkg.classed("hidden", not(prop("selected")));
-                });
-        });
+        // Updates
+
+        stateUpdateStream.map(".packages")
+            .map(objectValues)
+            .onValue(function(updatedPackages) {
+                var pkg = d3.select("#packages")
+                    .selectAll(".package")
+                    .data(updatedPackages, prop("name"));
+
+            });
+    });
 
 
 
 
-    state.map(".classes")
-        .map(objectValues)
-        .onValue(function(classes) {
-            console.log("Classes, ", classes);
+    // Test classes
+
+    state.onValue(function(state) {
+        var classes = objectValues(state.classes);
+        console.log("Classes, ", classes);
+
+
+        var clazz = d3.select("#classes")
+            .selectAll(".test-class")
+            .data(classes, prop("className"));
+
+
+        var enterClass = clazz.enter()
+            .append("div")
+            .attr("class", "entity test-class")
+            .classed("hidden", function(c) {
+                return c.packageName !== state.selectedPackage;
+            })
+            .classed("failure", greaterThenZero("failures"))
+            .on("click", function(p) {
+                state.selectedPackage = p.packageName;
+                state.selectedClass = p.className;
+                state.selectedTest = '';
+                triggerUpdate();
+            });
+
+        enterClass.append("h3")
+            .text(prop("simpleName"));
+
+        enterClass.append("p")
+            .attr("class", "summary")
+            .text(function(c) {
+                return c.testCount + " tests.";
+            });
+
+
+        // Updates
+
+        stateUpdateStream.onValue(function(state) {
+            var classes = objectValues(state.classes);
 
 
             var clazz = d3.select("#classes")
                 .selectAll(".test-class")
                 .data(classes, prop("className"));
 
-
-            var enterClass = clazz.enter()
-                .append("div")
-                .attr("class", "entity test-class")
-                .classed("failure", greaterThenZero("failures"));
-
-            enterClass.append("h3")
-                .text(prop("simpleName"));
-
-            enterClass.append("p")
-                .attr("class", "summary")
-                .text(function(c) {
-                    return c.testCount + " tests.";
-                });
-
-
-            // Enter + update
-
-            clazz.classed("hidden", not(prop("selected")));
+            clazz.classed("hidden", function(c) {
+                return c.packageName !== state.selectedPackage;
+            });
         });
 
-
-    state.map(".tests")
-        .map(objectValues)
-        .onValue(function(tests) {
-            console.log("Tests, ", tests);
+    });
 
 
+    // Individual tests
+
+    state.onValue(function(state) {
+        var tests = objectValues(state.tests);
+        console.log("Tests, ", tests);
+
+        var test = d3.select("#tests")
+            .selectAll(".test")
+            .data(tests, prop("name"));
+
+
+        var enterTest = test.enter()
+            .append("div")
+            .attr("class", "entity test")
+            .classed("hidden", function (t) {
+                return t.className !== state.selectedClass;
+            })
+            .classed("failure", prop("failure"));
+
+        enterTest.append("h3")
+            .text(prop("name"));
+
+        enterTest.append("p")
+            .attr("class", "summary")
+            .text(function(t) {
+                switch (t.result) {
+                    case "SKIPPED":
+                        return "Skipped :-(";
+
+                    case "FAILURE":
+                        return "Failure: " + t.exceptionMessage;
+
+                    case "SUCCESS":
+                        return "Completed successfully in " + t.durationMillis + " milliseconds.";
+
+                    default:
+                        return "????";
+                }
+            });
+
+
+        // Updates
+
+        stateUpdateStream.onValue(function(state) {
+            var tests = objectValues(state.tests);
             var test = d3.select("#tests")
                 .selectAll(".test")
                 .data(tests, prop("name"));
 
-
-            var enterTest = test.enter()
-                .append("div")
-                .attr("class", "entity test")
-                .classed("failure", prop("failure"));
-
-            enterTest.append("h3")
-                .text(prop("name"));
-
-            enterTest.append("p")
-                .attr("class", "summary")
-                .text(function(t) {
-                    switch (t.result) {
-                        case "SKIPPED":
-                            return "Skipped :-(";
-
-                        case "FAILURE":
-                            return "Failure: " + t.exceptionMessage;
-
-                        case "SUCCESS":
-                            return "Completed successfully in " + t.durationMillis + " milliseconds.";
-
-                        default:
-                            return "????";
-                    }
-                });
-
-
-            // Enter + update
-
-            test.classed("hidden", not(prop("selected")));
+            test.classed("hidden", function (t) {
+                return t.className !== state.selectedClass;
+            });
         });
+
+    });
 
 }
 
