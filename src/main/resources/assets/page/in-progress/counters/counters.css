@@ -1,0 +1,13 @@
+/* Counters */
+
+.counter-container h3 {
+    font-family: 'Architects Daughter', cursive;
+    margin-left: 1em;
+}
+
+#counterPanel {
+    position: absolute;
+    width: 1400px;
+    left: 40px;
+    bottom: 100px;
+}

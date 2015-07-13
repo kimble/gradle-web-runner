@@ -1,0 +1,61 @@
+/* Running tasks */
+
+#tasksScene2 {
+    margin-top: 2em;
+}
+
+#tasksScene2 .task-running {
+    font-family: 'Oswald', sans-serif;
+    opacity: 1;
+
+    float: left;
+    width: 400px;
+
+    background-color: rgb(58, 124, 165);
+    padding: 5px 10px;
+    margin: 5px 10px 5px 0;
+    color: white;
+
+    transition-property: opacity, background-color;
+    transition-duration: 0.5s;
+}
+
+#tasksScene2 .task-running.success {
+    background-color: rgb(174, 199, 59);
+    opacity: 0;
+}
+
+
+#tasksScene2 .task-running h3 {
+    margin: 7px 0 2px 0;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+#tasksScene2 .task-running.failed {
+    background-color: rgb(173, 108, 108);
+}
+
+#tasksScene2 .task-running p {
+    font-size: 0.9em;
+}
+
+#tasksScene2 .task-progress-bar {
+    background-color: white;
+    width: 300px;
+    height: 3px;
+
+    transition-property: width;
+}
+
+#tasksScene2 .task-progress-bar.started {
+    width: 0;
+}
+
+#tasksScene2 .task-running.finished .task-progress-bar {
+    opacity: 0;
+}
+
+#tasksScene2 .task-running.finished .estimate {
+    display: none;
+}

@@ -31,7 +31,7 @@ function createRunningTasks(pubsub) {
             var description = task.description != null ? task.description : "No description";
 
             if (task.estimateMillis != null) {
-                description += "<br/>Estimate: " + (Math.ceil(task.estimateMillis / 1000)) + " seconds";
+                description += "<span class='estimate'>Estimate: " + (Math.ceil(task.estimateMillis / 1000)) + " seconds.</span>";
             }
 
             // var css = "width: 300px; transition: width " + task.estimateMillis + "ms;";
@@ -56,11 +56,16 @@ function createRunningTasks(pubsub) {
     pubsub.stream("TaskCompleted")
         .onValue(function (task) {
             var $el = taskDataMap[task.path].$el;
-            $el.addClass("done");
 
-            setTimeout(function() {
-                $el.remove();
-            }, 300);
+            if (task.failureMessage != null) {
+                $el.addClass("finished").addClass("failed");
+            }
+            else {
+                $el.addClass("finished").addClass("success");
+                setTimeout(function() {
+                    $el.remove();
+                }, 300);
+            }
         });
 
 }

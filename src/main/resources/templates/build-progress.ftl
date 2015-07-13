@@ -26,13 +26,16 @@
         <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/build-estimate.js"></script>
-        <script src="/assets/lib/running-tasks.js"></script>
-        <script src="/assets/lib/counters.js"></script>
 
 
 
-        <script src="/assets/page/mini-test-report/mini-test-report.js"></script>
-        <link href="/assets/page/mini-test-report/mini-test-report.css" rel="stylesheet">
+        <script src="/assets/page/in-progress/running-tasks/running-tasks.js"></script>
+        <script src="/assets/page/in-progress/mini-test-report/mini-test-report.js"></script>
+        <script src="/assets/page/in-progress/counters/counters.js"></script>
+
+        <link rel="stylesheet" href="/assets/page/in-progress/mini-test-report/mini-test-report.css" />
+        <link rel="stylesheet" href="/assets/page/in-progress/running-tasks/running-tasks.css" />
+        <link rel="stylesheet" href="/assets/page/in-progress/counters/counters.css" />
 
 
         <style type="text/css">
@@ -173,7 +176,7 @@
                 width: 60%;
                 height: calc(100% + 4px);
 
-                box-shadow: inset 6px 0px 23px -2px rgba(0,0,0,1);
+                box-shadow: inset 6px 0 23px -2px rgba(0,0,0,1);
                 background-color: #242320;
 
                 color: rgb(201, 208, 194);
@@ -202,61 +205,7 @@
                 margin-bottom: 1em;
             }
 
-            /* Counters */
 
-            .counter-container h3 {
-                font-family: 'Architects Daughter', cursive;
-                margin-left: 1em;
-            }
-
-
-
-
-            /* Running tasks */
-
-            #tasksScene2 .task-running {
-                font-family: 'Oswald', sans-serif;
-                opacity: 1;
-
-                transition-property: opacity;
-                transition-duration: 0.3s;
-            }
-
-            #tasksScene2 .task-running.done {
-                opacity: 0;
-            }
-
-            #tasksScene2 .task-running h3 {
-                font-size: 1.0em;
-                font-weight: bold;
-                margin-bottom: 2px;
-            }
-
-            #tasksScene2 .task-running p {
-                font-size: 0.8em;
-            }
-
-            #tasksScene2 .task-progress-bar {
-                background-color: #555;
-                width: 300px;
-                height: 3px;
-
-                transition-property: width;
-            }
-
-            #tasksScene2 .task-progress-bar.started {
-                width: 0px;
-            }
-
-
-            /* Counter panel */
-
-            #counterPanel {
-                position: absolute;
-                width: 1400px;
-                left: 40px;
-                bottom: 100px;
-            }
 
 
             /* Build progress */
@@ -311,7 +260,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-8">
                     <div id="tasksScene2"></div>
                 </div>
             </div>

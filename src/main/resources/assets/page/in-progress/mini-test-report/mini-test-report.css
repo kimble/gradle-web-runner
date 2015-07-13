@@ -23,7 +23,7 @@
     background-color: rgb(174, 199, 59);
 }
 #miniTestReport.failure .page-header {
-    background-color: #FB8768;
+    background-color: rgb(173, 108, 108);
 }
 
 #miniTestReport .panel-container {
