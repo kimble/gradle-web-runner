@@ -2,6 +2,63 @@ function createTestReport(pubsub) {
     "use strict";
 
 
+    function getPackageName(className) {
+        return className.substring(0, className.lastIndexOf('.'));
+    }
+
+    function getSimpleClassName(className) {
+        return className.substring(className.lastIndexOf('.') + 1);
+    }
+
+
+    pubsub.stream("TestStarted")
+        .onValue(function(startedTest) {
+
+        });
+
+    var buildCompleted = pubsub.stream("GradleBuildCompleted");
+
+
+    var state = pubsub.stream("TestCompleted")
+        .takeUntil(buildCompleted)
+        .fold({ packages: {} }, function(state, startedTest) {
+            var packageName = getPackageName(startedTest.className);
+            var simpleName = getSimpleClassName(startedTest.className);
+            var testName = startedTest.name;
+
+            // Add package
+            if (!state.packages.hasOwnProperty(packageName)) {
+                state.packages[packageName] = {
+                    name: packageName,
+                    classes: { }
+                }
+            }
+
+            // Add classes
+            var pkg = state.packages[packageName];
+            if (!pkg.classes.hasOwnProperty(startedTest.className)) {
+                pkg.classes[startedTest.className] = {
+                    fullName: startedTest.className,
+                    name: simpleName,
+                    tests: { }
+                }
+            }
+
+            // Finally, add test
+            var clazz = pkg.classes[startedTest.className];
+            clazz.tests[testName] = {
+                name: testName,
+                result: startedTest.result,
+                output: startedTest.output != null ? startedTest.output.join("") : null,
+                durationMillis: startedTest.durationMillis,
+                exceptionMessage: startedTest.exceptionMessage
+            };
+
+            return state;
+        });
+
+
+    state.log("State");
 }
 
 
