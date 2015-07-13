@@ -82,6 +82,8 @@ function createTestReport(pubsub) {
                 className: startedTest.className,
                 result: startedTest.result,
                 failure: startedTest.result === "FAILURE",
+                skipped: startedTest.result === "SKIPPED",
+                success: startedTest.result === "SUCCESS",
                 output: startedTest.output != null ? startedTest.output.join("") : null,
                 durationMillis: startedTest.durationMillis,
                 exceptionMessage: startedTest.exceptionMessage,
@@ -141,6 +143,7 @@ function createTestReport(pubsub) {
             pkg.classed("hidden", prop("selected"));
         });
 
+
     state.map(".classes")
         .map(objectValues)
         .onValue(function(classes) {
@@ -172,6 +175,7 @@ function createTestReport(pubsub) {
             clazz.classed("hidden", prop("selected"));
         });
 
+
     state.map(".tests")
         .map(objectValues)
         .onValue(function(tests) {
@@ -193,7 +197,17 @@ function createTestReport(pubsub) {
 
             enterTest.append("p")
                 .attr("class", "summary")
-                .text("Her kommer oppsummering");
+                .text(function(t) {
+                    if (t.failure) {
+                        return "Failure: " + t.exceptionMessage;
+                    }
+                    else if (t.skipped) {
+                        return "Skipped :-("
+                    }
+                    else {
+                        return "Completed successfully in " + t.durationMillis + " milliseconds.";
+                    }
+                });
 
 
             // Enter + update
