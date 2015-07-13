@@ -25,7 +25,7 @@ function createTestReport(pubsub) {
 
     var state = pubsub.stream("TestCompleted")
         .takeUntil(pubsub.stream("GradleBuildCompleted"))
-        .fold({ packages: {} }, function(state, startedTest) {
+        .fold({ packages: {}, classes: {} }, function(state, startedTest) {
             var packageName = getPackageName(startedTest.className);
             var simpleName = getSimpleClassName(startedTest.className);
             var testName = startedTest.name;
@@ -42,12 +42,16 @@ function createTestReport(pubsub) {
             // Add classes
             var pkg = state.packages[packageName];
             if (!pkg.classes.hasOwnProperty(startedTest.className)) {
-                pkg.classes[startedTest.className] = {
+                var clazzState = {
                     className: startedTest.className,
+                    simpleName: simpleName,
                     packageName: packageName,
                     name: simpleName,
                     tests: { }
-                }
+                };
+
+                pkg.classes[startedTest.className] = clazzState;
+                state.classes[startedTest.className] = clazzState;
             }
 
             // Finally, add test
@@ -90,6 +94,29 @@ function createTestReport(pubsub) {
 
             enterPackage.append("h3")
                 .text(prop("name"));
+
+            enterPackage.append("p")
+                .attr("class", "summary")
+                .text("Her kommer oppsummering");
+        });
+
+    state.map(".classes")
+        .map(objectValues)
+        .onValue(function(classes) {
+            console.log("Classes, ", classes);
+
+
+            var pkg = d3.select("#classes")
+                .selectAll(".test-class")
+                .data(classes, prop("className"));
+
+
+            var enterPackage = pkg.enter()
+                .append("div")
+                .attr("class", "test-class");
+
+            enterPackage.append("h3")
+                .text(prop("simpleName"));
 
             enterPackage.append("p")
                 .attr("class", "summary")
