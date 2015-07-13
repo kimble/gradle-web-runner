@@ -405,14 +405,27 @@
                     // Create a stream of simple keyboard commands
                     $(document).keydown(function(event) {
                         var key = String.fromCharCode(event.keyCode);
-                        bus.push({type: "key-down-" + key, event: {}})
+                        var eventType = "key-down-" + key;
+
+                        bus.push({
+                            type: eventType,
+                            event: {}
+                        });
                     });
 
                     // Dead simple pubsub event-bus with reactive
                     // capabilities provided by Bacon.js
                     return {
-                        broadcast: function(event) {
-                            bus.push(event);
+                        broadcast: function() {
+                            if (arguments.length == 2) {
+                                bus.push({
+                                    type: arguments[0],
+                                    event: arguments[1]
+                                });
+                            }
+                            else {
+                                bus.push(arguments[0]);
+                            }
                         },
                         stream: function(type) {
                             return bus.filter(function (transfer) {

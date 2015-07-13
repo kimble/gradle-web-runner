@@ -10,7 +10,7 @@ function createBuildEstimate(pubsub) {
     var $progressBar = $buildProgress.find(".bar");
     var $progressLabel = $buildProgress.find(".bar-label");
 
-    pubsub.stream('estimated-received')
+    pubsub.stream('estimates-received')
         .filter(hasProperty("build"))
         .map(".build")
         .onValue(function (buildEstimate) {

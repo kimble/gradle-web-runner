@@ -36,7 +36,7 @@ function initializeTaskState(pubsub, buildNumber) {
         console.log("Fetching estimates");
 
         jQuery.getJSON("/api/build/" + buildNumber + "/estimates", function(estimates) {
-            pubsub.broadcast({ type: 'estimated-received', event: estimates });
+            pubsub.broadcast('estimates-received', estimates);
 
             for (var key in estimates) {
                 if (estimates.hasOwnProperty(key)) {
@@ -47,7 +47,7 @@ function initializeTaskState(pubsub, buildNumber) {
                 }
             }
 
-            pubsub.broadcast({ type: 'tasks-estimated', event: tasks });
+            pubsub.broadcast('tasks-estimated', tasks);
             broadcastStateUpdate();
         });
     }
@@ -68,6 +68,7 @@ function initializeTaskState(pubsub, buildNumber) {
             broadcastStateUpdate();
             fetchEstimates();
         });
+
 
     pubsub.stream("TaskStarting")
         .onValue(function(event) {
