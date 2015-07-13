@@ -15,8 +15,6 @@ function createRunningTestReport(pubsub) {
 
 
 
-
-
     var streamResultCount = (function() {
         var resultStream = pubsub.stream("TestCompleted").map(".result");
 
@@ -78,9 +76,23 @@ function createRunningTestReport(pubsub) {
         var packageName = test.className.substring(0, test.className.lastIndexOf('.'));
         var simpleClassName = test.className.substring(test.className.lastIndexOf('.') + 1);
 
-        $panelContainer.append('<div class="test failed"><h2><small class="package-name">' + packageName + '</small>' +
+        var $failure = $('<div class="test failed"><h2><small class="package-name">' + packageName + '</small>' +
             '<br/><span class="simple-class-name">' + simpleClassName + '</span>' +
-            '<br/><span class="test-name"><span class="glyphicon glyphicon-remove-sign"></span> ' + test.name + '</span></h2></div>');
+            '<br/><span class="test-name"><span class="glyphicon glyphicon-remove-sign"></span> ' + test.name + '</span></h2>' +
+            '<div class="alert alert-danger exception-message" role="alert">' + test.exceptionMessage + '</div>' +
+            '<pre class="stacktrace">'+ test.exceptionStacktrace +'</pre>' +
+            '<pre class="output">'+ test.output +'</pre>' +
+            '</div>');
+
+        if (test.output == null) {
+            $failure.find(".output").addClass("hidden");
+        }
+        if (test.exceptionStacktrace == null) {
+            $failure.find(".stacktrace").addClass("hidden");
+        }
+
+
+        $failure.appendTo($panelContainer);
 
         $panelContainer.append("<hr />");
     });

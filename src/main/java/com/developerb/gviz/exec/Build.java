@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Date;
@@ -62,62 +63,77 @@ public class Build implements Comparable<Build> {
         try {
             try (Socket socket = new Socket("localhost", 10_000)) {
                 log.info("Connected to spy running inside build");
-
-                try (InputStreamReader reader = new InputStreamReader(socket.getInputStream())) {
-                    try (BufferedReader in = new BufferedReader(reader)) {
-                        String userInput;
-                        while ((userInput = in.readLine()) != null) {
-                            final JsonNode json = jackson.readTree(userInput);
-                            final String type = json.get("type").asText();
-
-                            try {
-                                switch (type) {
-                                    case "settings-ready":
-                                        handleEvent(json, SettingsReady.class);
-                                        break;
-
-                                    case "task-graph-ready":
-                                        handleEvent(json, TaskGraphReady.class);
-                                        break;
-
-                                    case "task-before":
-                                        handleEvent(json, TaskStarting.class);
-                                        break;
-
-                                    case "task-after":
-                                        TaskCompleted taskCompleted = handleEvent(json, TaskCompleted.class);
-                                        statistics.reportDuration(taskCompleted.getPath(), taskCompleted.getDurationMillis());
-                                        break;
-
-                                    case "before-test":
-                                        handleEvent(json, TestStarted.class);
-                                        break;
-
-                                    case "after-test":
-                                        TestCompleted testCompleted = handleEvent(json, TestCompleted.class);
-                                        statistics.reportDuration(testCompleted.key(), testCompleted.getDurationMillis());
-                                        break;
-
-                                    case "build-completed":
-                                        GradleBuildCompleted buildCompleted = handleEvent(json, GradleBuildCompleted.class);
-                                        statistics.reportDuration("build", buildCompleted.getDurationMillis());
-                                        break;
-
-
-                                    default:
-                                        log.warn("Received message of unknown type: {}", type);
-                                }
-                            }
-                            catch (JsonProcessingException ex) {
-                                throw new IllegalStateException("Failed to deserialize '" + type + "': " + userInput, ex);
-                            }
-                        }
-                    }
-                }
+                readSocketMessages(socket);
             }
         }
         catch (Exception ex) {
             onUnknownFailure("Failed to connect to the spy running within build", ex);
+        }
+    }
+
+    private void readSocketMessages(Socket socket) throws IOException {
+        try (InputStreamReader reader = new InputStreamReader(socket.getInputStream())) {
+            try (BufferedReader in = new BufferedReader(reader)) {
+                StringBuilder buffer = new StringBuilder();
+                String receivedLine;
+
+                while ((receivedLine = in.readLine()) != null) {
+                    if (receivedLine.equals("----====----")) {
+                        parseMessage(buffer.toString());
+                        buffer = new StringBuilder();
+                    }
+                    else {
+                        buffer.append(receivedLine);
+                    }
+                }
+            }
+        }
+    }
+
+    private void parseMessage(String userInput) throws IOException {
+        final JsonNode json = jackson.readTree(userInput);
+        final String type = json.get("type").asText();
+
+        try {
+            switch (type) {
+                case "settings-ready":
+                    handleEvent(json, SettingsReady.class);
+                    break;
+
+                case "task-graph-ready":
+                    handleEvent(json, TaskGraphReady.class);
+                    break;
+
+                case "task-before":
+                    handleEvent(json, TaskStarting.class);
+                    break;
+
+                case "task-after":
+                    TaskCompleted taskCompleted = handleEvent(json, TaskCompleted.class);
+                    statistics.reportDuration(taskCompleted.getPath(), taskCompleted.getDurationMillis());
+                    break;
+
+                case "before-test":
+                    handleEvent(json, TestStarted.class);
+                    break;
+
+                case "after-test":
+                    TestCompleted testCompleted = handleEvent(json, TestCompleted.class);
+                    statistics.reportDuration(testCompleted.key(), testCompleted.getDurationMillis());
+                    break;
+
+                case "build-completed":
+                    GradleBuildCompleted buildCompleted = handleEvent(json, GradleBuildCompleted.class);
+                    statistics.reportDuration("build", buildCompleted.getDurationMillis());
+                    break;
+
+
+                default:
+                    log.warn("Received message of unknown type: {}", type);
+            }
+        }
+        catch (JsonProcessingException ex) {
+            throw new IllegalStateException("Failed to deserialize '" + type + "': " + userInput, ex);
         }
     }
 

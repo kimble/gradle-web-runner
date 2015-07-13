@@ -137,8 +137,8 @@
 
             <div class="panel-container">
                 <div class="waiting-message">
-                    <p>Yet to be implemented!</p>
-                    <p>This panel should contain a simple summary<br/>+ a link to a complete and interactive report page.</p>
+                    <p>Nice work!!</p>
+                    <p>Not a single test has failed so far!</p>
                 </div>
             </div>
         </div>

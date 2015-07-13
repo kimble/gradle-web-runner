@@ -26,7 +26,7 @@ class BuildSpy {
             socketWriter.write(JsonOutput.toJson([
                     type: type,
                     event: payload
-            ]) + "\n")
+            ]) + "\n----====----\n")
         }
         catch (Exception ex) {
             throw new GradleException("failed to send message '$type': <$payload>", ex)
@@ -122,12 +122,17 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
 
             // After
             task.afterTest { TestDescriptor test, TestResult result ->
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                result.exception?.printStackTrace(pw);
+
                 spy.send("after-test", [
                         name: test.name,
                         className: test.className,
                         result: result.resultType.name(),
                         durationMillis: result.endTime - result.startTime,
                         exceptionMessage: result.exception?.message,
+                        exceptionStacktrace: sw.toString(),
                         output: task.testOutput[test.className + ":" + test.name]
                 ])
             }

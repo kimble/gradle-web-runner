@@ -4,7 +4,7 @@
     bottom: 0;
     left: 500px;
 
-    width: 600px;
+    width: 720px;
     height: 500px;
 }
 
@@ -29,8 +29,26 @@
 #miniTestReport .test .simple-class-name {
     font-weight: bold;
 }
+
 #miniTestReport .test .test-name {
     font-weight: bold;
+}
+
+#miniTestReport .exception-message {
+    font-family: "Ubuntu Mono", monospace;
+    padding: 5px 10px;
+}
+#miniTestReport .stacktrace {
+    font-family: "Ubuntu Mono", monospace;
+    font-size: 0.8em;
+    padding: 5px 10px;
+
+    overflow: auto;
+    word-wrap: normal;
+    white-space: pre;
+
+    background-color: transparent;
+    border: none;
 }
 
 #miniTestReport .test.failed {

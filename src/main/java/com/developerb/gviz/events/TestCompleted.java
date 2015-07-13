@@ -14,6 +14,7 @@ public class TestCompleted extends TestEvent {
     private final Integer durationMillis;
 
     private final String exceptionMessage;
+    private final String exceptionStacktrace;
 
     private final List<String> output;
 
@@ -25,6 +26,7 @@ public class TestCompleted extends TestEvent {
             @JsonProperty("result") ResultType result,
             @JsonProperty("durationMillis") Integer durationMillis,
             @JsonProperty("exceptionMessage") String exceptionMessage,
+            @JsonProperty("exceptionStacktrace") String exceptionStacktrace,
             @JsonProperty("output") List<String> output) {
 
         super(className, name);
@@ -32,6 +34,7 @@ public class TestCompleted extends TestEvent {
         this.result = result;
         this.durationMillis = durationMillis;
         this.exceptionMessage = exceptionMessage;
+        this.exceptionStacktrace = exceptionStacktrace;
         this.output = output;
     }
 
@@ -45,6 +48,10 @@ public class TestCompleted extends TestEvent {
 
     public String getExceptionMessage() {
         return exceptionMessage;
+    }
+
+    public String getExceptionStacktrace() {
+        return exceptionStacktrace;
     }
 
     public List<String> getOutput() {
