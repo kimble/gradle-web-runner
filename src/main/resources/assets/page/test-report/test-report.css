@@ -3,6 +3,11 @@
     margin: 5px 0;
 }
 
+.entity-focus {
+    position: absolute;
+    transition-property: left, top;
+    transition-duration: 200ms;
+}
 
 .entity .package-name,.class-name {
     font-family: "Ubuntu Mono", monospace;

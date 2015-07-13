@@ -36,6 +36,33 @@ function createTestReport(pubsub) {
 
 
     function createInitialState() {
+        var focus = (function() {
+            var focusElements = { };
+
+            var ensureElement = function(name) {
+                if (!focusElements.hasOwnProperty(name)) {
+                    focusElements[name] = $('<span class="glyphicon glyphicon-search entity-focus" style="position: absolute; left: -100px; top: -100px;"></span>');
+                    $("body").append(focusElements[name]);
+                }
+
+                return focusElements[name];
+            };
+
+            return {
+                give: function(name, $focusedElement) {
+                    var $focusElement = ensureElement(name);
+
+                    $focusElement.css("left", $focusedElement.offset().left - 20)
+                                 .css("top", $focusedElement.offset().top + 20);
+                },
+                take: function(name) {
+                    var $focusElement = ensureElement(name);
+                    $focusElement.css("top", -100);
+                }
+            }
+        })();
+
+
         var state = {
             packages: {},
             classes: {},
@@ -50,18 +77,27 @@ function createTestReport(pubsub) {
             state.selectedPackage = packageName;
             state.selectedClass = '';
             state.selectedTest = '';
+
+            focus.give("package", state.packages[packageName].$el);
+            focus.take("class");
+            focus.take("test");
         };
 
         state.selectClass = function(className) {
             state.selectedPackage = getPackageName(className);
             state.selectedClass = className;
             state.selectedTest = '';
+
+            focus.give("class", state.classes[className].$el);
+            focus.take("test");
         };
 
         state.selectTest = function(className, name) {
             state.selectedPackage = getPackageName(className);
             state.selectedClass = className;
             state.selectedTest = name;
+
+            focus.give("test", state.tests[className + "-" + name].$el);
         };
 
         return state;
@@ -166,6 +202,9 @@ function createTestReport(pubsub) {
     }
 
 
+
+
+
     state.onValue(function(state) {
         var packages = objectValues(state.packages);
         console.log("Packages, ", packages);
@@ -182,7 +221,10 @@ function createTestReport(pubsub) {
                 triggerUpdate();
             })
             .attr("class", "entity package")
-            .classed("failure", greaterThenZero("failures"));
+            .classed("failure", greaterThenZero("failures"))
+            .each(function(p) {
+                p.$el = $(this);
+            });
 
         enterPackage.append("h3")
             .text(prop("name"));
@@ -231,6 +273,9 @@ function createTestReport(pubsub) {
             .on("click", function(p) {
                 state.selectClass(p.className);
                 triggerUpdate();
+            })
+            .each(function(p) {
+                p.$el = $(this);
             });
 
         enterClass.append("h3")
@@ -282,6 +327,9 @@ function createTestReport(pubsub) {
             .on("click", function(t) {
                 state.selectTest(t.className, t.name);
                 triggerUpdate();
+            })
+            .each(function(p) {
+                p.$el = $(this);
             });
 
         enterTest.append("h3")
