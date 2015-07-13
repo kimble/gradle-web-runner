@@ -1,6 +1,16 @@
 function createTestReport(pubsub) {
     "use strict";
 
+
+}
+
+
+
+
+/*
+function createTestReport(pubsub) {
+    "use strict";
+
     var $container = $("#testReport");
     var $small = $container.find(".page-header small");
     var $outputContainer = $container.find(".test-container");
@@ -218,3 +228,4 @@ function createTestReport(pubsub) {
         });
 
 }
+    */

@@ -52,7 +52,28 @@ public class ExecResource {
 
         if (optionalBuild.isPresent()) {
             Build build = optionalBuild.get();
-            BuildView view = new BuildView(build);
+            View view = new BuildView(build);
+
+            return Response.ok()
+                    .entity(view)
+                    .build();
+        }
+        else {
+            return Response.status(NOT_FOUND)
+                    .entity("No such build: " + nr)
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("build/{nr}/test-report")
+    @Produces("text/html")
+    public Response testReport(@PathParam("nr") Integer nr) {
+        Optional<Build> optionalBuild = buildRepository.get(nr);
+
+        if (optionalBuild.isPresent()) {
+            Build build = optionalBuild.get();
+            View view = new TestReportView(build);
 
             return Response.ok()
                     .entity(view)
@@ -152,6 +173,25 @@ public class ExecResource {
 
         public BuildView(Build build) {
             super("/templates/build-progress.ftl", UTF_8);
+            this.build = build;
+        }
+
+        public String getCommandLine() {
+            return Joiner.on(" ").join(build.buildParameters().createCommandLine());
+        }
+
+        public Integer getBuildNumber() {
+            return build.getBuildNumber();
+        }
+
+    }
+
+    public static class TestReportView extends View {
+
+        private final Build build;
+
+        public TestReportView(Build build) {
+            super("/templates/build-test-report.ftl", UTF_8);
             this.build = build;
         }
 
