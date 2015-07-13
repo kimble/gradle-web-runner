@@ -34,7 +34,7 @@ function createCounters(pubsub) {
     pubsub.stream("GradleBuildCompleted")
         .onValue(function() {
             $taskCounterContainer.find("h3").html("Executed tasks");
-            taskCountdown.setValue(taskCount);
+            taskCountdown.setValue(tasksCompleted);
         });
 
 }
