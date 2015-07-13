@@ -8,7 +8,7 @@
     background-color: #fafafa;
 
     transition-property: background-color, top, bottom, right, left;
-    transition-duration: 0.7s;
+    transition-duration: 0.4s;
 }
 
 .moving-panel.shy {

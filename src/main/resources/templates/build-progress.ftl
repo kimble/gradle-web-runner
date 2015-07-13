@@ -10,10 +10,8 @@
 
 
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/assets/flipclock/flipclock.css" rel="stylesheet">
 
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
-        <script src="/assets/flipclock/flipclock.min.js"></script>
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
@@ -22,7 +20,6 @@
         <script src="/assets/page/in-progress/build-details/build-details.js"></script>
         <script src="/assets/page/in-progress/running-tasks/running-tasks.js"></script>
         <script src="/assets/page/in-progress/mini-test-report/mini-test-report.js"></script>
-        <script src="/assets/page/in-progress/counters/counters.js"></script>
         <script src="/assets/page/in-progress/gradle-output/gradle-output.js"></script>
         <script src="/assets/page/in-progress/task-stack-panel/task-panel.js"></script>
         <script src="/assets/page/in-progress/build-estimate/build-estimate.js"></script>
@@ -34,7 +31,6 @@
 
         <link rel="stylesheet" href="/assets/page/in-progress/mini-test-report/mini-test-report.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/running-tasks/running-tasks.css" />
-        <link rel="stylesheet" href="/assets/page/in-progress/counters/counters.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/gradle-output/gradle-output.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/task-stack-panel/task-panel.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/build-estimate/build-estimate.css" />
@@ -60,10 +56,6 @@
             svg {
                 z-index: 0;
             }
-
-
-
-
         </style>
     </head>
     <body>
@@ -85,19 +77,6 @@
             <div class="row">
                 <div class="col-md-8">
                     <div id="tasksScene2"></div>
-                </div>
-            </div>
-        </div>
-
-
-
-
-        <!-- Counters -->
-        <div id="counterPanel">
-            <div class="row">
-                <div class="col-md-3 counter-container" id="taskCounterContainer">
-                    <h3>Remaining tasks</h3>
-                    <div id="taskCountdown"></div>
                 </div>
             </div>
         </div>
@@ -217,7 +196,6 @@
                 createGradleOutputConsole(pubsub);
                 createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
-                createCounters(pubsub);
                 createRunningTestReport(pubsub);
                 createTaskPanel(pubsub);
                 createBuildEstimate(pubsub);
