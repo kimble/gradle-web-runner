@@ -1,12 +1,14 @@
 .entity {
     padding: 5px 8px;
     margin: 5px 0;
+    display: block;
 }
 
 .entity-focus {
     position: absolute;
     transition-property: left, top;
     transition-duration: 200ms;
+    font-size: 2em;
 }
 
 .entity .package-name,.class-name {

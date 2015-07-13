@@ -41,7 +41,7 @@ function createTestReport(pubsub) {
 
             var ensureElement = function(name) {
                 if (!focusElements.hasOwnProperty(name)) {
-                    focusElements[name] = $('<span class="glyphicon glyphicon-search entity-focus" style="position: absolute; left: -100px; top: -100px;"></span>');
+                    focusElements[name] = $('<span class="glyphicon glyphicon-star entity-focus" style="position: absolute; left: -100px; top: -100px;"></span>');
                     $("body").append(focusElements[name]);
                 }
 
@@ -52,8 +52,8 @@ function createTestReport(pubsub) {
                 give: function(name, $focusedElement) {
                     var $focusElement = ensureElement(name);
 
-                    $focusElement.css("left", $focusedElement.offset().left - 20)
-                                 .css("top", $focusedElement.offset().top + 20);
+                    $focusElement.css("left", $focusedElement.offset().left - 30)
+                                 .css("top", $focusedElement.offset().top + 15);
                 },
                 take: function(name) {
                     var $focusElement = ensureElement(name);
@@ -100,6 +100,104 @@ function createTestReport(pubsub) {
             focus.give("test", state.tests[className + "-" + name].$el);
         };
 
+        state.ensurePackage = function(packageName) {
+            if (!state.packages.hasOwnProperty(packageName)) {
+                var pkg = {
+                    name: packageName,
+                    failures: 0,
+                    tests: { },
+                    classes: { },
+                    classCount: 0,
+                    testCount: 0
+                };
+
+
+                // Select
+                pkg.select = function() {
+                    if (pkg.hasOwnProperty("$el")) {
+                        focus.give("package", pkg.$el);
+                        focus.take("class");
+                        focus.take("test");
+                        state.selectedPackage = pkg.name;
+                    }
+                };
+
+                pkg.ensureClass = function(className) {
+                    if (!pkg.classes.hasOwnProperty(className)) {
+                        var simpleName = getSimpleClassName(className);
+
+                        var clazzState = {
+                            className: className,
+                            simpleName: simpleName,
+                            packageName: packageName,
+                            name: simpleName,
+                            failures: 0,
+                            testCount: 0,
+                            tests: { }
+                        };
+
+                        // Select
+                        clazzState.select = function() {
+                            if (clazzState.hasOwnProperty("$el")) {
+                                focus.give("class", clazzState.$el);
+                                focus.take("test");
+                                state.selectedClass = clazzState.className;
+                            }
+                        };
+
+                        clazzState.addTest = function(testCompletedEvent) {
+                            var test = {
+                                packageName: packageName,
+                                className: className,
+                                name: testCompletedEvent.name,
+                                result: testCompletedEvent.result,
+                                failure: testCompletedEvent.result === "FAILURE",
+                                skipped: testCompletedEvent.result === "SKIPPED",
+                                success: testCompletedEvent.result === "SUCCESS",
+                                output: testCompletedEvent.output != null ? testCompletedEvent.output.join("") : null,
+                                durationMillis: testCompletedEvent.durationMillis,
+                                exceptionMessage: testCompletedEvent.exceptionMessage
+                            };
+
+                            // Select
+                            test.select = function() {
+                                if (test.hasOwnProperty("$el")) {
+                                    focus.give("test", test.$el);
+                                    state.selectedTest = test.name;
+                                }
+                            };
+
+                            // Propagate failure upwards
+                            if (test.failure) {
+                                clazzState.failures++;
+                                pkg.failures++;
+                            }
+
+                            // Count
+                            clazzState.testCount++;
+                            pkg.testCount++;
+
+                            // State
+                            clazzState.tests[name] = test;
+                            state.tests[className + "-" + name] = test;
+                        };
+
+
+                        pkg.classCount++;
+                        pkg.classes[className] = clazzState; // Register class with package
+                        state.classes[className] = clazzState; // Register class globally
+                    }
+
+                    // This should now exist
+                    return state.classes[className];
+                };
+
+                state.packages[packageName] = pkg;
+            }
+
+            return state.packages[packageName];
+        };
+
         return state;
     }
 
@@ -108,69 +206,11 @@ function createTestReport(pubsub) {
 
     var state = pubsub.stream("TestCompleted")
         .takeUntil(pubsub.stream("GradleBuildCompleted"))
-        .fold(createInitialState(), function(state, startedTest) {
-            var packageName = getPackageName(startedTest.className);
-            var simpleName = getSimpleClassName(startedTest.className);
-            var testName = startedTest.name;
-
-            // Add package
-            if (!state.packages.hasOwnProperty(packageName)) {
-                state.packages[packageName] = {
-                    name: packageName,
-                    failures: 0,
-                    tests: { },
-                    classes: { },
-                    classCount: 0,
-                    testCount: 0
-                }
-            }
-
-            // Add classes
-            var pkg = state.packages[packageName];
-            if (!pkg.classes.hasOwnProperty(startedTest.className)) {
-                var clazzState = {
-                    className: startedTest.className,
-                    simpleName: simpleName,
-                    packageName: packageName,
-                    name: simpleName,
-                    failures: 0,
-                    testCount: 0,
-                    tests: { }
-                };
-
-                pkg.classCount++;
-                pkg.classes[startedTest.className] = clazzState;
-                state.classes[startedTest.className] = clazzState;
-            }
-
-            // Finally, add test
-            var clazz = pkg.classes[startedTest.className];
-            var test = {
-                name: testName,
-                packageName: packageName,
-                className: startedTest.className,
-                result: startedTest.result,
-                failure: startedTest.result === "FAILURE",
-                skipped: startedTest.result === "SKIPPED",
-                success: startedTest.result === "SUCCESS",
-                output: startedTest.output != null ? startedTest.output.join("") : null,
-                durationMillis: startedTest.durationMillis,
-                exceptionMessage: startedTest.exceptionMessage
-            };
-
-            // Propagate failure upwards
-            if (test.failure) {
-                clazz.failures++;
-                pkg.failures++;
-            }
-
-            // Count
-            clazz.testCount++;
-            pkg.testCount++;
-
-            clazz.tests[testName] = test;
-            pkg.tests[testName] = test;
-            state.tests[startedTest.className + "-" + testName] = test;
+        .fold(createInitialState(), function(state, completedTest) {
+            var packageName = getPackageName(completedTest.className);
+            var pkg = state.ensurePackage(packageName);
+            var clazz = pkg.ensureClass(completedTest.className);
+            clazz.addTest(completedTest);
 
             return state;
         });
@@ -217,7 +257,7 @@ function createTestReport(pubsub) {
         var enterPackage = pkg.enter()
             .append("div")
             .on("click", function(p) {
-                state.selectPackage(p.name);
+                p.select();
                 triggerUpdate();
             })
             .attr("class", "entity package")
@@ -241,7 +281,7 @@ function createTestReport(pubsub) {
         stateUpdateStream.map(".packages")
             .map(objectValues)
             .onValue(function(updatedPackages) {
-                var pkg = d3.select("#packages")
+                d3.select("#packages")
                     .selectAll(".package")
                     .data(updatedPackages, prop("name"));
 
@@ -270,8 +310,8 @@ function createTestReport(pubsub) {
                 return c.packageName !== state.selectedPackage;
             })
             .classed("failure", greaterThenZero("failures"))
-            .on("click", function(p) {
-                state.selectClass(p.className);
+            .on("click", function(c) {
+                c.select();
                 triggerUpdate();
             })
             .each(function(p) {
@@ -325,11 +365,11 @@ function createTestReport(pubsub) {
             })
             .classed("failure", prop("failure"))
             .on("click", function(t) {
-                state.selectTest(t.className, t.name);
+                t.select();
                 triggerUpdate();
             })
-            .each(function(p) {
-                p.$el = $(this);
+            .each(function(t) {
+                t.$el = $(this);
             });
 
         enterTest.append("h3")
