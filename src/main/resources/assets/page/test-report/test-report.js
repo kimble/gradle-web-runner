@@ -35,19 +35,44 @@ function createTestReport(pubsub) {
     }
 
 
-    var initialState = {
-        packages: {},
-        classes: {},
-        tests: {},
+    function createInitialState() {
+        var state = {
+            packages: {},
+            classes: {},
+            tests: {},
 
-        selectedPackage: '',
-        selectedClass: '',
-        selectedTest: ''
-    };
+            selectedPackage: '',
+            selectedClass: '',
+            selectedTest: ''
+        };
+
+        state.selectPackage = function(packageName) {
+            state.selectedPackage = packageName;
+            state.selectedClass = '';
+            state.selectedTest = '';
+        };
+
+        state.selectClass = function(className) {
+            state.selectedPackage = getPackageName(className);
+            state.selectedClass = className;
+            state.selectedTest = '';
+        };
+
+        state.selectTest = function(className, name) {
+            state.selectedPackage = getPackageName(className);
+            state.selectedClass = className;
+            state.selectedTest = name;
+        };
+
+        return state;
+    }
+
+
+
 
     var state = pubsub.stream("TestCompleted")
         .takeUntil(pubsub.stream("GradleBuildCompleted"))
-        .fold(initialState, function(state, startedTest) {
+        .fold(createInitialState(), function(state, startedTest) {
             var packageName = getPackageName(startedTest.className);
             var simpleName = getSimpleClassName(startedTest.className);
             var testName = startedTest.name;
@@ -153,9 +178,7 @@ function createTestReport(pubsub) {
         var enterPackage = pkg.enter()
             .append("div")
             .on("click", function(p) {
-                state.selectedPackage = p.name;
-                state.selectedClass = '';
-                state.selectedTest = '';
+                state.selectPackage(p.name);
                 triggerUpdate();
             })
             .attr("class", "entity package")
@@ -206,9 +229,7 @@ function createTestReport(pubsub) {
             })
             .classed("failure", greaterThenZero("failures"))
             .on("click", function(p) {
-                state.selectedPackage = p.packageName;
-                state.selectedClass = p.className;
-                state.selectedTest = '';
+                state.selectClass(p.className);
                 triggerUpdate();
             });
 
@@ -257,7 +278,11 @@ function createTestReport(pubsub) {
             .classed("hidden", function (t) {
                 return t.className !== state.selectedClass;
             })
-            .classed("failure", prop("failure"));
+            .classed("failure", prop("failure"))
+            .on("click", function(t) {
+                state.selectTest(t.className, t.name);
+                triggerUpdate();
+            });
 
         enterTest.append("h3")
             .text(prop("name"));
