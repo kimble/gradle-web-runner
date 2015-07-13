@@ -36,7 +36,7 @@ function createRunningTasks(pubsub) {
 
             // var css = "width: 300px; transition: width " + task.estimateMillis + "ms;";
 
-            var $el = $("<div class='task-running'><h3>" + task.path + "</h3><div class='task-progress-bar hidden'></div><p>" + description + "</p></div>");
+            var $el = $("<div class='task-running'><h3>" + task.path + "</h3><div class='task-progress-bar hidden'></div><p class='description'>" + description + "</p></div>");
             $el.appendTo($tasksScene2);
 
 
@@ -58,7 +58,10 @@ function createRunningTasks(pubsub) {
             var $el = taskDataMap[task.path].$el;
 
             if (task.failureMessage != null) {
-                $el.addClass("finished").addClass("failed");
+                $el.addClass("finished")
+                    .addClass("failed")
+                    .find(".description")
+                        .html(task.failureMessage);
             }
             else {
                 $el.addClass("finished").addClass("success");
