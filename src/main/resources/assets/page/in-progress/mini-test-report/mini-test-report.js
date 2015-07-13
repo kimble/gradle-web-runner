@@ -1,17 +1,14 @@
 function createRunningTestReport(pubsub) {
     "use strict";
 
-
     var $miniTestReport = $("#miniTestReport");
     var $summaryLine = $miniTestReport.find(".summary");
-    var $header = $miniTestReport.find(".page-header h3");
 
 
     var toggleShyness = function() {
         $miniTestReport.toggleClass("shy");
     };
 
-    $header.on("click", toggleShyness);
     pubsub.stream("key-down-T").onValue(toggleShyness);
 
 

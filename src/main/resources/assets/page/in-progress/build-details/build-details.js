@@ -2,7 +2,6 @@ function createBuildDetailsTab(pubsub) {
     "use strict";
 
     var $buildDetails = $("#buildDetails");
-    var $header = $buildDetails.find(".page-header h3");
     var $projectName = $(".project-name");
 
 
@@ -16,7 +15,6 @@ function createBuildDetailsTab(pubsub) {
         $buildDetails.toggleClass("shy");
     };
 
-    $header.on("click", toggleShyness);
     pubsub.stream("key-down-D").onValue(toggleShyness);
 
 

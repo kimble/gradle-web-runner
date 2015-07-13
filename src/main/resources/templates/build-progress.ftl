@@ -243,7 +243,29 @@
 
                 ws.onclose = function() {
                     console.info("Websocket closed");
-                }
+                };
+
+
+                // Shy panels
+
+                var $panel = $(".moving-panel");
+
+                $panel.asEventStream("mouseenter")
+                        .map(".target")
+                        .map($)
+                        .onValue(function($el) {
+                            console.log($el);
+                            $el.closest(".moving-panel").removeClass("shy");
+                        });
+
+                $panel.asEventStream("mouseleave")
+                        .map(".target")
+                        .map($)
+                        .onValue(function($el) {
+                            $el.closest(".moving-panel").addClass("shy");
+                        });
+
+
 
             })();
         </script>
