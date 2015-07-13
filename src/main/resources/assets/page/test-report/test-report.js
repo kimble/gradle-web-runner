@@ -51,7 +51,7 @@ function createTestReport(pubsub) {
                     classes: { },
                     classCount: 0,
                     testCount: 0,
-                    selected: false
+                    selected: true
                 }
             }
 
@@ -66,7 +66,7 @@ function createTestReport(pubsub) {
                     failures: 0,
                     testCount: 0,
                     tests: { },
-                    selected: false
+                    selected: true
                 };
 
                 pkg.classCount++;
@@ -87,7 +87,7 @@ function createTestReport(pubsub) {
                 output: startedTest.output != null ? startedTest.output.join("") : null,
                 durationMillis: startedTest.durationMillis,
                 exceptionMessage: startedTest.exceptionMessage,
-                selected: false
+                selected: true
             };
 
             // Propagate failure upwards
@@ -112,6 +112,26 @@ function createTestReport(pubsub) {
 
 
 
+    // Rendering
+
+
+
+
+
+    var updateTriggerStream = new Bacon.Bus();
+
+    var stateUpdateStream = state.combine(updateTriggerStream, function(state) {
+        return state;
+    });
+
+
+
+
+    function toggleSelected(entity) {
+        entity.selected = !entity.selected;
+        updateTriggerStream.push("Updated selected element");
+    }
+
     state.map(".packages")
         .map(objectValues)
         .onValue(function(packages) {
@@ -122,9 +142,9 @@ function createTestReport(pubsub) {
                 .selectAll(".package")
                 .data(packages, prop("name"));
 
-
             var enterPackage = pkg.enter()
                 .append("div")
+                .on("click", toggleSelected)
                 .attr("class", "entity package")
                 .classed("failure", greaterThenZero("failures"));
 
@@ -138,10 +158,21 @@ function createTestReport(pubsub) {
                 });
 
 
-            // Enter + update
+            // Updates
 
-            pkg.classed("hidden", prop("selected"));
+            stateUpdateStream.map(".packages")
+                .map(objectValues)
+                .onValue(function(updatedPackages) {
+                    var pkg = d3.select("#packages")
+                        .selectAll(".package")
+                        .data(updatedPackages, prop("name"));
+
+
+                    pkg.classed("hidden", not(prop("selected")));
+                });
         });
+
+
 
 
     state.map(".classes")
@@ -172,7 +203,7 @@ function createTestReport(pubsub) {
 
             // Enter + update
 
-            clazz.classed("hidden", prop("selected"));
+            clazz.classed("hidden", not(prop("selected")));
         });
 
 
@@ -198,21 +229,25 @@ function createTestReport(pubsub) {
             enterTest.append("p")
                 .attr("class", "summary")
                 .text(function(t) {
-                    if (t.failure) {
-                        return "Failure: " + t.exceptionMessage;
-                    }
-                    else if (t.skipped) {
-                        return "Skipped :-("
-                    }
-                    else {
-                        return "Completed successfully in " + t.durationMillis + " milliseconds.";
+                    switch (t.result) {
+                        case "SKIPPED":
+                            return "Skipped :-(";
+
+                        case "FAILURE":
+                            return "Failure: " + t.exceptionMessage;
+
+                        case "SUCCESS":
+                            return "Completed successfully in " + t.durationMillis + " milliseconds.";
+
+                        default:
+                            return "????";
                     }
                 });
 
 
             // Enter + update
 
-            test.classed("hidden", prop("selected"));
+            test.classed("hidden", not(prop("selected")));
         });
 
 }
