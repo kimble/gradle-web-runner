@@ -57,6 +57,12 @@ function createBuildDetailsTab(pubsub) {
                 .text(function(d) { return d.value; });
         });
 
+    pubsub.stream("TaskCompleted")
+        .onValue(function (task) {
+            if (task.failureMessage != null) {
+                $buildDetails.addClass("failure");
+            }
+        });
 
 
 }

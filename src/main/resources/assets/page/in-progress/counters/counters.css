@@ -11,3 +11,8 @@
     left: 40px;
     bottom: 100px;
 }
+
+.counter-container {
+    position: relative;
+    z-index: 10;
+}

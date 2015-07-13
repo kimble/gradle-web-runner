@@ -8,9 +8,6 @@
 
         <title>Gradle Web Runner - Build - ${buildNumber}</title>
 
-        <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-        <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
-
 
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <link href="/assets/flipclock/flipclock.css" rel="stylesheet">
@@ -23,15 +20,17 @@
         <script src="/assets/page/in-progress/task-state.js"></script>
 
         <script src="/assets/page/in-progress/build-details/build-details.js"></script>
-
-
-
         <script src="/assets/page/in-progress/running-tasks/running-tasks.js"></script>
         <script src="/assets/page/in-progress/mini-test-report/mini-test-report.js"></script>
         <script src="/assets/page/in-progress/counters/counters.js"></script>
         <script src="/assets/page/in-progress/gradle-output/gradle-output.js"></script>
         <script src="/assets/page/in-progress/task-stack-panel/task-panel.js"></script>
         <script src="/assets/page/in-progress/build-estimate/build-estimate.js"></script>
+
+        <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
+
+        <link rel="stylesheet" href="/assets/page/moving-panel.css" />
 
         <link rel="stylesheet" href="/assets/page/in-progress/mini-test-report/mini-test-report.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/running-tasks/running-tasks.css" />
@@ -62,50 +61,7 @@
                 z-index: 0;
             }
 
-            .counter-container {
-                position: relative;
-                z-index: 10;
-            }
 
-            .moving-panel {
-                position: absolute;
-                z-index: 100;
-
-                border: 1px solid #eee;
-                box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
-                background-color: #fafafa;
-
-                transition-property: background-color, top, bottom, right, left;
-                transition-duration: 0.7s;
-            }
-
-            .moving-panel.shy {
-                background-color: #fafafa;
-            }
-
-            .moving-panel .page-header {
-                cursor: pointer;
-            }
-
-            .moving-panel .output-container>div {
-                padding: 0 1em 0 1em;
-            }
-
-            .moving-panel .page-header {
-                background-color: rgb(174, 199, 59);
-                padding: 0.1em 1em 1em 1em;
-                margin: 0;
-                color: white;
-            }
-            .moving-panel .page-header  small {
-                color: white;
-            }
-
-            .moving-panel.upside-down .page-header {
-                position: absolute;
-                bottom: -20px;
-                width: 95%;
-            }
 
 
         </style>

@@ -6,24 +6,10 @@
 
     width: 600px;
     height: 500px;
-
 }
 
 #miniTestReport.shy {
     bottom: -440px;
-}
-
-
-#miniTestReport .page-header {
-    transition-property: background-color;
-    transition-duration: 0.7s;
-}
-
-#miniTestReport.success .page-header {
-    background-color: rgb(174, 199, 59);
-}
-#miniTestReport.failure .page-header {
-    background-color: rgb(173, 108, 108);
 }
 
 #miniTestReport .panel-container {

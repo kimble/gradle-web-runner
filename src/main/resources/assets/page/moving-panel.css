@@ -1,0 +1,44 @@
+
+.moving-panel {
+    position: absolute;
+    z-index: 100;
+
+    border: 1px solid #eee;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.1);
+    background-color: #fafafa;
+
+    transition-property: background-color, top, bottom, right, left;
+    transition-duration: 0.7s;
+}
+
+.moving-panel.shy {
+    background-color: #fafafa;
+}
+
+.moving-panel .page-header {
+    cursor: pointer;
+}
+
+.moving-panel .output-container>div {
+    padding: 0 1em 0 1em;
+}
+
+.moving-panel .page-header {
+    background-color: rgb(174, 199, 59);
+    padding: 0.1em 1em 1em 1em;
+    margin: 0;
+    color: white;
+}
+.moving-panel .page-header  small {
+    color: white;
+}
+
+.moving-panel.upside-down .page-header {
+    position: absolute;
+    bottom: -20px;
+    width: 95%;
+}
+
+.moving-panel.failure .page-header {
+    background-color: rgb(173, 108, 108);
+}
