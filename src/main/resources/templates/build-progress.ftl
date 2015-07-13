@@ -23,7 +23,6 @@
         <script src="/assets/lib/task-state.js"></script>
 
         <script src="/assets/lib/build-details.js"></script>
-        <script src="/assets/lib/build-estimate.js"></script>
 
 
 
@@ -32,12 +31,14 @@
         <script src="/assets/page/in-progress/counters/counters.js"></script>
         <script src="/assets/page/in-progress/gradle-output/gradle-output.js"></script>
         <script src="/assets/page/in-progress/task-stack-panel/task-panel.js"></script>
+        <script src="/assets/page/in-progress/build-estimate/build-estimate.js"></script>
 
         <link rel="stylesheet" href="/assets/page/in-progress/mini-test-report/mini-test-report.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/running-tasks/running-tasks.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/counters/counters.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/gradle-output/gradle-output.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/task-stack-panel/task-panel.css" />
+        <link rel="stylesheet" href="/assets/page/in-progress/build-estimate/build-estimate.css" />
 
 
         <style type="text/css">
@@ -138,51 +139,6 @@
             }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            /* Build progress */
-
-            #buildProgress .bar {
-                height: 3px;
-                width: 800px;
-                background-color: #333;
-                margin-top: 10px;
-                float: left;
-
-                transition-property: width;
-            }
-
-            #buildProgress .running {
-                width: 0;
-            }
-
-            #buildProgress.completed .bar {
-                transition-duration: 0.5s;
-                width: 800px;
-            }
-
-            #buildProgress.completed .bar-label {
-                display: none;
-            }
-
-            #buildProgress .bar-label {
-                color: #333;
-                width: 200px;
-                float: left;
-                padding-left: 0.5em;
-            }
 
 
         </style>
