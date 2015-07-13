@@ -22,7 +22,6 @@
 
         <script src="/assets/lib/task-state.js"></script>
 
-        <script src="/assets/lib/gradle-output.js"></script>
         <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/build-estimate.js"></script>
@@ -32,10 +31,12 @@
         <script src="/assets/page/in-progress/running-tasks/running-tasks.js"></script>
         <script src="/assets/page/in-progress/mini-test-report/mini-test-report.js"></script>
         <script src="/assets/page/in-progress/counters/counters.js"></script>
+        <script src="/assets/page/in-progress/gradle-output/gradle-output.js"></script>
 
         <link rel="stylesheet" href="/assets/page/in-progress/mini-test-report/mini-test-report.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/running-tasks/running-tasks.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/counters/counters.css" />
+        <link rel="stylesheet" href="/assets/page/in-progress/gradle-output/gradle-output.css" />
 
 
         <style type="text/css">
@@ -167,43 +168,7 @@
 
 
 
-            /* Output */
 
-            #gradleOutput {
-                top: -2px;
-                right: -10px;
-
-                width: 60%;
-                height: calc(100% + 4px);
-
-                box-shadow: inset 6px 0 23px -2px rgba(0,0,0,1);
-                background-color: #242320;
-
-                color: rgb(201, 208, 194);
-
-                border-left: 2px solid #222;
-            }
-
-            #gradleOutput.shy {
-                right: -500px;
-            }
-
-            #gradleOutput .output-container {
-                font-family: "Ubuntu Mono", monospace;
-                height: 100%;
-                width: 99%;
-                overflow: auto;
-            }
-
-            #gradleOutput .output-container a {
-                color: white;
-                text-decoration: underline;
-            }
-
-            #gradleOutput .output-container .intro {
-                color: white;
-                margin-bottom: 1em;
-            }
 
 
 
