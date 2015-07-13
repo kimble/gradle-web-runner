@@ -34,13 +34,15 @@ function createRunningTasks(pubsub) {
                 description += "<span class='estimate'>Estimate: " + (Math.ceil(task.estimateMillis / 1000)) + " seconds.</span>";
             }
 
-            // var css = "width: 300px; transition: width " + task.estimateMillis + "ms;";
-
             var $el = $("<div class='task-running'><h3>" + task.path + "</h3><div class='task-progress-bar hidden'></div><p class='description'>" + description + "</p></div>");
             $el.appendTo($tasksScene2);
 
 
             if (task.estimateMillis != null) {
+                if (task.estimateMillis < 500) {
+                    $el.addClass("hidden"); // Never display really short lived tasks (visual noise)
+                }
+
                 $el.find(".task-progress-bar")
                     .removeClass("hidden")
                     .css("transition", "width " + task.estimateMillis + "ms");
@@ -58,7 +60,8 @@ function createRunningTasks(pubsub) {
             var $el = taskDataMap[task.path].$el;
 
             if (task.failureMessage != null) {
-                $el.addClass("finished")
+                $el.removeClass("hidden")
+                    .addClass("finished")
                     .addClass("failed")
                     .find(".description")
                         .html(task.failureMessage);
