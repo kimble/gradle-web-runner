@@ -16,6 +16,12 @@ function createTestReport(pubsub) {
         });
     }
 
+    function greaterThenZero(prop) {
+        return function(obj) {
+            return obj[prop] > 0;
+        }
+    }
+
     function prop(name) {
         return function(obj) {
             return obj[name];
@@ -34,6 +40,7 @@ function createTestReport(pubsub) {
             if (!state.packages.hasOwnProperty(packageName)) {
                 state.packages[packageName] = {
                     name: packageName,
+                    failures: 0,
                     tests: { },
                     classes: { }
                 }
@@ -47,6 +54,7 @@ function createTestReport(pubsub) {
                     simpleName: simpleName,
                     packageName: packageName,
                     name: simpleName,
+                    failures: 0,
                     tests: { }
                 };
 
@@ -61,10 +69,17 @@ function createTestReport(pubsub) {
                 packageName: packageName,
                 className: startedTest.className,
                 result: startedTest.result,
+                failure: startedTest.result === "FAILURE",
                 output: startedTest.output != null ? startedTest.output.join("") : null,
                 durationMillis: startedTest.durationMillis,
                 exceptionMessage: startedTest.exceptionMessage
             };
+
+            // Propagate failure upwards
+            if (test.failure) {
+                clazz.failures++;
+                pkg.failures++;
+            }
 
             clazz.tests[testName] = test;
             pkg.tests[testName] = test;
@@ -91,7 +106,8 @@ function createTestReport(pubsub) {
 
             var enterPackage = pkg.enter()
                 .append("div")
-                .attr("class", "package");
+                .attr("class", "entity package")
+                .classed("failure", greaterThenZero("failures"));
 
             enterPackage.append("h3")
                 .text(prop("name"));
@@ -114,7 +130,8 @@ function createTestReport(pubsub) {
 
             var enterPackage = pkg.enter()
                 .append("div")
-                .attr("class", "test-class");
+                .attr("class", "entity test-class")
+                .classed("failure", greaterThenZero("failures"));
 
             enterPackage.append("h3")
                 .text(prop("simpleName"));
@@ -137,7 +154,8 @@ function createTestReport(pubsub) {
 
             var enterPackage = pkg.enter()
                 .append("div")
-                .attr("class", "test");
+                .attr("class", "entity test")
+                .classed("failure", prop("failure"));
 
             enterPackage.append("h3")
                 .text(prop("name"));

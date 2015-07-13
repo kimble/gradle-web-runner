@@ -1,100 +1,18 @@
-
-/* Test reports
-
-#testReport {
-    top: 20px;
-    right: 30px;
-
-    width: 1200px;
-    height: 600px;
+.entity {
+    padding: 5px 8px;
+    margin: 5px 0;
 }
 
-#testReport.shy {
-    top: -540px;
-    right: -600px;
+.entity h3 {
+    margin: 0;
+    padding-bottom: 0.2em;
 }
 
-#testReport #fullTestReport {
-    margin: 0.5em 1em;
-    height: 530px;
-    overflow: auto;
-    overflow-x: hidden;
+.entity.failure {
+    background-color: #ff5722;
+    color: white;
 }
 
-#fullTestReport .package-name {
-    font-family: 'Ubuntu Mono', monospace;
-    font-weight: bold;
-    font-size: 1.4em;
-    margin-top: 2em;
+.entity .summary {
+    margin-bottom: 0;
 }
-
-#fullTestReport .test-package.fail .package-name {
-    color: rgb(244, 117, 51);
-}
-
-#fullTestReport .test-class.fail .class-name {
-    color: rgb(244, 117, 51);
-}
-
-#fullTestReport .class-name {
-    font-family: 'Ubuntu Mono', monospace;
-    font-weight: bold;
-    font-size: 1.3em;
-}
-
-#fullTestReport .test-name {
-    font-family: 'Ubuntu Mono', monospace;
-    font-size: 1.1em;
-}
-
-#fullTestReport .individual-tests {
-    padding-left: 0.5em;
-    font-size: 0.9em;
-}
-
-#fullTestReport .individual-tests.success {
-    display: none;
-}
-
-#fullTestReport .individual-tests.show-successful {
-    display: block;
-}
-
-#fullTestReport .individual-tests.success {
-    border-left: 5px solid rgb(202, 215, 94);
-}
-#fullTestReport .individual-tests.fail {
-    border-left: 5px solid rgb(244, 117, 51);
-}
-#fullTestReport .individual-tests.skipped {
-    border-left: 5px solid rgb(244, 229, 69);
-}
-
-#fullTestReport h4 .glyphicon {
-    font-size: 0.9em;
-}
-
-
-
-#fullTestReport .individual-test.success {
-
-}
-#fullTestReport .individual-test.fail {
-    font-weight: bold;
-    color: rgb(244, 117, 51);
-}
-
-#fullTestReport pre {
-    font-family: "Ubuntu Mono", monospace;
-    font-size: 0.9em;
-    width: 90%;
-}
-
-#testReport .filter-container {
-    margin: 0.5em;
-    padding: 0.5em;
-    height: 525px;
-    background-color: #fafafa;
-}
-
-*/

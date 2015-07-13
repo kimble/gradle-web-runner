@@ -20,6 +20,8 @@
 
         <script src="/assets/page/test-report/test-report.js"></script>
 
+        <link href='/assets/page/test-report/test-report.css' rel='stylesheet' type='text/css'>
+
         <link href='http://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
         <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
 
