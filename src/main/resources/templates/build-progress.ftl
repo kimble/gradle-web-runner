@@ -22,7 +22,6 @@
 
         <script src="/assets/lib/task-state.js"></script>
 
-        <script src="/assets/lib/task-panel.js"></script>
         <script src="/assets/lib/build-details.js"></script>
         <script src="/assets/lib/build-estimate.js"></script>
 
@@ -32,11 +31,13 @@
         <script src="/assets/page/in-progress/mini-test-report/mini-test-report.js"></script>
         <script src="/assets/page/in-progress/counters/counters.js"></script>
         <script src="/assets/page/in-progress/gradle-output/gradle-output.js"></script>
+        <script src="/assets/page/in-progress/task-stack-panel/task-panel.js"></script>
 
         <link rel="stylesheet" href="/assets/page/in-progress/mini-test-report/mini-test-report.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/running-tasks/running-tasks.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/counters/counters.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/gradle-output/gradle-output.css" />
+        <link rel="stylesheet" href="/assets/page/in-progress/task-stack-panel/task-panel.css" />
 
 
         <style type="text/css">
@@ -140,29 +141,7 @@
 
 
 
-            /* Task panel */
 
-            #taskPanel {
-                left: -2px;
-                top: -2px;
-                width: 10px;
-
-                height: calc(100% + 4px);
-
-                box-shadow: 0 0 15px rgba(50, 50, 50, 0.5);
-                background-color: #242320;
-
-                color: rgb(201, 208, 194);
-
-                border-right: 2px solid #222;
-            }
-
-
-            #taskStack {
-                height: 100%;
-                width: 100%;
-                overflow: hidden;
-            }
 
 
 
