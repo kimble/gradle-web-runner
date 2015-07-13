@@ -10,17 +10,21 @@ function createTestReport(pubsub) {
         return className.substring(className.lastIndexOf('.') + 1);
     }
 
-
-    pubsub.stream("TestStarted")
-        .onValue(function(startedTest) {
-
+    function objectValues(obj) {
+        return Object.keys(obj).map(function(key) {
+            return obj[key];
         });
+    }
 
-    var buildCompleted = pubsub.stream("GradleBuildCompleted");
+    function prop(name) {
+        return function(obj) {
+            return obj[name];
+        }
+    }
 
 
     var state = pubsub.stream("TestCompleted")
-        .takeUntil(buildCompleted)
+        .takeUntil(pubsub.stream("GradleBuildCompleted"))
         .fold({ packages: {} }, function(state, startedTest) {
             var packageName = getPackageName(startedTest.className);
             var simpleName = getSimpleClassName(startedTest.className);
@@ -30,6 +34,7 @@ function createTestReport(pubsub) {
             if (!state.packages.hasOwnProperty(packageName)) {
                 state.packages[packageName] = {
                     name: packageName,
+                    tests: { },
                     classes: { }
                 }
             }
@@ -38,7 +43,8 @@ function createTestReport(pubsub) {
             var pkg = state.packages[packageName];
             if (!pkg.classes.hasOwnProperty(startedTest.className)) {
                 pkg.classes[startedTest.className] = {
-                    fullName: startedTest.className,
+                    className: startedTest.className,
+                    packageName: packageName,
                     name: simpleName,
                     tests: { }
                 }
@@ -46,19 +52,50 @@ function createTestReport(pubsub) {
 
             // Finally, add test
             var clazz = pkg.classes[startedTest.className];
-            clazz.tests[testName] = {
+            var test = {
                 name: testName,
+                packageName: packageName,
+                className: startedTest.className,
                 result: startedTest.result,
                 output: startedTest.output != null ? startedTest.output.join("") : null,
                 durationMillis: startedTest.durationMillis,
                 exceptionMessage: startedTest.exceptionMessage
             };
 
+            clazz.tests[testName] = test;
+            pkg.tests[testName] = test;
+
             return state;
         });
 
 
     state.log("State");
+
+
+
+    state.map(".packages")
+        .map(objectValues)
+        .onValue(function(packages) {
+            console.log("Packages, ", packages);
+
+
+            var pkg = d3.select("#packages")
+                .selectAll(".package")
+                .data(packages, prop("name"));
+
+
+            var enterPackage = pkg.enter()
+                .append("div")
+                .attr("class", "package");
+
+            enterPackage.append("h3")
+                .text(prop("name"));
+
+            enterPackage.append("p")
+                .attr("class", "summary")
+                .text("Her kommer oppsummering");
+        });
+
 }
 
 

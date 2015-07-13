@@ -28,10 +28,6 @@
 
 
         <style type="text/css">
-            body {
-                overflow: hidden;
-            }
-
             .container-full {
                 margin: 0 auto;
                 padding-left: 1em;
@@ -45,6 +41,10 @@
             svg {
                 z-index: 0;
             }
+
+            h3 {
+                font-size: 1.3em;
+            }
         </style>
     </head>
     <body>
@@ -54,13 +54,28 @@
         <div class="container container-full">
             <div class="row">
                 <div id="headerRow" class="col-md-12">
-                    <h1>#${buildNumber} - Test report - <span class="project-name">Waiting for project name...</span> <small>./gradlew ${commandLine}</small></h1>
+                    <h1>#${buildNumber} - Test report - <span class="project-name">Waiting for project name...</span> <br/> <small>./gradlew ${commandLine}</small></h1>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-8">
-
+                <div class="col-md-2">
+                    <div class="page-header">
+                        <h2>Packages</h2>
+                    </div>
+                    <div id="packages"></div>
+                </div>
+                <div class="col-md-2">
+                    <div class="page-header">
+                        <h2>Classes</h2>
+                    </div>
+                    <div id="classes"></div>
+                </div>
+                <div class="col-md-2">
+                    <div class="page-header">
+                        <h2>Tests</h2>
+                    </div>
+                    <div id="tests"></div>
                 </div>
             </div>
         </div>
