@@ -54,3 +54,7 @@
 #miniTestReport .test.failed {
 
 }
+
+#miniTestReport .test.skipped .test-name {
+    color: #ff932b;
+}

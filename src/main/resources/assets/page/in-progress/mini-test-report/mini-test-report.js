@@ -69,6 +69,13 @@ function createRunningTestReport(pubsub) {
             $miniTestReport.find(".waiting-message").remove();
         });
 
+    streamResultCount("SKIPPED")
+        .skip(1) // 0
+        .take(1)
+        .onValue(function () {
+            $miniTestReport.find(".waiting-message").remove();
+        });
+
 
 
 
@@ -93,8 +100,22 @@ function createRunningTestReport(pubsub) {
 
 
         $failure.appendTo($panelContainer);
-
         $panelContainer.append("<hr />");
     });
+
+
+    streamResult("SKIPPED").onValue(function (test) {
+        var packageName = test.className.substring(0, test.className.lastIndexOf('.'));
+        var simpleClassName = test.className.substring(test.className.lastIndexOf('.') + 1);
+
+        var $skipped = $('<div class="test skipped"><h2><small class="package-name">' + packageName + '</small>' +
+            '<br/><span class="simple-class-name">' + simpleClassName + '</span>' +
+            '<br/><span class="test-name" title="Skipped"><span class="glyphicon glyphicon-minus-sign"></span> ' + test.name + '</span></h2>' +
+            '</div>');
+
+        $skipped.appendTo($panelContainer);
+        $panelContainer.append("<hr />");
+    });
+
 
 }
