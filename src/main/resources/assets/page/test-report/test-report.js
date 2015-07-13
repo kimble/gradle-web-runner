@@ -25,7 +25,7 @@ function createTestReport(pubsub) {
 
     var state = pubsub.stream("TestCompleted")
         .takeUntil(pubsub.stream("GradleBuildCompleted"))
-        .fold({ packages: {}, classes: {} }, function(state, startedTest) {
+        .fold({ packages: {}, classes: {}, tests: {} }, function(state, startedTest) {
             var packageName = getPackageName(startedTest.className);
             var simpleName = getSimpleClassName(startedTest.className);
             var testName = startedTest.name;
@@ -68,6 +68,7 @@ function createTestReport(pubsub) {
 
             clazz.tests[testName] = test;
             pkg.tests[testName] = test;
+            state.tests[startedTest.className + "-" + testName] = test;
 
             return state;
         });
@@ -117,6 +118,29 @@ function createTestReport(pubsub) {
 
             enterPackage.append("h3")
                 .text(prop("simpleName"));
+
+            enterPackage.append("p")
+                .attr("class", "summary")
+                .text("Her kommer oppsummering");
+        });
+
+    state.map(".tests")
+        .map(objectValues)
+        .onValue(function(tests) {
+            console.log("Tests, ", tests);
+
+
+            var pkg = d3.select("#tests")
+                .selectAll(".test")
+                .data(tests, prop("name"));
+
+
+            var enterPackage = pkg.enter()
+                .append("div")
+                .attr("class", "test");
+
+            enterPackage.append("h3")
+                .text(prop("name"));
 
             enterPackage.append("p")
                 .attr("class", "summary")

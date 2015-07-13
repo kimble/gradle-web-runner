@@ -59,19 +59,19 @@
             </div>
 
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="page-header">
                         <h2>Packages</h2>
                     </div>
                     <div id="packages"></div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="page-header">
                         <h2>Classes</h2>
                     </div>
                     <div id="classes"></div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="page-header">
                         <h2>Tests</h2>
                     </div>
