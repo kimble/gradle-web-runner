@@ -136,8 +136,10 @@
             </div>
 
             <div class="panel-container">
-                <p>Yet to be implemented!</p>
-                <p>This panel should contain a simple summary<br/>+ a link to a complete and interactive report page.</p>
+                <div class="waiting-message">
+                    <p>Yet to be implemented!</p>
+                    <p>This panel should contain a simple summary<br/>+ a link to a complete and interactive report page.</p>
+                </div>
             </div>
         </div>
 
@@ -254,7 +256,6 @@
                         .map(".target")
                         .map($)
                         .onValue(function($el) {
-                            console.log($el);
                             $el.closest(".moving-panel").removeClass("shy");
                         });
 

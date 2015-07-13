@@ -2,6 +2,7 @@ function createRunningTestReport(pubsub) {
     "use strict";
 
     var $miniTestReport = $("#miniTestReport");
+    var $panelContainer = $miniTestReport.find(".panel-container");
     var $summaryLine = $miniTestReport.find(".summary");
 
 
@@ -14,7 +15,9 @@ function createRunningTestReport(pubsub) {
 
 
 
-    var createResultStream = (function() {
+
+
+    var streamResultCount = (function() {
         var resultStream = pubsub.stream("TestCompleted").map(".result");
 
         var is = function (expected) {
@@ -22,6 +25,7 @@ function createRunningTestReport(pubsub) {
                 return val === expected;
             }
         };
+
         var plus = function (a, b) {
             return a + b;
         };
@@ -34,11 +38,24 @@ function createRunningTestReport(pubsub) {
     })();
 
 
+    var streamResult = (function() {
+        var is = function (expected) {
+            return function(test) {
+                return test.result === expected;
+            }
+        };
+
+        return function(result) {
+            return pubsub.stream("TestCompleted").filter(is(result));
+        }
+    })();
+
+
 
     var summaryTemplate = Bacon.combineTemplate({
-        successes: createResultStream("SUCCESS"),
-        failures: createResultStream("FAILURE"),
-        skipped: createResultStream("SKIPPED")
+        successes: streamResultCount("SUCCESS"),
+        failures: streamResultCount("FAILURE"),
+        skipped: streamResultCount("SKIPPED")
     });
 
 
@@ -46,10 +63,26 @@ function createRunningTestReport(pubsub) {
         $summaryLine.html(summary.successes + " successful, " + summary.failures + " failures and " + summary.skipped + " skipped tests executed");
     });
 
-
-    createResultStream("FAILURE")
+    streamResultCount("FAILURE")
         .skip(1) // 0
         .take(1)
-        .assign($miniTestReport, "toggleClass", "failure");
+        .onValue(function () {
+            $miniTestReport.addClass("failure");
+            $miniTestReport.find(".waiting-message").remove();
+        });
+
+
+
+
+    streamResult("FAILURE").onValue(function (test) {
+        var packageName = test.className.substring(0, test.className.lastIndexOf('.'));
+        var simpleClassName = test.className.substring(test.className.lastIndexOf('.') + 1);
+
+        $panelContainer.append('<div class="test failed"><h2><small class="package-name">' + packageName + '</small>' +
+            '<br/><span class="simple-class-name">' + simpleClassName + '</span>' +
+            '<br/><span class="test-name"><span class="glyphicon glyphicon-remove-sign"></span> ' + test.name + '</span></h2></div>');
+
+        $panelContainer.append("<hr />");
+    });
 
 }

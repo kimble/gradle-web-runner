@@ -33,7 +33,7 @@ function initializeTaskState(pubsub, buildNumber) {
 
 
     function fetchEstimates() {
-        console.log("Fetching estimates");
+        console.info("Fetching estimates");
 
         jQuery.getJSON("/api/build/" + buildNumber + "/estimates", function(estimates) {
             pubsub.broadcast('estimates-received', estimates);

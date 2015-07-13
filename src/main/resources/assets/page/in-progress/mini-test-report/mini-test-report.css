@@ -13,5 +13,26 @@
 }
 
 #miniTestReport .panel-container {
+    overflow: auto;
+    overflow-x: hidden;
+    height: 430px;
     padding: 1em;
+}
+
+#miniTestReport .test h2 {
+    font-size: 1.2em;
+}
+#miniTestReport .test h2>small {
+    font-size: 1.0em;
+}
+
+#miniTestReport .test .simple-class-name {
+    font-weight: bold;
+}
+#miniTestReport .test .test-name {
+    font-weight: bold;
+}
+
+#miniTestReport .test.failed {
+
 }
