@@ -15,6 +15,8 @@
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
 
+        <script src="/assets/page/pubsub.js"></script>
+        <script src="/assets/page/build-websockets.js"></script>
         <script src="/assets/page/in-progress/task-state.js"></script>
 
         <script src="/assets/page/in-progress/build-details/build-details.js"></script>
@@ -148,47 +150,10 @@
                 "use strict";
 
                 var buildNumber = ${buildNumber};
-                var ws = new WebSocket("ws://localhost:8080/ws/build");
 
 
 
-                var pubsub = (function() {
-                    var bus = new Bacon.Bus();
 
-                    // Create a stream of simple keyboard commands
-                    $(document).keydown(function(event) {
-                        var key = String.fromCharCode(event.keyCode);
-                        var eventType = "key-down-" + key;
-
-                        bus.push({
-                            type: eventType,
-                            event: {}
-                        });
-                    });
-
-                    // Dead simple pubsub event-bus with reactive
-                    // capabilities provided by Bacon.js
-                    return {
-                        broadcast: function() {
-                            if (arguments.length == 2) {
-                                bus.push({
-                                    type: arguments[0],
-                                    event: arguments[1]
-                                });
-                            }
-                            else {
-                                bus.push(arguments[0]);
-                            }
-                        },
-                        stream: function(type) {
-                            return bus.filter(function (transfer) {
-                                return transfer.type == type;
-                            }).map(function(transfer) {
-                                return transfer.event;
-                            });
-                        }
-                    }
-                })();
 
 
                 // Interface
@@ -205,25 +170,11 @@
                 initializeTaskState(pubsub, buildNumber);
 
 
+                // Connect to websocket
 
-                ws.onopen = function() {
-                    ws.send(buildNumber);
+                streamBuildEvents(pubsub, buildNumber);
 
-                    ws.onmessage = function(message) {
-                        var transfer = JSON.parse(message.data);
-                        pubsub.broadcast(transfer);
 
-                        if (transfer.type === 'GradleBuildCompleted') {
-                            console.info("Got last event, closing the websocket");
-                            ws.close();
-                        }
-                    }
-
-                };
-
-                ws.onclose = function() {
-                    console.info("Websocket closed");
-                };
 
 
                 // Shy panels
