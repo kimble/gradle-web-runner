@@ -35,6 +35,18 @@ function createTestReport(pubsub) {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
     function createInitialState(raiseDirtyFlag) {
         var focus = (function() {
             var focusElements = { };
@@ -52,7 +64,7 @@ function createTestReport(pubsub) {
                 give: function(name, $focusedElement) {
                     var $focusElement = ensureElement(name);
 
-                    $focusElement.css("left", $focusedElement.offset().left - 30)
+                    $focusElement.css("left", $focusedElement.offset().left - 25)
                                  .css("top", $focusedElement.offset().top + 15);
                 },
                 take: function(name) {

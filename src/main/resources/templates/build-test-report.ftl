@@ -26,28 +26,6 @@
         <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
 
 
-
-
-
-        <style type="text/css">
-            .container-full {
-                margin: 0 auto;
-                padding-left: 1em;
-                width: 95%;
-            }
-
-            .page-header, #headerRow {
-                font-family: 'Oswald', sans-serif;
-            }
-
-            svg {
-                z-index: 0;
-            }
-
-            h3 {
-                font-size: 1.3em;
-            }
-        </style>
     </head>
     <body>
 
