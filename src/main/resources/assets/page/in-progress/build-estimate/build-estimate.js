@@ -43,7 +43,7 @@ function createBuildEstimate(pubsub) {
     progressSummaryTemplate.sampledBy(Bacon.interval(1000, "ping"))
         .takeWhile(buildCompleted.not())
         .onValue(function(progressSummary) {
-            var summary = "Completed " +  progressSummary.completedTasks + " of " + progressSummary.taskCount + " tasks.";
+            var summary = (progressSummary.taskCount - progressSummary.completedTasks) + " tasks remaining (" + progressSummary.completedTasks + " completed)";
 
             if (progressSummary.buildEstimate > 0) {
                 var elapsedSeconds = Math.ceil((Date.now() - progressSummary.startTime) / 1000);
