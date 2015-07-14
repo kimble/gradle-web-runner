@@ -14,6 +14,7 @@
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
+        <script src="/assets/underscore/underscore-min.js"></script>
 
         <script src="/assets/page/pubsub.js"></script>
         <script src="/assets/page/build-websockets.js"></script>
@@ -24,8 +25,6 @@
 
         <link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700' rel='stylesheet' type='text/css'>
         <link href='http://fonts.googleapis.com/css?family=Oswald:400,700,300' rel='stylesheet' type='text/css'>
-
-
     </head>
     <body>
 
@@ -45,18 +44,6 @@
                     </div>
                     <div id="packages"></div>
                 </div>
-                <div class="col-md-3">
-                    <div class="page-header">
-                        <h2>Classes</h2>
-                    </div>
-                    <div id="classes"></div>
-                </div>
-                <div class="col-md-6">
-                    <div class="page-header">
-                        <h2>Tests</h2>
-                    </div>
-                    <div id="tests"></div>
-                </div>
             </div>
         </div>
 
@@ -64,7 +51,18 @@
 
 
 
+        <script type="text/template" id="packageTemplate" class="template">
+            <div class="entity package">
+                <h3 class="header">
+                    <%- root.name %>
+                </h3>
 
+                <p class="summary">
+                    <%- root.classCount + " classes with a total of " + root.testCount + " tests" %>
+                </p>
+            </div>
+
+        </script>
 
 
 
