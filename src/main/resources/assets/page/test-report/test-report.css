@@ -176,17 +176,27 @@ h3 {
 .output-container pre {
     background-color: white;
     width: 100%;
-    white-space: pre;
+    word-wrap: normal;
+    overflow: auto;
 }
 
 .output-header {
     padding: 5px 10px;
     background-color: gray;
+    font-size: 1.2em;
     color: white;
 }
 
 .output-header .header {
     margin: 0;
+}
+
+.output-header .summary {
+    margin: 0;
+}
+
+.output-header .class-name {
+    font-family: "Ubuntu Mono", monospace;
 }
 
 .output-header .header small {

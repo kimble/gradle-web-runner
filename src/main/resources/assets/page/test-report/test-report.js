@@ -201,6 +201,9 @@ function createTestReport(pubsub) {
     var outputTemplate = _.template (
         $("#outputTemplate").html()
     );
+    var testOutputHeaderTemplate = _.template (
+        $("#testOutputHeaderTemplate").html()
+    );
 
     var $testContainer = $(".test-container");
     var $outputPanel = $("#outputPanel");
@@ -221,12 +224,11 @@ function createTestReport(pubsub) {
         tests.forEach(function(testInstance) {
             if (testVisibilityPredicate(testInstance)) {
                 var alterOutputContainer = function() {
-                    var $headerElement = $(testInstanceTemplate(testInstance));
+                    var $headerElement = $(testOutputHeaderTemplate(testInstance));
                     $outputHeader.toggleClass("failure", testInstance.failure);
                     $outputHeader.toggleClass("skipped", testInstance.skipped);
                     $outputHeader.toggleClass("success", testInstance.success);
                     $outputHeader.html($headerElement);
-                    $outputHeader.find("hr").remove();
 
                     var $newOutputElement = $(outputTemplate(testInstance));
                     $outputPanel.find(".output-container").remove();

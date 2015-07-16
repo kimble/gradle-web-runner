@@ -96,6 +96,20 @@
             </div>
         </script>
 
+        <script type="text/template" id="testOutputHeaderTemplate">
+            <div>
+                <h3 class="header">
+                    <small class="class-name"><%- root.className %></small>
+                    <br/>
+                    <%- root.name %>
+                </h3>
+
+                <p class="summary">
+                    <%- root.summary %>
+                </p>
+            </div>
+        </script>
+
 
         <script type="text/javascript">
             (function() {
