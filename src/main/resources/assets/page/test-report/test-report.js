@@ -45,6 +45,7 @@ function createTestReport(pubsub) {
 
     var initializeDataStructure = (function() {
         var packages = { };
+        var tests = [ ];
 
         var createClass = function(pkg, className) {
             var classInstance = {
@@ -65,10 +66,26 @@ function createTestReport(pubsub) {
                     skipped: testCompletedEvent.result === "SKIPPED",
                     success: testCompletedEvent.result === "SUCCESS",
                     output: testCompletedEvent.output != null ? testCompletedEvent.output.join("") : null,
+
                     durationMillis: testCompletedEvent.durationMillis,
-                    exceptionMessage: testCompletedEvent.exceptionMessage
+                    exceptionMessage: testCompletedEvent.exceptionMessage,
+                    exceptionStacktrace: testCompletedEvent.exceptionStacktrace,
+
+                    summary: ''
                 };
 
+                if (testInstance.failure) {
+                    testInstance.summary = "Failed: " + testInstance.exceptionMessage;
+                }
+                else if (testInstance.skipped) {
+                    testInstance.summary = "Skipped :-("
+                }
+                else if (testInstance.success) {
+                    testInstance.summary = "Succeeded after " +testInstance.durationMillis + " milliseconds.";
+                }
+
+
+                tests.push(testInstance);
                 classInstance.tests[testCompletedEvent.name] = testInstance;
                 classInstance.testCount++;
 
@@ -116,6 +133,7 @@ function createTestReport(pubsub) {
 
         return {
             ensurePackage: ensurePackage,
+            tests: tests,
 
             packageList: function() {
                 return objectValues(packages);
@@ -175,24 +193,72 @@ function createTestReport(pubsub) {
 
     _.templateSettings.variable = "root";
 
-    var packageTemplate = _.template(
-        $("#packageTemplate").html()
+
+
+    var testInstanceTemplate = _.template (
+        $("#testInstanceTemplate").html()
+    );
+    var outputTemplate = _.template (
+        $("#outputTemplate").html()
     );
 
-    var $packages = $("#packages");
+    var $testContainer = $(".test-container");
+    var $outputPanel = $("#outputPanel");
+    var $outputContainer = $(".output-container");
+    var $outputHeader = $(".output-header");
+
+
+    var testVisibilityPredicate = function(testInstance) {
+        return true; // testInstance.failure === true;
+    };
+
 
 
     state.onValue(function(dataStructure) {
-        var packages = dataStructure.packageList();
-        console.log("Packages, ", packages);
+        var tests = dataStructure.tests;
+        console.log("Tests: ", tests);
+
+        tests.forEach(function(testInstance) {
+            if (testVisibilityPredicate(testInstance)) {
+                var alterOutputContainer = function() {
+                    var $headerElement = $(testInstanceTemplate(testInstance));
+                    $outputHeader.toggleClass("failure", testInstance.failure);
+                    $outputHeader.toggleClass("skipped", testInstance.skipped);
+                    $outputHeader.toggleClass("success", testInstance.success);
+                    $outputHeader.html($headerElement);
+                    $outputHeader.find("hr").remove();
+
+                    var $newOutputElement = $(outputTemplate(testInstance));
+                    $outputPanel.find(".output-container").remove();
+                    $outputPanel.append($newOutputElement);
+                    $outputPanel.addClass("expanded");
+                };
 
 
-        packages.forEach(function(packageInstance) {
-            var $el = $(packageTemplate(packageInstance));
-            $el.toggleClass("failure", packageInstance.testFailures > 0);
-            $el.appendTo($packages);
+                var $el = $(testInstanceTemplate(testInstance));
+                $el.toggleClass("failure", testInstance.failure);
+                $el.toggleClass("skipped", testInstance.skipped);
+                $el.toggleClass("success", testInstance.success);
+                $el.appendTo($testContainer);
+
+
+                $el.on("click", function() {
+                    if ($outputPanel.hasClass("expanded")) {
+                        $outputPanel.removeClass("expanded");
+
+                        setTimeout(function() {
+                            alterOutputContainer();
+                        }, 200);
+                    }
+                    else {
+                        alterOutputContainer();
+                    }
+                });
+            }
         });
     });
+
+
 
 }
 

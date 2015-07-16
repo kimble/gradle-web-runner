@@ -36,17 +36,19 @@
                     <h1>#${buildNumber} - Test report - <span class="project-name">Waiting for project name...</span> <br/> <small>./gradlew ${commandLine}</small></h1>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="page-header">
-                        <h2>Packages</h2>
-                    </div>
-                    <div id="packages"></div>
-                </div>
-            </div>
         </div>
 
+
+        <div id="testPanel">
+            <h2>Test panel</h2>
+            <hr/>
+            
+            <div class="test-container"></div>
+        </div>
+
+        <div id="outputPanel">
+            <div class="output-header"></div>
+        </div>
 
 
 
@@ -61,9 +63,38 @@
                     <%- root.classCount + " classes with a total of " + root.testCount + " tests" %>
                 </p>
             </div>
-
         </script>
 
+
+        <script type="text/template" id="testInstanceTemplate">
+            <div class="test">
+                <h3 class="header">
+                    <small><%- root.className %></small>
+                    <br/>
+                    <%- root.name %>
+                </h3>
+
+                <p class="summary">
+                    <%- root.summary %>
+                </p>
+            </div>
+            <hr/>
+        </script>
+
+
+        <script type="text/template" id="outputTemplate">
+            <div class="output-container">
+                <% if (root.output != null) { %>
+                <h3>System output</h3>
+                <pre class="output"><%- root.output %></pre>
+                <% } %>
+
+                <% if (root.exceptionStacktrace != "") { %>
+                <h3>Stacktrace</h3>
+                <pre class="stacktrace"><%- root.exceptionStacktrace %></pre>
+                <% } %>
+            </div>
+        </script>
 
 
         <script type="text/javascript">
