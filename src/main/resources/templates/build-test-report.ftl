@@ -94,6 +94,12 @@
                 <h3>Stacktrace</h3>
                 <pre class="stacktrace"><%- root.exceptionStacktrace %></pre>
                 <% } %>
+
+                <% if (root.exceptionStacktrace == "" && root.output == null) { %>
+                    <% if (root.success) { %>
+                        <span class="glyphicon glyphicon-thumbs-up big-thumbs-up"></span>
+                    <% } %>
+                <% } %>
             </div>
         </script>
 

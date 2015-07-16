@@ -145,7 +145,7 @@ h3 {
 #outputPanel {
     position: absolute;
     bottom: 0;
-    left: 700px;
+    left: 725px;
 
     z-index: 1;
 
@@ -161,6 +161,7 @@ h3 {
 
     transition-property: left;
     transition-duration: 200ms;
+    transition-timing-function: ease-out;
 }
 
 #outputPanel.expanded {
@@ -220,4 +221,12 @@ h3 {
 }
 .output-header.failure {
     background-color: #cf5a0b;
+}
+
+.output-container .big-thumbs-up {
+    color: #ededed;
+    width: 250px;
+    display: block;
+    margin: 200px auto;
+    font-size: 250px;
 }
