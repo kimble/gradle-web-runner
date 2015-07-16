@@ -245,10 +245,8 @@ function createTestReport(pubsub) {
                     $outputHeader.html($headerElement);
 
                     var $newOutputElement = $(outputTemplate(testInstance));
-                    $outputPanel.find(".output-container").remove();
-                    $outputPanel.append($newOutputElement);
+                    $outputPanel.find(".output-container").html($newOutputElement);
                     $outputPanel.addClass("expanded");
-
                 };
 
 

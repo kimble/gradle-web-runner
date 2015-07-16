@@ -48,6 +48,7 @@
 
         <div id="outputPanel">
             <div class="output-header"></div>
+            <div class="output-container"></div>
         </div>
 
 
@@ -83,7 +84,7 @@
 
 
         <script type="text/template" id="outputTemplate">
-            <div class="output-container">
+            <div>
                 <% if (root.output != null) { %>
                 <h3>System output</h3>
                 <pre class="output"><%- root.output %></pre>
