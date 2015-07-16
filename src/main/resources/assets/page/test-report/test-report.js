@@ -216,6 +216,20 @@ function createTestReport(pubsub) {
     };
 
 
+    var testSelector = (function() {
+        var $previousTest = null;
+
+        return function($selectedTest) {
+            if (!$selectedTest.is($previousTest)) {
+                $selectedTest.addClass("selected");
+                $($previousTest).removeClass("selected");
+                $previousTest = $selectedTest;
+            }
+        }
+    })();
+
+
+
 
     state.onValue(function(dataStructure) {
         var tests = dataStructure.tests;
@@ -234,6 +248,7 @@ function createTestReport(pubsub) {
                     $outputPanel.find(".output-container").remove();
                     $outputPanel.append($newOutputElement);
                     $outputPanel.addClass("expanded");
+
                 };
 
 
@@ -250,10 +265,12 @@ function createTestReport(pubsub) {
 
                         setTimeout(function() {
                             alterOutputContainer();
+                            testSelector($el);
                         }, 200);
                     }
                     else {
                         alterOutputContainer();
+                        testSelector($el);
                     }
                 });
             }

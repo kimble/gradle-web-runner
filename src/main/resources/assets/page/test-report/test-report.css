@@ -92,6 +92,13 @@ h3 {
 
     background-color: white;
     border-left: 7px solid gray;
+
+    transition-property: border-border-left-width;
+    transition-duration: 500ms;
+}
+
+.test-container .test.selected {
+    border-left-width: 14px;
 }
 
 .test-container .test .summary {
@@ -185,6 +192,9 @@ h3 {
     background-color: gray;
     font-size: 1.2em;
     color: white;
+
+    transition-property: background-color;
+    transition-duration: 300ms;
 }
 
 .output-header .header {
