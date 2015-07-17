@@ -308,12 +308,15 @@ function createTestReport(pubsub) {
             }
 
             switch (summary.skipped) {
+                case 0:
+                    break;
+
                 case 1:
                     text += ", one skipped";
                     break;
 
                 default:
-                    text += summary.skipped + " skipped";
+                    text += ", " + summary.skipped + " skipped";
             }
 
 
