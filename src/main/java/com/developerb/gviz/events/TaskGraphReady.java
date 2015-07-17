@@ -32,6 +32,7 @@ public class TaskGraphReady extends Event {
 
     public static class Task {
 
+        private final String projectPath;
         private final String type;
         private final String name;
         private final String path;
@@ -39,17 +40,24 @@ public class TaskGraphReady extends Event {
         private final Set<String> dependsOn;
 
         @JsonCreator
-        public Task(@JsonProperty("type") String type,
+        public Task(@JsonProperty("projectPath") String projectPath,
+                    @JsonProperty("type") String type,
                     @JsonProperty("name") String name,
                     @JsonProperty("path") String path,
                     @JsonProperty("description") String description,
                     @JsonProperty("dependsOn") Set<String> dependsOn) {
+
+            this.projectPath = projectPath;
 
             this.type = type;
             this.name = name;
             this.path = path;
             this.description = description;
             this.dependsOn = dependsOn;
+        }
+
+        public String getProjectPath() {
+            return projectPath;
         }
 
         public String getName() {

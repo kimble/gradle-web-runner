@@ -158,7 +158,7 @@
 
                 // Interface
 
-                createGradleOutputConsole(pubsub);
+                createGradleOutputConsole(pubsub, buildNumber);
                 createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 createRunningTestReport(pubsub);

@@ -100,6 +100,10 @@ public class Build implements Comparable<Build> {
                     handleEvent(json, SettingsReady.class);
                     break;
 
+                case "project-evaluated":
+                    handleEvent(json, ProjectEvaluated.class);
+                    break;
+
                 case "task-graph-ready":
                     handleEvent(json, TaskGraphReady.class);
                     break;

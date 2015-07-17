@@ -71,11 +71,23 @@ gradle.projectsLoaded { gradle ->
     gradle.ext.buildStarted = System.currentTimeMillis()
 }
 
+gradle.afterProject { Project project, evaluationFailure ->
+    spy.send("project-evaluated", [
+            name: project.name,
+            path: project.path,
+            description: project.description,
+
+            parent: project.parent?.path,
+            children: project.childProjects.values().collect { it.path }
+    ]);
+}
+
 gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
     spy.send("task-graph-ready",
             [
                     tasks: graph.allTasks.collect { Task task ->
                         [
+                                projectPath: task.project.path,
                                 type: task.class.simpleName.replace("_Decorated", ""),
                                 name: task.name,
                                 path: task.path,
@@ -105,7 +117,9 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
             task.beforeTest { TestDescriptor test ->
                 spy.send("before-test", [
                         name: test.name,
-                        className: test.className
+                        className: test.className,
+                        projectName: task.project.name,
+                        projectPath: task.project.path
                 ])
             }
 
