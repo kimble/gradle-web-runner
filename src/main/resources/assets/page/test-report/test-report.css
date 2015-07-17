@@ -157,11 +157,11 @@ h3 {
 #outputPanel {
     position: absolute;
     bottom: 0;
-    left: 725px;
+    left: 740px;
 
     z-index: 1;
 
-    height: calc(100% - 263px);
+    height: calc(100% - 50px);
     width: calc(100% - 800px);
 
     background-color: rgb(241, 241, 241);
@@ -188,8 +188,7 @@ h3 {
 
 .output-container {
     width: 100%;
-    height: 625px;
-
+    height: calc(100% - 95px);
     overflow: auto;
     padding: 5px 10px;
 }
