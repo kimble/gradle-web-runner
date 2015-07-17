@@ -205,6 +205,7 @@ function createTestReport(pubsub) {
         $("#testOutputHeaderTemplate").html()
     );
 
+    var $testPanel = $("#testPanel");
     var $testContainer = $(".test-container");
     var $outputPanel = $("#outputPanel");
     var $outputContainer = $(".output-container");
@@ -232,48 +233,132 @@ function createTestReport(pubsub) {
 
 
     state.onValue(function(dataStructure) {
+        var summary = {
+            success: 0,
+            skipped: 0,
+            failure: 0
+        };
+
         var tests = dataStructure.tests;
         console.log("Tests: ", tests);
 
         tests.forEach(function(testInstance) {
-            if (testVisibilityPredicate(testInstance)) {
-                var alterOutputContainer = function() {
-                    var $headerElement = $(testOutputHeaderTemplate(testInstance));
-                    $outputHeader.toggleClass("failure", testInstance.failure);
-                    $outputHeader.toggleClass("skipped", testInstance.skipped);
-                    $outputHeader.toggleClass("success", testInstance.success);
-                    $outputHeader.html($headerElement);
-
-                    var $newOutputElement = $(outputTemplate(testInstance));
-                    $outputPanel.find(".output-container").html($newOutputElement);
-                    $outputPanel.addClass("expanded");
-                };
+            if (testInstance.success) {
+                summary.success++;
+            }
+            if (testInstance.failure) {
+                summary.failure++;
+            }
+            if (testInstance.skipped) {
+                summary.skipped++;
+            }
 
 
-                var $el = $(testInstanceTemplate(testInstance));
-                $el.toggleClass("failure", testInstance.failure);
-                $el.toggleClass("skipped", testInstance.skipped);
-                $el.toggleClass("success", testInstance.success);
-                $el.appendTo($testContainer);
+            var alterOutputContainer = function() {
+                var $headerElement = $(testOutputHeaderTemplate(testInstance));
+                $outputHeader.toggleClass("failure", testInstance.failure);
+                $outputHeader.toggleClass("skipped", testInstance.skipped);
+                $outputHeader.toggleClass("success", testInstance.success);
+                $outputHeader.html($headerElement);
+
+                var $newOutputElement = $(outputTemplate(testInstance));
+                $outputPanel.find(".output-container").html($newOutputElement);
+                $outputPanel.addClass("expanded");
+            };
 
 
-                $el.on("click", function() {
-                    if ($outputPanel.hasClass("expanded")) {
-                        $outputPanel.removeClass("expanded");
+            var $el = $(testInstanceTemplate(testInstance));
+            $el.toggleClass("failure", testInstance.failure);
+            $el.toggleClass("skipped", testInstance.skipped);
+            $el.toggleClass("success", testInstance.success);
+            $el.appendTo($testContainer);
 
-                        setTimeout(function() {
-                            alterOutputContainer();
-                            testSelector($el);
-                        }, 200);
-                    }
-                    else {
+
+            $el.on("click", function() {
+                if ($outputPanel.hasClass("expanded")) {
+                    $outputPanel.removeClass("expanded");
+
+                    setTimeout(function() {
                         alterOutputContainer();
                         testSelector($el);
-                    }
-                });
-            }
+                    }, 200);
+                }
+                else {
+                    alterOutputContainer();
+                    testSelector($el);
+                }
+            });
         });
+
+
+        // Summary
+        $testPanel.find("h2").html(function() {
+            var text = "";
+            switch (summary.success) {
+                case 0:
+                    text += "No successes";
+                    break;
+
+                case 1:
+                    text += "A single success";
+                    break;
+
+                default:
+                    text += summary.success + " successes";
+            }
+
+            switch (summary.skipped) {
+                case 1:
+                    text += ", one skipped";
+                    break;
+
+                default:
+                    text += summary.skipped + " skipped";
+            }
+
+
+            switch (summary.failure) {
+                case 0:
+                    text += " and not a single failure!";
+                    break;
+
+                case 1:
+                    text += " and a single failed test..";
+                    break;
+
+                default:
+                    text += " and "  + summary.failure + " failed tests";
+            }
+
+            return text;
+        });
+
+        // Show successful tests only if we don't have a single
+        // skipped or failed test...
+        if (summary.failure === 0 && summary.skipped === 0) {
+            $testContainer.removeClass("hide-success");
+        }
     });
+
+
+    // Build name
+
+    pubsub.stream("SettingsReady")
+        .map(".settings.projectName")
+        .onValue(function(projectName) {
+            $(".project-name").html(projectName);
+        });
+
+
+    // Filter
+
+    function createCheckboxStream(selector) {
+        var $el = $(selector);
+        return $el.asEventStream("change").map(".target.checked").toProperty($el.is(":checked"));
+    }
+
+
+    createCheckboxStream("#showSuccess").not().assign($testContainer, "toggleClass", "hide-success");
 
 
 

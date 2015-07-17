@@ -9,12 +9,14 @@
         <title>Gradle Web Runner - Build - ${buildNumber} - Test report</title>
 
 
+        <link rel="stylesheet" href="/assets/mdl/material.min.css">
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
         <script src="/assets/underscore/underscore-min.js"></script>
+        <script src="/assets/mdl/material.min.js"></script>
 
         <script src="/assets/page/pubsub.js"></script>
         <script src="/assets/page/build-websockets.js"></script>
@@ -38,12 +40,21 @@
             </div>
         </div>
 
+        <div id="filterPanel">
+            <div>
+                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="showSuccess">
+                    <input type="checkbox" id="showSuccess" class="mdl-checkbox__input" tabindex="3" />
+                    <span class="mdl-checkbox__label">Show successful tests</span>
+                </label>
+            </div>
+        </div>
+
 
         <div id="testPanel">
-            <h2>Test panel</h2>
+            <h2 class="header">Test panel</h2>
             <hr/>
             
-            <div class="test-container"></div>
+            <div class="test-container hide-success"></div>
         </div>
 
         <div id="outputPanel">
@@ -79,7 +90,6 @@
                     <%- root.summary %>
                 </p>
             </div>
-            <hr/>
         </script>
 
 
