@@ -25,7 +25,6 @@
         <script src="/assets/page/in-progress/running-tasks/running-tasks.js"></script>
         <script src="/assets/page/in-progress/mini-test-report/mini-test-report.js"></script>
         <script src="/assets/page/in-progress/gradle-output/gradle-output.js"></script>
-        <script src="/assets/page/in-progress/task-stack-panel/task-panel.js"></script>
         <script src="/assets/page/in-progress/build-estimate/build-estimate.js"></script>
         <script src="/assets/page/in-progress/project-details/project-details.js"></script>
 
@@ -37,7 +36,6 @@
         <link rel="stylesheet" href="/assets/page/in-progress/mini-test-report/mini-test-report.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/running-tasks/running-tasks.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/gradle-output/gradle-output.css" />
-        <link rel="stylesheet" href="/assets/page/in-progress/task-stack-panel/task-panel.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/build-estimate/build-estimate.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/build-details/build-details.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/project-details/project-details.css" />
@@ -55,16 +53,16 @@
             }
 
             .container-full {
-                margin: 0 auto;
-                padding-left: 1em;
-                width: 95%;
+                margin: 0;
+                width: 100%;
                 height: 100%;
+                padding-left: 2em;
             }
 
             .inner-container {
                 overflow-y: auto;
                 overflow-x: hidden;
-                width: calc(100% - 588px);
+                width: calc(100% - 0.8em - (60% - 500px));
                 height: 500px;
             }
 
@@ -110,11 +108,6 @@
 
 
 
-
-        <!-- Tasks -->
-        <div id="taskPanel" class="moving-panel shy">
-            <div id="taskStack"></div>
-        </div>
 
 
         <!-- Gradle output -->
@@ -216,7 +209,6 @@
                 // createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 createRunningTestReport(pubsub);
-                createTaskPanel(pubsub);
                 createBuildEstimate(pubsub);
                 createProjectDetails(pubsub);
 
