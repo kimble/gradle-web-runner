@@ -4,16 +4,27 @@
     -moz-column-count: 4;
     -moz-column-gap: 1em;
     column-count: 4;
-    column-gap: 1em;
 }
 
 
 #projectDetails .project-detail {
-    -mpz-column-break-inside: avoid;
+    -moz-column-break-inside: avoid;
     -webkit-column-break-inside: avoid;
     break-inside: avoid-column;
     width: 260px;
     margin-bottom: 3em;
+    column-gap: 1em;
+
+    padding: 5px 5px;
+    border-radius: 4px;
+    background-color: white;
+
+    transition-property: background-color;
+    transition-duration: 500ms;
+}
+
+#projectDetails .project-detail.task-running {
+    background-color: #f4f4f4;
 }
 
 #projectDetails .page-header {

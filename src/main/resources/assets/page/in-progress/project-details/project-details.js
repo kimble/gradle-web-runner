@@ -1,6 +1,12 @@
 var createProjectDetails = function(pubsub) {
     "use strict";
 
+    var hasProperty = function(property, expected) {
+        return function(event) {
+            return event.hasOwnProperty(property) && event[property] === expected;
+        }
+    };
+
     function createTemplate(selector) {
         _.templateSettings.variable = "root";
         var $el = $(selector);
@@ -9,7 +15,6 @@ var createProjectDetails = function(pubsub) {
 
     var $projectDetails = $("#projectDetails");
 
-    var projectDetailsTemplate = createTemplate("#projectDetailTemplate");
 
 
     $(document).ready(function() {
@@ -17,11 +22,6 @@ var createProjectDetails = function(pubsub) {
     });
 
 
-    pubsub.stream("ProjectEvaluated")
-        .onValue(function(event) {
-            var html = projectDetailsTemplate(event);
-            $(html).appendTo($projectDetails);
-        });
 
 
     /**
@@ -155,35 +155,6 @@ var createProjectDetails = function(pubsub) {
 
 
     (function() {
-        var hasProperty = function(property, expected) {
-            return function(event) {
-                return event.hasOwnProperty(property) && event[property] === expected;
-            }
-        };
-
-        var formatTestSummary = function(summary) {
-            var text = "";
-            switch (summary.success) {
-                case 0: text += "No successes"; break;
-                case 1: text += "A single success"; break;
-                default: text += summary.success + " successes";
-            }
-
-            switch (summary.skipped) {
-                case 0: break;
-                case 1: text += ", one skipped"; break;
-                default: text += ", " + summary.skipped + " skipped";
-            }
-
-            switch (summary.failure) {
-                case 0: text += " and not a single failure!"; break;
-                case 1: text += " and a single failed test.."; break;
-                default: text += " and "  + summary.failure + " failed tests";
-            }
-
-            return text;
-        };
-
         pubsub.takeOne("TaskGraphReady")
             .map(".tasks")
             .flatMap(Bacon.fromArray)
@@ -205,11 +176,6 @@ var createProjectDetails = function(pubsub) {
                     .take(1);
 
                 taskCompleted.onValue(function () {
-                    if (testSummary.started > 0) {
-                        $task.find(".summary")
-                            .removeClass("hidden")
-                            .html(formatTestSummary(testSummary));
-                    }
                 });
 
 
@@ -226,9 +192,27 @@ var createProjectDetails = function(pubsub) {
                             .onValue(function (completed) {
                                 testSummary.started++;
 
-                                if (completed.result === "SUCCESS") testSummary.success++;
-                                if (completed.result === "SKIPPED") testSummary.skipped++;
-                                if (completed.result === "FAILURE") testSummary.failure++;
+                                if (completed.result === "SUCCESS") {
+                                    testSummary.success++;
+
+                                    $task.find(".test-success-count")
+                                        .removeClass("hidden")
+                                        .html(testSummary.success);
+                                }
+                                if (completed.result === "SKIPPED") {
+                                    testSummary.skipped++;
+
+                                    $task.find(".test-skipped-count")
+                                        .removeClass("hidden")
+                                        .html(testSummary.skipped);
+                                }
+                                if (completed.result === "FAILURE") {
+                                    testSummary.failure++;
+
+                                    $task.find(".test-failure-count")
+                                        .removeClass("hidden")
+                                        .html(testSummary.failure);
+                                }
                             });
                     });
 
@@ -242,10 +226,56 @@ var createProjectDetails = function(pubsub) {
 
 
 
+    (function() {
+        var taskGraphReady = pubsub.takeOne("TaskGraphReady");
+        var buildCompleted = pubsub.takeOne("GradleBuildCompleted");
+        var projectDetailsTemplate = createTemplate("#projectDetailTemplate");
+
+        pubsub.stream("ProjectEvaluated")
+            .takeUntil(taskGraphReady)
+            .onValue(function (projectEvaluated) {
+                var $projectElement = $(projectDetailsTemplate(projectEvaluated));
+                $projectElement.appendTo($projectDetails);
 
 
 
+                var summary = {
+                    total: -1,
+                    started: 0,
+                    completed: 0,
+                    running: 0
+                };
 
+                var toggleClasses = function() {
+                    $projectElement.toggleClass("task-running", (summary.started - summary.completed) > 0);
+                };
+
+                pubsub.takeOne("TaskGraphReady")
+                    .map(".tasks")
+                    .flatMap(Bacon.fromArray)
+                    .filter(hasProperty("projectPath", projectEvaluated.path))
+                    .onValue(function(definedTask) {
+                        summary.total++;
+                    });
+
+                pubsub.stream("TaskStarting")
+                    .takeUntil(buildCompleted)
+                    .filter(hasProperty("projectPath", projectEvaluated.path))
+                    .onValue(function(taskStarted) {
+                        summary.started++;
+                        toggleClasses();
+
+                        pubsub.stream("TaskCompleted")
+                            .filter(hasProperty("path", taskStarted.path))
+                            .take(1)
+                            .onValue(function () {
+                                summary.completed++;
+                                toggleClasses();
+                            });
+                    });
+            });
+
+    })();
 
 
 };

@@ -165,6 +165,7 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
 
         spy.send("task-before", [
                 path: task.path,
+                projectPath: task.project.path,
                 timestamp: task.ext.startTime
         ])
     }

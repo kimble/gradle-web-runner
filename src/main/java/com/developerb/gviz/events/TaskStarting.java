@@ -10,9 +10,19 @@ import java.util.Date;
  */
 public class TaskStarting extends TaskEvent {
 
+    private final String projectPath;
+
     @JsonCreator
-    public TaskStarting(@JsonProperty("path") String path, @JsonProperty("timestamp") Date timestamp) {
+    public TaskStarting(@JsonProperty("path") String path,
+                        @JsonProperty("timestamp") Date timestamp,
+                        @JsonProperty("projectPath") String projectPath) {
         super(timestamp, path);
+
+        this.projectPath = projectPath;
+    }
+
+    public String getProjectPath() {
+        return projectPath;
     }
 
     @Override

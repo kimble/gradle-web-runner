@@ -171,6 +171,9 @@
                     <span class="task-icon glyphicon glyphicon-record" title="Not started"></span>
 
                     <span title="<%- root.name %>"><%- _.trunc(root.name, 25) %></span>
+                    <span title="Successful tests" class="hidden label label-success test-success-count"></span>
+                    <span title="Skipped tests" class="hidden label label-warning test-skipped-count"></span>
+                    <span title="Failed tests" class="hidden label label-danger test-failure-count"></span>
                     <span class="duration"></span>
                 </div>
                 <div class="summary hidden"></div>
