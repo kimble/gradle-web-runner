@@ -129,8 +129,8 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
                 spy.send("before-test", [
                         name: test.name,
                         className: test.className,
-                        projectName: task.project.name,
-                        projectPath: task.project.path
+                        projectPath: task.project.path,
+                        taskPath: task.path
                 ])
             }
 

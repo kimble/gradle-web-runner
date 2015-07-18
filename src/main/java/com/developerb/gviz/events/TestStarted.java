@@ -6,11 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
 
 /**
+ * A test has started executing.
+ * We know which project and task this test belongs to.
+ *
  * @author Kim A. Betti
  */
 public class TestStarted extends TestEvent {
 
-    private final String projectName;
+    private final String taskPath;
     private final String projectPath;
 
     @JsonCreator
@@ -18,16 +21,16 @@ public class TestStarted extends TestEvent {
                        @JsonProperty("className") String className,
                        @JsonProperty("name") String name,
                        @JsonProperty("projectPath") String projectPath,
-                       @JsonProperty("projectName") String projectName) {
+                       @JsonProperty("taskPath") String taskPath) {
 
         super(timestamp, className, name);
 
-        this.projectName = projectName;
+        this.taskPath = taskPath;
         this.projectPath = projectPath;
     }
 
-    public String getProjectName() {
-        return projectName;
+    public String getTaskPath() {
+        return taskPath;
     }
 
     public String getProjectPath() {

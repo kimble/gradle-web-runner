@@ -151,4 +151,101 @@ var createProjectDetails = function(pubsub) {
             });
     })();
 
+
+
+
+    (function() {
+        var hasProperty = function(property, expected) {
+            return function(event) {
+                return event.hasOwnProperty(property) && event[property] === expected;
+            }
+        };
+
+        var formatTestSummary = function(summary) {
+            var text = "";
+            switch (summary.success) {
+                case 0: text += "No successes"; break;
+                case 1: text += "A single success"; break;
+                default: text += summary.success + " successes";
+            }
+
+            switch (summary.skipped) {
+                case 0: break;
+                case 1: text += ", one skipped"; break;
+                default: text += ", " + summary.skipped + " skipped";
+            }
+
+            switch (summary.failure) {
+                case 0: text += " and not a single failure!"; break;
+                case 1: text += " and a single failed test.."; break;
+                default: text += " and "  + summary.failure + " failed tests";
+            }
+
+            return text;
+        };
+
+        pubsub.takeOne("TaskGraphReady")
+            .map(".tasks")
+            .flatMap(Bacon.fromArray)
+            .onValue(function(task) {
+                var $task = $projectDetails.find(".task-details[data-task='"+ task.path +"']");
+
+                var testSummary = {
+                    started: 0,
+                    completed: 0,
+
+                    success: 0,
+                    skipped: 0,
+                    failure: 0
+                };
+
+
+                var taskCompleted = pubsub.stream("TaskCompleted")
+                    .filter(hasProperty("path", task.path))
+                    .take(1);
+
+                taskCompleted.onValue(function () {
+                    if (testSummary.started > 0) {
+                        $task.find(".summary")
+                            .removeClass("hidden")
+                            .html(formatTestSummary(testSummary));
+                    }
+                });
+
+
+                pubsub.stream("TestStarted")
+                    .filter(hasProperty("taskPath", task.path))
+                    .takeUntil(taskCompleted)
+                    .onValue(function(started) {
+                        testSummary.started++;
+
+                        pubsub.stream("TestCompleted")
+                            .filter(hasProperty("className", started.className))
+                            .filter(hasProperty("name", started.name))
+                            .take(1)
+                            .onValue(function (completed) {
+                                testSummary.started++;
+
+                                if (completed.result === "SUCCESS") testSummary.success++;
+                                if (completed.result === "SKIPPED") testSummary.skipped++;
+                                if (completed.result === "FAILURE") testSummary.failure++;
+                            });
+                    });
+
+
+
+
+            });
+    })();
+
+
+
+
+
+
+
+
+
+
+
 };

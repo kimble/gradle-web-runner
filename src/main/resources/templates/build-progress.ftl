@@ -167,10 +167,13 @@
 
         <script type="text/template" id="taskDetailTemplate">
             <div class="task-details" data-task="<%- root.path %>">
-                <span class="task-icon glyphicon glyphicon-record" title="Not started"></span>
+                <div>
+                    <span class="task-icon glyphicon glyphicon-record" title="Not started"></span>
 
-                <span title="<%- root.name %>"><%- _.trunc(root.name, 25) %></span>
-                <span class="duration"></span>
+                    <span title="<%- root.name %>"><%- _.trunc(root.name, 25) %></span>
+                    <span class="duration"></span>
+                </div>
+                <div class="summary hidden"></div>
             </div>
             <br/>
         </script>

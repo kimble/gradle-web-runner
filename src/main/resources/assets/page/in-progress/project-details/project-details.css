@@ -42,19 +42,25 @@
 
 
 #projectDetails .task-details.failed {
-    color: white;
     font-weight: bold;
-    background-color: #e36e24;
 }
 
+#projectDetails .task-details .summary {
+    font-size: 0.9em;
+    color: white;
+    padding: 2px 4px;
+    background-color: #747373;
+    font-family: Oswald, sans-serif;
+}
+
+#projectDetails .task-details.failed .summary {
+    background-color: #e36e24;
+}
 
 #projectDetails .task-details .duration {
     font-size: 0.8em;
     font-style: italic;
     color: #999;
-}
-#projectDetails .task-details.failed .duration {
-    color: white;
 }
 
 
