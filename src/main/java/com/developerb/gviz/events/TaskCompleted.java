@@ -15,6 +15,7 @@ public class TaskCompleted extends TaskEvent {
     private final boolean skipped;
     private final String skippedMessage;
     private final String failureMessage;
+    private final String failureStacktrace;
     private final Integer durationMillis;
 
 
@@ -26,6 +27,7 @@ public class TaskCompleted extends TaskEvent {
                          @JsonProperty("skipped") boolean skipped,
                          @JsonProperty("skippedMessage") String skippedMessage,
                          @JsonProperty("failureMessage") String failureMessage,
+                         @JsonProperty("failureStacktrace") String failureStacktrace,
                          @JsonProperty("durationMillis") Integer durationMillis) {
         super(timestamp, path);
 
@@ -34,6 +36,7 @@ public class TaskCompleted extends TaskEvent {
         this.skipped = skipped;
         this.skippedMessage = skippedMessage;
         this.failureMessage = failureMessage;
+        this.failureStacktrace = failureStacktrace;
         this.durationMillis = durationMillis;
     }
 
@@ -55,6 +58,10 @@ public class TaskCompleted extends TaskEvent {
 
     public String getFailureMessage() {
         return failureMessage;
+    }
+
+    public String getFailureStacktrace() {
+        return failureStacktrace;
     }
 
     public Integer getDurationMillis() {

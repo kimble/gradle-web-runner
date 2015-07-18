@@ -63,7 +63,18 @@ BuildSpy spy = new BuildSpy(Integer.parseInt(spyPort))
 
 
 
+def printExceptionToString = { Throwable trouble ->
+    if (trouble != null) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        trouble?.printStackTrace(pw);
 
+        return sw.toString();
+    }
+    else {
+        return null;
+    }
+}
 
 // Gradle event listeners
 
@@ -136,17 +147,13 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
 
             // After
             task.afterTest { TestDescriptor test, TestResult result ->
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                result.exception?.printStackTrace(pw);
-
                 spy.send("after-test", [
                         name: test.name,
                         className: test.className,
                         result: result.resultType.name(),
                         durationMillis: result.endTime - result.startTime,
                         exceptionMessage: result.exception?.message,
-                        exceptionStacktrace: sw.toString(),
+                        exceptionStacktrace: printExceptionToString(result.exception),
                         output: task.testOutput[test.className + ":" + test.name]
                 ])
             }
@@ -173,6 +180,7 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
                 skipped: state.skipped,
                 skippedMessage: state.skipMessage,
                 failureMessage: state.failure?.message,
+                failureStacktrace: printExceptionToString(state.failure),
                 durationMillis: timestamp - task.ext.startTime
         ])
     }

@@ -33,8 +33,6 @@ function initializeTaskState(pubsub, buildNumber) {
 
 
     function fetchEstimates() {
-        console.info("Fetching estimates");
-
         jQuery.getJSON("/api/build/" + buildNumber + "/estimates", function(estimates) {
             pubsub.broadcast('estimates-received', estimates);
 
@@ -96,5 +94,46 @@ function initializeTaskState(pubsub, buildNumber) {
 
             broadcastStateUpdate();
         });
+
+
+
+    (function() {
+        var foldProjects = function (state, event) {
+            return state.set(event.path, Immutable.fromJS({
+                path: event.path,
+                name: event.name,
+                description: event.description,
+                parent: event.parentPath,
+                children: event.childrenPaths
+            }));
+        };
+
+        pubsub.stream("ProjectEvaluated")
+            .takeUntil(pubsub.takeOne("TaskGraphReady"))
+            .fold(Immutable.Map({ }), foldProjects)
+            .assign(pubsub, "broadcast", "project-data-assembled");
+    })();
+
+
+
+
+
+    (function() {
+        var combineTasksAndProjects = function(projectMap, tasks) {
+            return tasks.map(function (task) {
+                var taskProjectPath = task.get("projectPath");
+                var project = projectMap.get(taskProjectPath);
+
+                return task.set("project", project);
+            });
+        };
+
+        var projectData = pubsub.takeOne("project-data-assembled");
+        var taskData = pubsub.takeOne("TaskGraphReady").map(".tasks").map(Immutable.fromJS);
+
+        Bacon.combineWith(combineTasksAndProjects, projectData, taskData)
+            .log("Combined tasks and projects");
+    })();
+
 
 }

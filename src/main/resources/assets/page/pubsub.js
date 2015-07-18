@@ -14,6 +14,14 @@ window.pubsub = (function() {
         });
     });
 
+    var stream = function(type) {
+        return bus.filter(function (transfer) {
+            return transfer.type == type;
+        }).map(function(transfer) {
+            return transfer.event;
+        });
+    };
+
     // Dead simple pubsub event-bus with reactive
     // capabilities provided by Bacon.js
     return {
@@ -28,12 +36,11 @@ window.pubsub = (function() {
                 bus.push(arguments[0]);
             }
         },
-        stream: function(type) {
-            return bus.filter(function (transfer) {
-                return transfer.type == type;
-            }).map(function(transfer) {
-                return transfer.event;
-            });
+
+        stream: stream,
+
+        takeOne: function(type) {
+            return stream(type).take(1);
         }
     }
 })();
