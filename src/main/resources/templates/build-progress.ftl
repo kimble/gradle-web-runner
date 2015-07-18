@@ -23,7 +23,6 @@
 
         <script src="/assets/page/in-progress/build-details/build-details.js"></script>
         <script src="/assets/page/in-progress/running-tasks/running-tasks.js"></script>
-        <script src="/assets/page/in-progress/mini-test-report/mini-test-report.js"></script>
         <script src="/assets/page/in-progress/gradle-output/gradle-output.js"></script>
         <script src="/assets/page/in-progress/build-estimate/build-estimate.js"></script>
         <script src="/assets/page/in-progress/project-details/project-details.js"></script>
@@ -33,7 +32,6 @@
 
         <link rel="stylesheet" href="/assets/page/moving-panel.css" />
 
-        <link rel="stylesheet" href="/assets/page/in-progress/mini-test-report/mini-test-report.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/running-tasks/running-tasks.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/gradle-output/gradle-output.css" />
         <link rel="stylesheet" href="/assets/page/in-progress/build-estimate/build-estimate.css" />
@@ -128,21 +126,6 @@
             </table>
         </div>
 
-        <!-- Mini test report -->
-        <div id="miniTestReport" class="moving-panel shy">
-            <div class="page-header">
-                <h3><u>T</u>est report <small class="summary">Awaiting test results..</small></h3>
-            </div>
-
-            <div class="panel-container">
-                <div class="waiting-message">
-                    <p>Nice work!!</p>
-                    <p>Not a single test has failed so far!</p>
-                </div>
-            </div>
-        </div>
-
-
 
 
         <!-- Project details template -->
@@ -214,7 +197,6 @@
                 createGradleOutputConsole(pubsub, buildNumber);
                 // createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
-                createRunningTestReport(pubsub);
                 createBuildEstimate(pubsub);
                 createProjectDetails(pubsub);
 
