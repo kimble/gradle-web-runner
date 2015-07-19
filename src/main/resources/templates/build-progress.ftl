@@ -12,6 +12,7 @@
         <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
+        <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
         <script src="/assets/bacon/bacon.js"></script>
         <script src="/assets/d3/d3.min.js"></script>
         <script src="/assets/immutable/immutable-min.js"></script>

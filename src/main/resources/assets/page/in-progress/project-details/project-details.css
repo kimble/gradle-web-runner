@@ -6,6 +6,18 @@
     column-count: 4;
 }
 
+#projectDetails .popover {
+    max-width: 700px;
+}
+
+#projectDetails .popover pre {
+    width: 100%;
+    word-wrap: normal;
+    overflow-x: auto;
+    background-color: #242320;
+    color: rgb(201, 208, 194);
+}
+
 #projectDetails .project-detail {
     -moz-column-break-inside: avoid;
     -webkit-column-break-inside: avoid;
@@ -103,6 +115,7 @@
     padding: 2px 4px;
     background-color: #747373;
     font-family: Oswald, sans-serif;
+    cursor: pointer;
 }
 
 #projectDetails .task-details.failure .summary {

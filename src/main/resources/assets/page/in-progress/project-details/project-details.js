@@ -368,7 +368,13 @@ var createProjectDetails = function(pubsub, buildNumber) {
             var enterTaskSecondLine = enterTask.append("div");
 
             enterTaskSecondLine.append("div")
-                .attr("class", "summary hidden");
+                .attr("class", "summary hidden")
+                .each(function(task) {
+                    $(this).popover({
+                        title: task.path,
+                        html: true
+                    });
+                });
 
             var enterTaskIcons = enterTaskFirstLine.append("span")
                 .attr("class", "icons");
@@ -463,7 +469,11 @@ var createProjectDetails = function(pubsub, buildNumber) {
                 .classed("hidden", function (task) {
                     return task.failure !== true;
                 })
-                .text(prop("failureMessage"));
+                .text(prop("failureMessage"))
+                .attr("data-toggle", "popover")
+                .attr("data-content", function(task) {
+                    return "<pre>" + task.failureStacktrace + "</pre>";
+                });
 
         });
     })();
