@@ -28,7 +28,7 @@ Screenshots
 ![Configuration page](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/configuration-page.png)
 
 ### Building Hibernate
-![Test report](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v4.png)page.png)
+![Building hibernate](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v5.png)
 
 ### Full test report
 ![Test report](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/full-test-report.png)

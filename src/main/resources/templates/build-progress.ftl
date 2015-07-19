@@ -114,7 +114,7 @@
                 <div class="intro">Waiting to receive output from forked Gradle process.<br/>Hit [O] to expand this panel.<br/></div>
             </div>
         </div>
-        
+
         <!-- Build details -->
         <div id="buildDetails" class="moving-panel shy">
             <div class="page-header">
