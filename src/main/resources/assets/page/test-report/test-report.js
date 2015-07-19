@@ -240,7 +240,6 @@ function createTestReport(pubsub) {
         };
 
         var tests = dataStructure.tests;
-        console.log("Tests: ", tests);
 
         tests.forEach(function(testInstance) {
             if (testInstance.success) {
