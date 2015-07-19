@@ -114,6 +114,17 @@
                 <div class="intro">Waiting to receive output from forked Gradle process.<br/>Hit [O] to expand this panel.<br/></div>
             </div>
         </div>
+        
+        <!-- Build details -->
+        <div id="buildDetails" class="moving-panel shy">
+            <div class="page-header">
+                <h3>Build <u>d</u>etails <small class="project-name">....</small></h3>
+            </div>
+
+            <table id="buildDetailsContainer" class="table table-hover">
+                <tbody></tbody>
+            </table>
+        </div>
 
 
 
