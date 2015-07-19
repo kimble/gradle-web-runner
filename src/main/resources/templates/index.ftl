@@ -17,22 +17,8 @@
         <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
 
         <style type="text/css">
-            .input-dashed {
-                padding: 5px 10px;
-                font-size: 1.6em;
-                border: none;
-                border-bottom: 3px dotted #777;
-                font-family: Ubuntu, monospace;
-                margin-top: 1em;
-                width: 100%;
-            }
-
             #go {
                 margin-top: 2em;
-            }
-
-            #headerRow {
-                margin-top: 4em;
             }
 
             body {
@@ -141,27 +127,6 @@
             </div>
         </div>
 
-
-        <script type="text/javascript">
-
-
-/*
-            (function() {
-                "use strict";
-
-                $("#go").on("click", function() {
-                    var path = $("#path").val();
-                    var tasks = $("#tasks").val();
-
-
-                    console.log("Posting..");
-                    $.postJSON('/api/exec', { path: path, tasks: tasks }, function(response) {
-                        window.location = "/api/build/" + response.number
-                    });
-
-                });
-            })();*/
-        </script>
 
 
         <script type="text/javascript">

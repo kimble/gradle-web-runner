@@ -234,8 +234,6 @@ var createProjectDetails = function(pubsub, buildNumber) {
         var pd = d3.select("#projectDetails");
 
         data.stream.throttle(1000).onValue(function (state) {
-            console.log("Drawing: " , state);
-
             var projectDetails = pd.selectAll(".project-detail")
                 .data(state.projects, prop("path"));
 
@@ -463,9 +461,6 @@ var createProjectDetails = function(pubsub, buildNumber) {
 
             projectTasks.select(".summary")
                 .classed("hidden", function (task) {
-                    if (task.name === "test") {
-                        console.log(task.failureMessage);
-                    }
                     return task.failure !== true;
                 })
                 .text(prop("failureMessage"));
