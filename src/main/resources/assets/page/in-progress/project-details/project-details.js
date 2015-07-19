@@ -76,7 +76,8 @@ var createProjectDetails = function(pubsub, buildNumber) {
                             success: 0
                         },
 
-                        testClasses: { }
+                        testClasses: { },
+                        tests: [ ]
                     };
 
                     var project = projects[task.projectPath];
@@ -140,7 +141,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
                     taskTestClasses[event.className] = { };
                 }
 
-                taskTestClasses[event.className][event.name] = {
+                var testState = {
                     className: event.className,
                     name: event.name,
 
@@ -150,7 +151,10 @@ var createProjectDetails = function(pubsub, buildNumber) {
                     exceptionStacktrace: null
                 };
 
+                taskTestClasses[event.className][event.name] = testState;
 
+
+                task.tests.push(testState);
                 task.testSummary.started++;
 
                 // pushState();
@@ -403,7 +407,27 @@ var createProjectDetails = function(pubsub, buildNumber) {
 
             enterTaskFirstLine.append("span")
                 .attr("title", "Failed tests")
-                .attr("class", "hidden label label-danger test-failure-count");
+                .attr("class", "hidden label label-danger test-failure-count")
+                .each(function(task) {
+                    $(this).popover({
+                        title: task.path,
+                        html: true,
+                        content: function() {
+                            var allTests = task.tests;
+                            var failedTests = allTests.filter(function (test) {
+                                return test.failure === true;
+                            });
+
+                            return failedTests.map(function(test) {
+                                return '<div class="test-summary failed">' +
+                                    '<div class="page-header"><h3><small>' + test.className + '</small><br>' + test.name + '</h3></div>' +
+                                    '<div class="test-exception-message">' + test.exceptionMessage + '</div>' +
+                                    '<pre>' + test.exceptionStacktrace + '</pre>' +
+                                    '</div>';
+                            }).join("");
+                        }
+                    });
+                });
 
 
             enterTaskFirstLine.append("span")

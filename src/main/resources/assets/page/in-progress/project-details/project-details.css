@@ -7,7 +7,26 @@
 }
 
 #projectDetails .popover {
-    max-width: 700px;
+    max-width: 900px;
+    max-height: 700px;
+    overflow-y: auto;
+}
+#projectDetails .popover-title {
+    font-family: Oswald, sans-serif;
+}
+#projectDetails .popover .page-header h3 {
+    font-size: 1.5em;
+}
+
+#projectDetails .popover .test-exception-message {
+    font-family: Oswald, sans-serif;
+    font-size: 1.1em;
+    color: rgb(119, 11, 11);
+    margin: 1em 0 0.5em 0;
+}
+
+#projectDetails .popover .test-summary {
+    margin-bottom: 2em;
 }
 
 #projectDetails .popover pre {
@@ -16,6 +35,7 @@
     overflow-x: auto;
     background-color: #242320;
     color: rgb(201, 208, 194);
+    font-size: 0.8em;
 }
 
 #projectDetails .project-detail {
@@ -124,7 +144,7 @@
 
 #projectDetails .task-details .label {
     margin-left: 4px;
-    cursor: default;
+    cursor: pointer;
 }
 
 #projectDetails .task-details .task-name {
