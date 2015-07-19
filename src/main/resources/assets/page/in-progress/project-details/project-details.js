@@ -150,6 +150,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
                     exceptionStacktrace: null
                 };
 
+
                 task.testSummary.started++;
 
                 // pushState();
@@ -381,7 +382,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
             };
 
             addIcon("waiting", "record", "Waiting..");
-            addIcon("running", "time", "Running...");
+            addIcon("running", "cog", "Running...");
             addIcon("success", "ok-sign", "Success");
             addIcon("skipped", "minus-sign", "Skipped");
             addIcon("failure", "remove-sign", "Failure");

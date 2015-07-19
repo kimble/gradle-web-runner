@@ -138,6 +138,8 @@
 }
 .task-details.running .task-icon-running {
     display: inline;
+    color: rgb(103, 161, 237);
+    text-shadow: 0 0 10px rgb(152, 210, 231);
 }
 .task-details.success .task-icon-success {
     display: inline;
