@@ -13,7 +13,6 @@ import java.util.Date;
  */
 public class TestStarted extends TestEvent {
 
-    private final String taskPath;
     private final String projectPath;
 
     @JsonCreator
@@ -23,14 +22,9 @@ public class TestStarted extends TestEvent {
                        @JsonProperty("projectPath") String projectPath,
                        @JsonProperty("taskPath") String taskPath) {
 
-        super(timestamp, className, name);
+        super(timestamp, taskPath, className, name);
 
-        this.taskPath = taskPath;
         this.projectPath = projectPath;
-    }
-
-    public String getTaskPath() {
-        return taskPath;
     }
 
     public String getProjectPath() {

@@ -22,6 +22,7 @@ public class TestCompleted extends TestEvent {
 
     @JsonCreator
     public TestCompleted(@JsonProperty("timestamp") Date timestamp,
+                         @JsonProperty("taskPath") String taskPath,
                          @JsonProperty("className") String className,
                          @JsonProperty("name") String name,
                          @JsonProperty("result") ResultType result,
@@ -30,7 +31,7 @@ public class TestCompleted extends TestEvent {
                          @JsonProperty("exceptionStacktrace") String exceptionStacktrace,
                          @JsonProperty("output") List<String> output) {
 
-        super(timestamp, className, name);
+        super(timestamp, taskPath, className, name);
 
         this.result = result;
         this.durationMillis = durationMillis;

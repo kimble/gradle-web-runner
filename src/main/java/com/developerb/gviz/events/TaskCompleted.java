@@ -21,6 +21,7 @@ public class TaskCompleted extends TaskEvent {
 
     @JsonCreator
     public TaskCompleted(@JsonProperty("path") String path,
+                         @JsonProperty("projectPath") String projectPath,
                          @JsonProperty("timestamp") Date timestamp,
                          @JsonProperty("didWork") boolean didWork,
                          @JsonProperty("executed") boolean executed,
@@ -29,7 +30,8 @@ public class TaskCompleted extends TaskEvent {
                          @JsonProperty("failureMessage") String failureMessage,
                          @JsonProperty("failureStacktrace") String failureStacktrace,
                          @JsonProperty("durationMillis") Integer durationMillis) {
-        super(timestamp, path);
+
+        super(timestamp, path, projectPath);
 
         this.didWork = didWork;
         this.executed = executed;
@@ -42,6 +44,14 @@ public class TaskCompleted extends TaskEvent {
 
     public boolean isDidWork() {
         return didWork;
+    }
+
+    public boolean isSuccess() {
+        return !skipped && executed && !isFailure();
+    }
+
+    public boolean isFailure() {
+        return failureMessage != null;
     }
 
     public boolean isExecuted() {

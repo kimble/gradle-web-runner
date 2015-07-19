@@ -115,45 +115,21 @@
             </div>
         </div>
 
-        <!-- Build details -->
-        <div id="buildDetails" class="moving-panel shy">
-            <div class="page-header">
-                <h3>Build <u>d</u>etails <small class="project-name">....</small></h3>
-            </div>
 
-            <table id="buildDetailsContainer" class="table table-hover">
-                <tbody></tbody>
-            </table>
-        </div>
-
-
-
-        <!-- Project details template -->
-        <script type="text/template" id="projectDetailTemplate">
-            <div class="project-detail" data-project="<%- root.path %>" data-remaining-tasks="0">
-                <div class="page-header">
-                    <h3 class="header">
-                        <small><%- root.path %></small><br/>
-                        <%- root.name %>
-                    </h3>
-                </div>
-
-                <% if (root.description != null) { %>
-                    <blockquote>
-                        <%- root.description %>
-                    </blockquote>
-                <% } %>
-
-                <div class="project-tasks"></div>
-            </div>
-        </script>
 
         <script type="text/template" id="taskDetailTemplate">
-            <div class="task-details" data-task="<%- root.path %>">
+            <div class="task-details waiting" data-task="<%- root.path %>">
                 <div>
-                    <span class="task-icon glyphicon glyphicon-record" title="Not started"></span>
+                    <span class="icons">
+                        <span class="task-icon-waiting glyphicon glyphicon-record" title="Waiting..."></span>
+                        <span class="task-icon-running glyphicon glyphicon-time" title="Running..."></span>
+                        <span class="task-icon-success glyphicon glyphicon-ok-sign" title="Success"></span>
+                        <span class="task-icon-skipped glyphicon glyphicon-minus-sign" title="Skipped"></span>
+                        <span class="task-icon-failure glyphicon glyphicon-remove-sign" title="Failure"></span>
+                    </span>
 
-                    <span title="<%- root.name %>"><%- _.trunc(root.name, 25) %></span>
+
+                    <span title="<%- root.name %>" class="task-name"><%- _.trunc(root.name, 25) %></span>
                     <span title="Successful tests" class="hidden label label-success test-success-count"></span>
                     <span title="Skipped tests" class="hidden label label-warning test-skipped-count"></span>
                     <span title="Failed tests" class="hidden label label-danger test-failure-count"></span>
@@ -198,7 +174,7 @@
                 // createRunningTasks(pubsub);
                 createBuildDetailsTab(pubsub);
                 createBuildEstimate(pubsub);
-                createProjectDetails(pubsub);
+                createProjectDetails(pubsub, buildNumber);
 
                 // State
 

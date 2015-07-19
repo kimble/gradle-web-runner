@@ -7,13 +7,20 @@ import java.util.Date;
  */
 public abstract class TestEvent extends Event {
 
+    private final String taskPath;
     private final String className;
     private final String name;
 
-    protected TestEvent(Date timestamp, String className, String name) {
+    protected TestEvent(Date timestamp, String taskPath, String className, String name) {
         super(timestamp);
+
+        this.taskPath = taskPath;
         this.className = className;
         this.name = name;
+    }
+
+    public String getTaskPath() {
+        return taskPath;
     }
 
     public String getClassName() {

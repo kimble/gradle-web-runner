@@ -8,14 +8,20 @@ import java.util.Date;
 public abstract class TaskEvent extends Event {
 
     private final String path;
+    private final String projectPath;
 
-    protected TaskEvent(Date timestamp, String path) {
+    protected TaskEvent(Date timestamp, String path, String projectPath) {
         super(timestamp);
         this.path = path;
+        this.projectPath = projectPath;
     }
 
     public String getPath() {
         return path;
+    }
+
+    public String getProjectPath() {
+        return projectPath;
     }
 
     @Override

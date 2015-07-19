@@ -82,6 +82,14 @@ gradle.projectsLoaded { gradle ->
     gradle.ext.buildStarted = System.currentTimeMillis()
 }
 
+gradle.beforeProject { Project project ->
+    spy.send("evaluating-project", [
+            name: project.name,
+            path: project.path,
+            description: project.description
+    ])
+}
+
 gradle.afterProject { Project project, evaluationFailure ->
     spy.send("project-evaluated", [
             name: project.name,
@@ -150,6 +158,7 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
                 spy.send("after-test", [
                         name: test.name,
                         className: test.className,
+                        taskPath: task.path,
                         result: result.resultType.name(),
                         durationMillis: result.endTime - result.startTime,
                         exceptionMessage: result.exception?.message,
@@ -175,6 +184,7 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
 
         spy.send("task-after", [
                 path: task.path,
+                projectPath: task.project.path,
                 timestamp: timestamp,
                 didWork: state.didWork,
                 executed: state.executed,

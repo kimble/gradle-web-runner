@@ -1,19 +1,5 @@
-var createProjectDetails = function(pubsub) {
+var createProjectDetails = function(pubsub, buildNumber) {
     "use strict";
-
-    var hasProperty = function(property, expected) {
-        return function(event) {
-            return event.hasOwnProperty(property) && event[property] === expected;
-        }
-    };
-
-    function createTemplate(selector) {
-        _.templateSettings.variable = "root";
-        var $el = $(selector);
-        return _.template($el.html());
-    }
-
-    var $projectDetails = $("#projectDetails");
 
 
 
@@ -24,258 +10,384 @@ var createProjectDetails = function(pubsub) {
 
 
 
-    /**
-     * Append tasks to projects
-     */
-    (function() {
-        var taskDetailTemplate = createTemplate("#taskDetailTemplate");
 
-        var findProjectContainer = function(path) {
-            return $projectDetails.find(".project-detail[data-project='"+path+"']");
+    var data = (function() {
+        var bus = new Bacon.Bus();
+
+        var projects = { };
+        var tasks = { };
+
+
+        var pushState = function() {
+            bus.push({
+                projects: _.values(projects)
+            })
         };
 
-        var appendTaskDetails = function(task) {
-            var $project = findProjectContainer(task.projectPath);
-            var $tasks = $project.find(".project-tasks");
+        return {
+            evaluateProject : function(event) {
+                projects[event.path] = {
+                    path: event.path,
+                    name: event.name,
+                    description: null, // After evaluation
 
-            var $taskDetails = $(taskDetailTemplate(task));
-            $taskDetails.appendTo($tasks);
-
-            var remainingTasks = parseInt($project.attr("data-remaining-tasks")) + 1;
-            $project.attr("data-remaining-tasks", remainingTasks);
-        };
-
-        var removeProjectsWithoutTasks = function() {
-            $projectDetails.find(".project-detail").each(function(i, el) {
-                var $el = $(el);
-                if ($el.find(".task-details").length == 0) {
-                    $el.remove();
-                }
-            });
-        };
-
-
-        pubsub.takeOne("TaskGraphReady")
-            .map(".tasks")
-            .onValue(function(tasks) {
-                tasks.forEach(appendTaskDetails);
-                removeProjectsWithoutTasks();
-            });
-    })();
-
-
-    /**
-     * Start tasks
-     */
-    (function() {
-        var findTaskContainer = function(path) {
-            return $projectDetails.find(".task-details[data-task='"+path+"']");
-        };
-
-        pubsub.stream("TaskStarting")
-            .onValue(function (event) {
-                var $el = findTaskContainer(event.path);
-                $el.find(".task-icon")
-                    .removeClass("glyphicon-record")
-                    .addClass("glyphicon-question-sign")
-                    .attr("title", "Execution started");
-
-                $el.addClass("running");
-            });
-    })();
-
-    /**
-     * Completing tasks
-     */
-    (function() {
-        var findTaskContainer = function(path) {
-            return $projectDetails.find(".task-details[data-task='"+path+"']");
-        };
-
-        pubsub.stream("TaskCompleted")
-            .onValue(function (event) {
-                var $task = findTaskContainer(event.path);
-                var $project = $task.parents(".project-detail");
-
-                $task.find(".task-icon")
-                    .removeClass("glyphicon-question-sign")
-                    .addClass("glyphicon-ok-sign")
-                    .attr("title", "Executed successfully");
-
-                if (event.failureMessage != null) {
-                    $task.addClass("failed");
-
-                    $task.find(".task-icon")
-                        .removeClass("glyphicon-ok-sign")
-                        .addClass("glyphicon-remove-sign")
-                        .attr("title", "Failure: " + event.failureMessage);
-
-
-                    $project.add("class", "contains-failed-task");
-                }
-
-                if (event.skipped) {
-                    $task.addClass("skipped");
-
-                    $task.find(".task-icon")
-                        .removeClass("glyphicon-question-sign")
-                        .addClass("glyphicon-minus-sign")
-                        .attr("title", "Skipped: " + event.skippedMessage);
-
-                    $project.add("class", "contains-skipped-task");
-                }
-
-                $task.removeClass("running");
-                $task.addClass("completed");
-
-
-
-                // Duration
-
-                (function() {
-                    $task.find(".duration").html(" - " + event.durationMillis + " ms");
-                })();
-
-
-
-                // Mark projects where all tasks has completed
-
-                (function() {
-                    var remainingTasks = parseInt($project.attr("data-remaining-tasks")) - 1;
-                    $project.attr("data-remaining-tasks", remainingTasks);
-
-                    if (remainingTasks === 0) {
-                        $project.addClass("tasks-completed")
-                    }
-                })();
-            });
-    })();
-
-
-
-
-    (function() {
-        pubsub.takeOne("TaskGraphReady")
-            .map(".tasks")
-            .flatMap(Bacon.fromArray)
-            .onValue(function(task) {
-                var $task = $projectDetails.find(".task-details[data-task='"+ task.path +"']");
-
-                var testSummary = {
-                    started: 0,
-                    completed: 0,
-
-                    success: 0,
-                    skipped: 0,
-                    failure: 0
+                    tasks: [ ],
+                    evaluating: true
                 };
 
+                pushState();
+            },
 
-                var taskCompleted = pubsub.stream("TaskCompleted")
-                    .filter(hasProperty("path", task.path))
-                    .take(1);
+            projectEvaluated : function(event) {
+                projects[event.path].evaluating = false;
+                projects[event.path].description = event.description;
 
-                taskCompleted.onValue(function () {
+                pushState();
+            },
+
+            addTasks : function(addedTasks) {
+                addedTasks.forEach(function(task) {
+                    var taskState = {
+                        projectPath : task.projectPath,
+
+                        path: task.path,
+                        type: task.type,
+                        name: task.name,
+                        description: task.description,
+
+                        waiting: true,
+                        running: false,
+                        skipped: false,
+                        failed: false,
+                        success: false,
+                        completed: false,
+
+                        testSummary: {
+                            started: 0,
+                            completed: 0,
+                            skipped: 0,
+                            failure: 0,
+                            success: 0
+                        },
+
+                        testClasses: { }
+                    };
+
+                    projects[task.projectPath].tasks.push(taskState);
+                    tasks[task.path] = taskState;
+                });
+
+                pushState();
+            },
+
+            taskStarted : function(event) {
+                tasks[event.path].running = true;
+                tasks[event.path].waiting = false;
+
+                pushState();
+            },
+
+            taskCompleted: function(event) {
+                tasks[event.path].running = false;
+                tasks[event.path].completed = true;
+
+                tasks[event.path].durationMillis = event.durationMillis;
+
+                tasks[event.path].skipped = event.skipped;
+                tasks[event.path].success = event.success;
+                tasks[event.path].failure = event.failure;
+                tasks[event.path].didWork = event.didWork;
+
+                tasks[event.path].skippedMessage = event.skippedMessage;
+                tasks[event.path].failureMessage = event.failureMessage;
+                tasks[event.path].failureStacktrace = event.failureStacktrace;
+
+                pushState();
+            },
+
+            testStarted : function(event) {
+                var task = tasks[event.taskPath];
+                var taskTestClasses = task.testClasses;
+
+                if (!taskTestClasses.hasOwnProperty(event.className)) {
+                    taskTestClasses[event.className] = { };
+                }
+
+                taskTestClasses[event.className][event.name] = {
+                    className: event.className,
+                    name: event.name,
+
+                    output: null,
+                    durationMillis: null,
+                    exceptionMessage: null,
+                    exceptionStacktrace: null
+                };
+
+                task.testSummary.started++;
+
+                // pushState();
+            },
+
+            testCompleted : function(event) {
+                var task = tasks[event.taskPath];
+                var taskTestClasses = task.testClasses;
+                var tests = taskTestClasses[event.className];
+                var test = tests[event.name];
+
+                test.output = event.output;
+                test.durationMillis = event.durationMillis;
+                test.exceptionMessage = event.exceptionMessage;
+                test.exceptionStacktrace = event.exceptionStacktrace;
+
+                test.success = event.result === "SUCCESS";
+                test.skipped = event.result === "SKIPPED";
+                test.failure = event.result === "FAILURE";
+
+                task.testSummary.completed++;
+
+                if (test.success) {
+                    task.testSummary.success++;
+                }
+                if (test.skipped) {
+                    task.testSummary.skipped++;
+                }
+                if (test.failure) {
+                    task.testSummary.failure++;
+                }
+
+                pushState();
+            },
+
+
+            stream : bus
+        };
+    })();
+
+    var taskGraphReady = pubsub.takeOne("TaskGraphReady");
+    var buildCompleted = pubsub.takeOne("GradleBuildCompleted");
+
+    pubsub.stream("ProjectEvaluationStarted")
+        .takeUntil(taskGraphReady)
+        .assign(data, "evaluateProject");
+
+    pubsub.stream("ProjectEvaluated")
+        .takeUntil(taskGraphReady)
+        .assign(data, "projectEvaluated");
+
+    pubsub.stream("TaskStarting")
+        .takeUntil(buildCompleted)
+        .assign(data, "taskStarted");
+
+    pubsub.stream("TaskCompleted")
+        .takeUntil(buildCompleted)
+        .assign(data, "taskCompleted");
+
+    pubsub.stream("TestStarted")
+        .takeUntil(buildCompleted)
+        .assign(data, "testStarted");
+
+    pubsub.stream("TestCompleted")
+        .takeUntil(buildCompleted)
+        .assign(data, "testCompleted");
+
+
+    taskGraphReady.map(".tasks").assign(data, "addTasks");
+
+
+
+    var prop = function(name) {
+        return function(obj) {
+            return obj[name];
+        };
+    };
+
+
+    (function() {
+        var pd = d3.select("#projectDetails");
+
+        data.stream.throttle(1000).onValue(function (state) {
+            console.log("Drawing: " , state);
+
+            var projectDetails = pd.selectAll(".project-detail")
+                .data(state.projects, prop("path"));
+
+
+
+
+
+            // Enter project
+
+            var enterProject = projectDetails.enter()
+                .append("div")
+                .attr("class", "project-detail");
+
+
+
+            // Enter project header
+
+
+            var enterProjectHeader = enterProject.append("div")
+                .attr("class", "page-header")
+                .append("h3")
+                .attr("class", "header");
+
+            enterProjectHeader.append("small")
+                .attr("class", "project-path")
+                .text(prop("path"))
+                .append("br");
+
+            enterProjectHeader.append("span")
+                .attr("class", "project-name")
+                .text(prop("name"));
+
+            // Enter project description
+
+            enterProject.append("blockquote")
+                .attr("class", "project-description");
+
+            // Enter task container
+
+            enterProject.append("div").attr("class", "project-tasks");
+
+
+            // Update project classes
+
+            projectDetails.classed("evaluating", prop("evaluating"))
+                .classed("hidden", function(project) {
+                    return project.tasks.length === 0;
                 });
 
 
-                pubsub.stream("TestStarted")
-                    .filter(hasProperty("taskPath", task.path))
-                    .takeUntil(taskCompleted)
-                    .onValue(function(started) {
-                        testSummary.started++;
 
-                        pubsub.stream("TestCompleted")
-                            .filter(hasProperty("className", started.className))
-                            .filter(hasProperty("name", started.name))
-                            .take(1)
-                            .onValue(function (completed) {
-                                testSummary.started++;
+            // Update description (available after project evaluation)
 
-                                if (completed.result === "SUCCESS") {
-                                    testSummary.success++;
-
-                                    $task.find(".test-success-count")
-                                        .removeClass("hidden")
-                                        .html(testSummary.success);
-                                }
-                                if (completed.result === "SKIPPED") {
-                                    testSummary.skipped++;
-
-                                    $task.find(".test-skipped-count")
-                                        .removeClass("hidden")
-                                        .html(testSummary.skipped);
-                                }
-                                if (completed.result === "FAILURE") {
-                                    testSummary.failure++;
-
-                                    $task.find(".test-failure-count")
-                                        .removeClass("hidden")
-                                        .html(testSummary.failure);
-                                }
-                            });
-                    });
+            projectDetails.select(".project-description")
+                .classed("hidden", function(p) { return p.description == null; })
+                .text(prop("description"));
 
 
 
+            // Tasks
 
-            });
+            var projectTasks = projectDetails.select(".project-tasks")
+                .selectAll(".task-details")
+                .data(prop("tasks"), prop("path"));
+
+
+
+            // Enter project tasks
+
+            var enterTask = projectTasks.enter()
+                .append("div")
+                .attr("class", "task-details");
+
+            var enterTaskFirstLine = enterTask.append("div");
+            var enterTaskSecondLine = enterTask.append("div");
+
+            enterTaskSecondLine.append("div")
+                .attr("class", "summary hidden");
+
+            var enterTaskIcons = enterTaskFirstLine.append("span")
+                .attr("class", "icons");
+
+            var addIcon = function(name, icon, title) {
+                enterTaskIcons.append("span")
+                    .attr("class", "task-icon-" + name + " glyphicon glyphicon-" + icon)
+                    .attr("title", title);
+            };
+
+            addIcon("waiting", "record", "Waiting..");
+            addIcon("running", "time", "Running...");
+            addIcon("success", "ok-sign", "Success");
+            addIcon("skipped", "minus-sign", "Skipped");
+            addIcon("failure", "remove-sign", "Failure");
+
+            enterTaskFirstLine.append("span")
+                .attr("class", "task-name")
+                .attr("title", prop("name"))
+                .text(function(task) {
+                    return _.trunc(task.name, 25);
+                });
+
+
+            enterTaskFirstLine.append("span")
+                .attr("title", "Successful tests")
+                .attr("class", "hidden label label-success test-success-count");
+
+            enterTaskFirstLine.append("span")
+                .attr("title", "Skipped tests")
+                .attr("class", "hidden label label-warning test-skipped-count");
+
+            enterTaskFirstLine.append("span")
+                .attr("title", "Failed tests")
+                .attr("class", "hidden label label-danger test-failure-count");
+
+
+            enterTaskFirstLine.append("span")
+                .attr("class", "duration hidden");
+
+
+            // Update task duration
+
+            projectTasks.select(".duration")
+                .classed("hidden", function(task) {
+                    return task.durationMillis == null;
+                })
+                .text(function(task) {
+                    return task.durationMillis + " ms";
+                });
+
+            // Update task status
+
+            projectTasks.classed("waiting", prop("waiting"))
+                .classed("running", prop("running"))
+                .classed("skipped", prop("skipped"))
+                .classed("success", prop("success"))
+                .classed("failure", prop("failure"))
+                .classed("completed", prop("completed"));
+
+
+            // Update test summary
+
+            projectTasks.select(".test-success-count")
+                .classed("hidden", function(test) {
+                    return test.testSummary.success === 0;
+                })
+                .text(function(test) {
+                    return test.testSummary.success;
+                });
+
+            projectTasks.select(".test-skipped-count")
+                .classed("hidden", function(test) {
+                    return test.skipped.success === 0;
+                })
+                .text(function(test) {
+                    return test.skipped.success;
+                });
+
+            projectTasks.select(".test-failure-count")
+                .classed("hidden", function(test) {
+                    return test.testSummary.failure === 0;
+                })
+                .text(function(test) {
+                    return test.testSummary.failure;
+                });
+
+
+            // Update task summary
+
+            projectTasks.select(".summary")
+                .classed("hidden", function (task) {
+                    if (task.name === "test") {
+                        console.log(task.failureMessage);
+                    }
+                    return task.failure !== true;
+                })
+                .text(prop("failureMessage"));
+
+        });
     })();
 
-
-
-
-
-    (function() {
-        var taskGraphReady = pubsub.takeOne("TaskGraphReady");
-        var buildCompleted = pubsub.takeOne("GradleBuildCompleted");
-        var projectDetailsTemplate = createTemplate("#projectDetailTemplate");
-
-        pubsub.stream("ProjectEvaluated")
-            .takeUntil(taskGraphReady)
-            .onValue(function (projectEvaluated) {
-                var $projectElement = $(projectDetailsTemplate(projectEvaluated));
-                $projectElement.appendTo($projectDetails);
-
-
-
-                var summary = {
-                    total: -1,
-                    started: 0,
-                    completed: 0,
-                    running: 0
-                };
-
-                var toggleClasses = function() {
-                    $projectElement.toggleClass("task-running", (summary.started - summary.completed) > 0);
-                };
-
-                pubsub.takeOne("TaskGraphReady")
-                    .map(".tasks")
-                    .flatMap(Bacon.fromArray)
-                    .filter(hasProperty("projectPath", projectEvaluated.path))
-                    .onValue(function(definedTask) {
-                        summary.total++;
-                    });
-
-                pubsub.stream("TaskStarting")
-                    .takeUntil(buildCompleted)
-                    .filter(hasProperty("projectPath", projectEvaluated.path))
-                    .onValue(function(taskStarted) {
-                        summary.started++;
-                        toggleClasses();
-
-                        pubsub.stream("TaskCompleted")
-                            .filter(hasProperty("path", taskStarted.path))
-                            .take(1)
-                            .onValue(function () {
-                                summary.completed++;
-                                toggleClasses();
-                            });
-                    });
-            });
-
-    })();
 
 
 };

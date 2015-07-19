@@ -6,7 +6,6 @@
     column-count: 4;
 }
 
-
 #projectDetails .project-detail {
     -moz-column-break-inside: avoid;
     -webkit-column-break-inside: avoid;
@@ -21,6 +20,11 @@
 
     transition-property: background-color;
     transition-duration: 500ms;
+}
+
+#projectDetails .project-detail.evaluating {
+    -webkit-filter: blur(1px);
+    filter: blur(1px);
 }
 
 #projectDetails .project-detail.task-running {
@@ -45,18 +49,13 @@
 }
 
 #projectDetails .task-details {
-    display: inline-block;
+    display: block;
     border-radius: 2px;
     padding: 2px 4px 2px 4px;
 }
 
-
-
-#projectDetails .task-details.failed {
-    font-weight: bold;
-}
-
 #projectDetails .task-details .summary {
+    margin-top: 4px;
     font-size: 0.9em;
     color: white;
     padding: 2px 4px;
@@ -64,30 +63,48 @@
     font-family: Oswald, sans-serif;
 }
 
-#projectDetails .task-details.failed .summary {
+#projectDetails .task-details.failure .summary {
     background-color: #e36e24;
+}
+
+#projectDetails .task-details .label {
+    margin-left: 4px;
+    cursor: default;
+}
+
+#projectDetails .task-details .task-name {
+    font-family: Oswald, sans-serif;
+    padding: 0 5px;
 }
 
 #projectDetails .task-details .duration {
     font-size: 0.8em;
     font-style: italic;
     color: #999;
+    padding-left: 10px;
 }
 
 
-/* Spinning icons */
+/* Icons */
 
-.glyphicon.spinning {
-    animation: spin 1s infinite linear;
-    -webkit-animation: spin2 1s infinite linear;
+.task-details .icons .glyphicon {
+    display: none;
 }
 
-@keyframes spin {
-    from { transform: scale(1) rotate(0deg);}
-    to { transform: scale(1) rotate(360deg);}
+.task-details.waiting .task-icon-waiting {
+    display: inline;
+}
+.task-details.running .task-icon-running {
+    display: inline;
+}
+.task-details.success .task-icon-success {
+    display: inline;
+}
+.task-details.skipped .task-icon-skipped {
+    display: inline;
+}
+.task-details.failure .task-icon-failure {
+    display: inline;
 }
 
-@-webkit-keyframes spin2 {
-    from { -webkit-transform: rotate(0deg);}
-    to { -webkit-transform: rotate(360deg);}
-}
+
