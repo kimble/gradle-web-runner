@@ -54,6 +54,48 @@
     padding: 2px 4px 2px 4px;
 }
 
+#projectDetails .project-path {
+    font-weight: 300;
+    color: #666;
+}
+
+#projectDetails .project-info {
+    width: 35px;
+    height: 35px;
+    float: right;
+
+    margin-top: 10px;
+    margin-right: 10px;
+
+    border-radius: 18px;
+    border: 2px solid #ECECEC;
+    background-color: #fefefe;
+    font-size: 0.9em;
+    color: #333;
+
+    text-align: center;
+    padding-top: 7px;
+
+    transition-property: background-color, color;
+    transition-duration: 500ms;
+}
+
+#projectDetails .project-info.running {
+    background-color: rgb(134, 155, 208);
+    color: white;
+    border-color: rgb(108, 149, 213);
+}
+#projectDetails .project-info.failed {
+    border-color: rgb(179, 124, 84);
+    background-color: #e36e24;
+    color: white;
+}
+#projectDetails .project-info.success {
+    background-color: rgb(199, 215, 124);
+    border-color: rgb(160, 176, 85);
+    color: white;
+}
+
 #projectDetails .task-details .summary {
     margin-top: 4px;
     font-size: 0.9em;

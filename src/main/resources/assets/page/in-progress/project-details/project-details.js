@@ -31,6 +31,12 @@ var createProjectDetails = function(pubsub, buildNumber) {
                     name: event.name,
                     description: null, // After evaluation
 
+                    taskCount: 0,
+                    completedTasks: 0,
+                    runningTasks: 0,
+                    remainingTasks: 0,
+                    failedTasks: 0,
+
                     tasks: [ ],
                     evaluating: true
                 };
@@ -73,7 +79,12 @@ var createProjectDetails = function(pubsub, buildNumber) {
                         testClasses: { }
                     };
 
-                    projects[task.projectPath].tasks.push(taskState);
+                    var project = projects[task.projectPath];
+
+                    project.taskCount++;
+                    project.remainingTasks++;
+                    project.tasks.push(taskState);
+
                     tasks[task.path] = taskState;
                 });
 
@@ -81,26 +92,42 @@ var createProjectDetails = function(pubsub, buildNumber) {
             },
 
             taskStarted : function(event) {
-                tasks[event.path].running = true;
-                tasks[event.path].waiting = false;
+                var task = tasks[event.path];
+                var project = projects[task.projectPath];
+
+                task.running = true;
+                task.waiting = false;
+
+                project.runningTasks++;
 
                 pushState();
             },
 
             taskCompleted: function(event) {
-                tasks[event.path].running = false;
-                tasks[event.path].completed = true;
+                var task = tasks[event.path];
+                var project = projects[task.projectPath];
 
-                tasks[event.path].durationMillis = event.durationMillis;
+                task.running = false;
+                task.completed = true;
 
-                tasks[event.path].skipped = event.skipped;
-                tasks[event.path].success = event.success;
-                tasks[event.path].failure = event.failure;
-                tasks[event.path].didWork = event.didWork;
+                task.durationMillis = event.durationMillis;
 
-                tasks[event.path].skippedMessage = event.skippedMessage;
-                tasks[event.path].failureMessage = event.failureMessage;
-                tasks[event.path].failureStacktrace = event.failureStacktrace;
+                task.skipped = event.skipped;
+                task.success = event.success;
+                task.failure = event.failure;
+                task.didWork = event.didWork;
+
+                task.skippedMessage = event.skippedMessage;
+                task.failureMessage = event.failureMessage;
+                task.failureStacktrace = event.failureStacktrace;
+
+                project.runningTasks--;
+                project.remainingTasks--;
+                project.completedTasks++;
+
+                if (task.failure === true) {
+                    project.failedTasks++;
+                }
 
                 pushState();
             },
@@ -227,8 +254,10 @@ var createProjectDetails = function(pubsub, buildNumber) {
 
 
             var enterProjectHeader = enterProject.append("div")
-                .attr("class", "page-header")
-                .append("h3")
+                .attr("class", "page-header");
+
+
+            enterProjectHeader.append("h3")
                 .attr("class", "header");
 
             enterProjectHeader.append("small")
@@ -239,6 +268,11 @@ var createProjectDetails = function(pubsub, buildNumber) {
             enterProjectHeader.append("span")
                 .attr("class", "project-name")
                 .text(prop("name"));
+
+            enterProjectHeader.append("div")
+                .attr("class", "project-info")
+                .attr("title", "Evaluating...")
+                .text("E");
 
             // Enter project description
 
@@ -265,6 +299,56 @@ var createProjectDetails = function(pubsub, buildNumber) {
                 .classed("hidden", function(p) { return p.description == null; })
                 .text(prop("description"));
 
+
+            // Update project info
+
+            projectDetails.select(".project-info")
+                .classed("running", function(p) {
+                    return p.runningTasks > 0;
+                })
+                .classed("failed", function(p) {
+                    return p.failedTasks > 0;
+                })
+                .classed("completed", function(p) {
+                    return p.remainingTasks === 0;
+                })
+                .classed("success", function(p) {
+                    return p.remainingTasks === 0 && p.failedTasks === 0;
+                })
+                .attr("title", function(project) {
+                    if (project.runningTasks > 0) {
+                        return "Running: " + project.runningTasks;
+                    }
+                    else if (project.failedTasks > 0) {
+                        return project.failedTasks + " failed task(s)";
+                    }
+                    else if (project.remainingTasks === 0 && project.failedTasks === 0) {
+                        return project.completedTasks + " task(s) completed successfully";
+                    }
+                    else if (project.remainingTasks > 0) {
+                        return project.remainingTasks + " task(s) remaining";
+                    }
+                    else {
+                        return "?";
+                    }
+                })
+                .text(function(project) {
+                    if (project.runningTasks > 0) {
+                        return "R";
+                    }
+                    else if (project.failedTasks > 0) {
+                        return project.failedTasks + " F";
+                    }
+                    else if (project.remainingTasks === 0 && project.failedTasks === 0) {
+                        return "OK";
+                    }
+                    else if (project.remainingTasks > 0) {
+                        return project.remainingTasks + " R";
+                    }
+                    else {
+                        return "?";
+                    }
+                });
 
 
             // Tasks
