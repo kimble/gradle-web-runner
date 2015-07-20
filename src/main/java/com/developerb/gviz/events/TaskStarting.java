@@ -10,17 +10,26 @@ import java.util.Date;
  */
 public class TaskStarting extends TaskEvent {
 
+    private final String threadName;
+
     @JsonCreator
     public TaskStarting(@JsonProperty("path") String path,
                         @JsonProperty("timestamp") Date timestamp,
-                        @JsonProperty("projectPath") String projectPath) {
+                        @JsonProperty("projectPath") String projectPath,
+                        @JsonProperty("threadName") String threadName) {
 
         super(timestamp, path, projectPath);
+
+        this.threadName = threadName;
+    }
+
+    public String getThreadName() {
+        return threadName;
     }
 
     @Override
     protected String describeTaskEvent() {
-        return "Starting";
+        return String.format("Starting in thread '%s'", threadName);
     }
 
 }

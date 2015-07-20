@@ -53,7 +53,10 @@ public class Build implements Comparable<Build> {
 
     private void connectToSpyWithinBuild() {
         log.info("Kicking off thread to listen for socket messages");
-        new Thread(Build.this::listen).start();
+        Thread thread = new Thread(Build.this::listen);
+        thread.setName("socket-listener-build-" + buildNumber);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @SuppressWarnings("unchecked")

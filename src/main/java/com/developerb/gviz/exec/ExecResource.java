@@ -37,7 +37,10 @@ public class ExecResource {
     public Response exec(ExecRequest request) {
         Build build = buildRepository.create(request.asParameters());
 
-        new Thread(build::execute).start(); // Todo: Be a bit more clever about this..?
+        Thread thread = new Thread(build::execute); // Todo: Be a bit more clever about this..?
+        thread.setName("build-" + build.getBuildNumber());
+        thread.setDaemon(false);
+        thread.start();
 
         return Response.ok()
                 .entity(ImmutableMap.of("number", build.getBuildNumber()))
