@@ -1,4 +1,4 @@
-<#-- @ftlvariable name="" type="com.developerb.gviz.exec.ExecResource.BuildView" -->
+<#-- @ftlvariable name="" type="com.developerb.gviz.exec.ExecResource.TestReportView" -->
 <!DOCTYPE html>
 <html lang="en">
     <head>

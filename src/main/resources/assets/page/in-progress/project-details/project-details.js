@@ -258,7 +258,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
 
     pubsub.takeOne("estimates-received")
         .takeUntil(buildCompleted)
-        .assign(data, "estimatesArrived")
+        .assign(data, "estimatesArrived");
 
 
     taskGraphReady.map(".tasks").assign(data, "addTasks");

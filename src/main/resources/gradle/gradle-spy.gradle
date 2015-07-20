@@ -108,6 +108,7 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
                         [
                                 projectPath: task.project.path,
                                 type: task.class.simpleName.replace("_Decorated", ""),
+                                group: task.group,
                                 name: task.name,
                                 path: task.path,
                                 description: task.description,
@@ -204,10 +205,12 @@ gradle.settingsEvaluated { Settings settings ->
             timestamp: System.currentTimeMillis(),
             settings: [
                     projectName: settings.rootProject.name,
-                    parallelExecution: settings.startParameter.parallelProjectExecutionEnabled,
-                    maxWorkerCount: settings.startParameter.maxWorkerCount,
-                    configureOnDemand: settings.startParameter.configureOnDemand,
-                    gradleVersion: settings.gradle.gradleVersion
+                    parallelExecution: settings.startParameter.hasProperty("parallelProjectExecutionEnabled") ? settings.startParameter.parallelProjectExecutionEnabled : false,
+                    maxWorkerCount: settings.startParameter.hasProperty("maxWorkerCount") ? settings.startParameter.maxWorkerCount : 1,
+                    configureOnDemand: settings.startParameter.hasProperty("configureOnDemand") ? settings.startParameter.configureOnDemand : false,
+                    gradleVersion: settings.gradle.gradleVersion,
+                    taskNames: settings.gradle.startParameter.taskNames,
+                    directory: gradle.startParameter.currentDir.absolutePath
             ]
     ])
 }

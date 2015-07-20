@@ -37,7 +37,10 @@ function createGradleOutputConsole(pubsub, buildNumber) {
     pubsub.stream("GradleBuildCompleted")
         .delay(300)
         .onValue(function() {
-            $outputContainer.append("<div style='margin-top: 1em; margin-bottom: 1em;'><a href='/api/build/"+buildNumber+"/test-report'>Complete test report</a></div>");
+            $outputContainer.append("<div style='margin-top: 1em; margin-bottom: 1em;'>" +
+                "<a href='/api/build/" + buildNumber + "/test-report'>Complete test report</a><br>" +
+                "<a href='/api/build/" + buildNumber + "/tasks-parallel'>Parallel task execution report</a>" +
+                "</div>");
             scrollToBottom();
         });
 }

@@ -34,6 +34,7 @@ public class TaskGraphReady extends Event {
 
         private final String projectPath;
         private final String type;
+        private final String group;
         private final String name;
         private final String path;
         private final String description;
@@ -42,6 +43,7 @@ public class TaskGraphReady extends Event {
         @JsonCreator
         public Task(@JsonProperty("projectPath") String projectPath,
                     @JsonProperty("type") String type,
+                    @JsonProperty("group") String group,
                     @JsonProperty("name") String name,
                     @JsonProperty("path") String path,
                     @JsonProperty("description") String description,
@@ -50,6 +52,7 @@ public class TaskGraphReady extends Event {
             this.projectPath = projectPath;
 
             this.type = type;
+            this.group = group;
             this.name = name;
             this.path = path;
             this.description = description;

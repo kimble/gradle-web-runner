@@ -90,6 +90,27 @@ public class ExecResource {
     }
 
     @GET
+    @Path("build/{nr}/tasks-parallel")
+    @Produces("text/html")
+    public Response taskParallel(@PathParam("nr") Integer nr) {
+        Optional<Build> optionalBuild = buildRepository.get(nr);
+
+        if (optionalBuild.isPresent()) {
+            Build build = optionalBuild.get();
+            View view = new TaskParallelReportView(build);
+
+            return Response.ok()
+                    .entity(view)
+                    .build();
+        }
+        else {
+            return Response.status(NOT_FOUND)
+                    .entity("No such build: " + nr)
+                    .build();
+        }
+    }
+
+    @GET
     @Path("build/{nr}/estimates")
     @Produces(APPLICATION_JSON)
     public Response estimates(@PathParam("nr") Integer nr) {
@@ -195,6 +216,24 @@ public class ExecResource {
 
         public TestReportView(Build build) {
             super("/templates/build-test-report.ftl", UTF_8);
+            this.build = build;
+        }
+
+        public String getCommandLine() {
+            return Joiner.on(" ").join(build.buildParameters().createCommandLine());
+        }
+
+        public Integer getBuildNumber() {
+            return build.getBuildNumber();
+        }
+
+    }
+
+    public static class TaskParallelReportView extends View {
+        private final Build build;
+
+        public TaskParallelReportView(Build build) {
+            super("/templates/build-tasks-parallel.ftl", UTF_8);
             this.build = build;
         }
 
