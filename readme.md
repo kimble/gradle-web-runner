@@ -55,9 +55,6 @@ Things I might do
 As this is just a summer pet projects I'll probably never get around to do half of these things.
 
 
-### Bugfixes
-
-- Increase websocket idle timeout (java.util.concurrent.TimeoutException: Idle timeout expired: 10003/10000 ms)
 
 ### Build features
 

@@ -36,7 +36,7 @@ public class BuildWebsocketServlet extends WebSocketServlet {
 
     @Override
     public void configure(WebSocketServletFactory factory) {
-        factory.getPolicy().setIdleTimeout(10_000);
+        factory.getPolicy().setIdleTimeout(30_000);
         factory.setCreator((req, resp) -> new BuildSocket());
     }
 
