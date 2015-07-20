@@ -24,6 +24,18 @@ var createProjectDetails = function(pubsub, buildNumber) {
         var projects = { };
         var tasks = { };
 
+        var hasTask  = function(path) {
+            return tasks.hasOwnProperty(path);
+        };
+
+        var getTask = function(path) {
+            if (hasTask(path)) {
+                return tasks[path];
+            }
+            else {
+                throw "Unknown task: " + path;
+            }
+        };
 
         var pushState = function() {
             bus.push({
@@ -67,6 +79,8 @@ var createProjectDetails = function(pubsub, buildNumber) {
                         type: task.type,
                         name: task.name,
                         description: task.description,
+
+                        estimateMillis: null,
 
                         waiting: true,
                         running: false,
@@ -136,6 +150,17 @@ var createProjectDetails = function(pubsub, buildNumber) {
                 if (task.failure === true) {
                     project.failedTasks++;
                 }
+
+                pushState();
+            },
+
+            estimatesArrived : function(estimates) {
+                Object.keys(estimates).forEach(function (key) {
+                    if (hasTask(key)) {
+                        var task = getTask(key);
+                        task.estimateMillis = estimates[key];
+                    }
+                });
 
                 pushState();
             },
@@ -228,6 +253,10 @@ var createProjectDetails = function(pubsub, buildNumber) {
     pubsub.stream("TestCompleted")
         .takeUntil(buildCompleted)
         .assign(data, "testCompleted");
+
+    pubsub.takeOne("estimates-received")
+        .takeUntil(buildCompleted)
+        .assign(data, "estimatesArrived")
 
 
     taskGraphReady.map(".tasks").assign(data, "addTasks");
@@ -448,10 +477,10 @@ var createProjectDetails = function(pubsub, buildNumber) {
 
             projectTasks.select(".duration")
                 .classed("hidden", function(task) {
-                    return task.durationMillis == null;
+                    return task.durationMillis == null && task.estimateMillis == null;
                 })
                 .text(function(task) {
-                    return task.durationMillis + " ms";
+                    return ((task.durationMillis != null) ? task.durationMillis : "~ " + task.estimateMillis) + " ms";
                 });
 
             // Update task status

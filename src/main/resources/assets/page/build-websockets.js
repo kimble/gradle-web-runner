@@ -15,6 +15,7 @@ var streamBuildEvents = (function() {
         };
 
         ws.onopen = function() {
+            console.info("Connected to backend, requesting build event stream");
             ws.send(buildNumber);
         };
 
