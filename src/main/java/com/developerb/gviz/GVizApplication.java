@@ -5,6 +5,7 @@ import com.developerb.gviz.exec.BuildRepository;
 import com.developerb.gviz.exec.BuildWebsocketServlet;
 import com.developerb.gviz.exec.ExecResource;
 import com.developerb.gviz.exec.GradleForker;
+import com.developerb.gviz.health.SpyScriptHealthCheck;
 import com.developerb.gviz.root.RootResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.Application;
@@ -42,6 +43,8 @@ public class GVizApplication extends Application<GVizConfiguration> {
         environment.jersey().register(new ExecResource(buildRepository));
 
         registerWebsocket(environment, buildRepository);
+
+        environment.healthChecks().register("spy-script", new SpyScriptHealthCheck(gradleInitScript));
     }
 
     private void registerWebsocket(Environment environment, BuildRepository buildRepository) {
