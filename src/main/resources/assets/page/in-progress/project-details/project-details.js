@@ -81,6 +81,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
                         description: task.description,
 
                         estimateMillis: null,
+                        startedLocalTime: null,
 
                         waiting: true,
                         running: false,
@@ -117,6 +118,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
                 var task = tasks[event.path];
                 var project = projects[task.projectPath];
 
+                task.startedLocalTime = new Date().getTime();
                 task.running = true;
                 task.waiting = false;
 
@@ -269,6 +271,14 @@ var createProjectDetails = function(pubsub, buildNumber) {
         };
     };
 
+    var formatMilliseconds = function(milliseconds) {
+        if (milliseconds < 5000) {
+            return milliseconds + " ms";
+        }
+        else {
+            return Math.round(milliseconds / 1000) + " sec";
+        }
+    };
 
     (function() {
         var pd = d3.select("#projectDetails");
@@ -480,7 +490,26 @@ var createProjectDetails = function(pubsub, buildNumber) {
                     return task.durationMillis == null && task.estimateMillis == null;
                 })
                 .text(function(task) {
-                    return ((task.durationMillis != null) ? task.durationMillis : "~ " + task.estimateMillis) + " ms";
+                    if (task.durationMillis != null) {
+                        return formatMilliseconds(task.durationMillis);
+                    }
+                    else {
+                        if (task.running) {
+                            var now = new Date().getTime();
+                            var elapsed = now - task.startedLocalTime;
+                            var remaining = task.estimateMillis - elapsed;
+
+                            if (remaining > 0) {
+                                return " ~" + formatMilliseconds(remaining);
+                            }
+                            else {
+                                return " ~" + formatMilliseconds(Math.abs(remaining)) + " over estimate";
+                            }
+                        }
+                        else {
+                            return "~ " + formatMilliseconds(task.estimateMillis);
+                        }
+                    }
                 });
 
             // Update task status
