@@ -99,7 +99,7 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div id="projectDetails"></div>
+                        <div id="projectDetails" class=""></div>
                     </div>
                 </div>
             </div>
@@ -112,7 +112,11 @@
         <!-- Gradle output -->
         <div id="gradleOutput" class="moving-panel shy">
             <div class="output-container">
-                <div class="intro">Waiting to receive output from forked Gradle process.<br/>Hit [O] to expand this panel.<br/></div>
+                <div class="intro">
+                    Waiting to receive output from forked Gradle process.<br/>
+                    Hit [O] to expand this panel.<br/>
+                    Hit [H] to hide successful / skipped tasks.<br/>
+                </div>
             </div>
         </div>
 

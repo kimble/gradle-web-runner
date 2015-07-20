@@ -8,7 +8,14 @@ var createProjectDetails = function(pubsub, buildNumber) {
     });
 
 
+    pubsub.stream("key-down-H").onValue(function() {
+        $("#projectDetails").toggleClass("hide-successful");
+    });
 
+    pubsub.takeOne("GradleBuildCompleted")
+        .onValue(function() {
+            $("#projectDetails").removeClass("hide-successful");
+        });
 
 
     var data = (function() {
@@ -290,6 +297,9 @@ var createProjectDetails = function(pubsub, buildNumber) {
             // Update project classes
 
             projectDetails.classed("evaluating", prop("evaluating"))
+                .classed("success", function(project) {
+                    return project.remainingTasks === 0 && project.failedTasks === 0;
+                })
                 .classed("hidden", function(project) {
                     return project.tasks.length === 0;
                 });
@@ -502,7 +512,6 @@ var createProjectDetails = function(pubsub, buildNumber) {
 
         });
     })();
-
 
 
 };
