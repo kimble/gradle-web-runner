@@ -17,6 +17,7 @@ public class TaskCompleted extends TaskEvent {
     private final String failureMessage;
     private final String failureStacktrace;
     private final Integer durationMillis;
+    private final String output;
 
 
     @JsonCreator
@@ -29,7 +30,8 @@ public class TaskCompleted extends TaskEvent {
                          @JsonProperty("skippedMessage") String skippedMessage,
                          @JsonProperty("failureMessage") String failureMessage,
                          @JsonProperty("failureStacktrace") String failureStacktrace,
-                         @JsonProperty("durationMillis") Integer durationMillis) {
+                         @JsonProperty("durationMillis") Integer durationMillis,
+                         @JsonProperty("output") String output) {
 
         super(timestamp, path, projectPath);
 
@@ -40,6 +42,7 @@ public class TaskCompleted extends TaskEvent {
         this.failureMessage = failureMessage;
         this.failureStacktrace = failureStacktrace;
         this.durationMillis = durationMillis;
+        this.output = output;
     }
 
     public boolean isDidWork() {
@@ -76,6 +79,10 @@ public class TaskCompleted extends TaskEvent {
 
     public Integer getDurationMillis() {
         return durationMillis;
+    }
+
+    public String getOutput() {
+        return output;
     }
 
     @Override

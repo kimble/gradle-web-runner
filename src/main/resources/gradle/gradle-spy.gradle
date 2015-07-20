@@ -1,7 +1,6 @@
 import groovy.json.JsonOutput
 
 
-
 class BuildSpy {
 
     ServerSocket serverSocket
@@ -21,6 +20,8 @@ class BuildSpy {
         socketWriter = bufferedSocketOutputStream.newWriter("utf-8")
     }
 
+    // Replace this custom socket crap with a websocket client?
+    // The backend already host one websocket service..
     synchronized void send(String type, Object payload) {
         try {
             socketWriter.write(JsonOutput.toJson([
@@ -56,7 +57,7 @@ if (!spyPort) {
 
 logger.lifecycle "Gradle build spy starting on port $spyPort"
 new Thread({
-    Thread.sleep(500) // Give some time for the port to open
+    Thread.sleep(500) // Give some time for the port to open (ugh..)
     // - The client on the other end will listen for the following message.
     logger.lifecycle "I'll be hanging around waiting for the backend to connect.."
 }).start()
@@ -121,12 +122,32 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
     )
 
     /**
+     * Attach output listeners to each task.
+     * This will not be perfect when running in parallel,
+     * see: https://discuss.gradle.org/t/how-to-separate-standard-output-logging-of-parallel-tasks-from-the-old-forum/10694
+     */
+    graph.allTasks.forEach { Task task ->
+        task.ext.capturedOutput = [ ]
+
+        def listener = { line -> task.capturedOutput << line } as StandardOutputListener
+
+        task.logging.addStandardErrorListener(listener)
+        task.logging.addStandardOutputListener(listener)
+
+        task.doLast {
+            task.logging.removeStandardOutputListener(listener)
+            task.logging.removeStandardErrorListener(listener)
+        }
+    }
+
+
+
+    /**
      * Attach listeners for test execution and output
      * (leveraging Gradle's framework agnostic api)
      */
     graph.allTasks.forEach { Task task ->
         if (task instanceof Test) {
-
             task.doFirst {
                 task.ext.testOutput = [:]
             }
@@ -196,8 +217,11 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
                 skippedMessage: state.skipMessage,
                 failureMessage: state.failure?.message,
                 failureStacktrace: printExceptionToString(state.failure),
-                durationMillis: timestamp - task.ext.startTime
+                durationMillis: timestamp - task.ext.startTime,
+                output: task.capturedOutput.join("").trim()
         ])
+
+        task.ext.capturedOutput = null
     }
 }
 

@@ -83,6 +83,8 @@ var createProjectDetails = function(pubsub, buildNumber) {
                         estimateMillis: null,
                         startedLocalTime: null,
 
+                        output: null,
+
                         waiting: true,
                         running: false,
                         skipped: false,
@@ -128,6 +130,8 @@ var createProjectDetails = function(pubsub, buildNumber) {
             },
 
             taskCompleted: function(event) {
+                console.log(event.path + ", output: ", event.output);
+
                 var task = tasks[event.path];
                 var project = projects[task.projectPath];
 
@@ -144,6 +148,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
                 task.skippedMessage = event.skippedMessage;
                 task.failureMessage = event.failureMessage;
                 task.failureStacktrace = event.failureStacktrace;
+                task.output = event.output;
 
                 project.runningTasks--;
                 project.remainingTasks--;
@@ -443,6 +448,21 @@ var createProjectDetails = function(pubsub, buildNumber) {
                 .attr("title", prop("name"))
                 .text(function(task) {
                     return _.trunc(task.name, 25);
+                })
+                .each(function(task) {
+                    $(this).popover({
+                        title: task.path,
+                        html: true,
+                        content: function() {
+                            var html = "...";
+
+                            if (task.output != null && task.output.length > 0) {
+                                html += "<pre>" + task.output + "</pre>";
+                            }
+
+                            return html;
+                        }
+                    });
                 });
 
 

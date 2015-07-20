@@ -14,6 +14,7 @@
 }
 
 #projectDetails .popover {
+    min-width: 300px;
     max-width: 900px;
     max-height: 700px;
     overflow-y: auto;
@@ -158,7 +159,12 @@
 
 #projectDetails .task-details .task-name {
     font-family: Oswald, sans-serif;
+    cursor: pointer;
     padding: 0 5px;
+}
+
+#projectDetails .task-details .task-name:hover {
+    text-decoration: underline;
 }
 
 #projectDetails .task-details .duration {
