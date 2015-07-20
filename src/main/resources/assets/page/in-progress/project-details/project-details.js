@@ -283,7 +283,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
     (function() {
         var pd = d3.select("#projectDetails");
 
-        data.stream.throttle(1000).onValue(function (state) {
+        data.stream.throttle(500).onValue(function (state) {
             var projectDetails = pd.selectAll(".project-detail")
                 .data(state.projects, prop("path"));
 

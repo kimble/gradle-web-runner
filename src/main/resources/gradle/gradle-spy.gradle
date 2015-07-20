@@ -27,6 +27,8 @@ class BuildSpy {
                     type: type,
                     event: payload
             ]) + "\n----====----\n")
+
+            socketWriter.flush()
         }
         catch (Exception ex) {
             throw new GradleException("failed to send message '$type': <$payload>", ex)
@@ -205,9 +207,9 @@ gradle.settingsEvaluated { Settings settings ->
             timestamp: System.currentTimeMillis(),
             settings: [
                     projectName: settings.rootProject.name,
-                    parallelExecution: settings.startParameter.hasProperty("parallelProjectExecutionEnabled") ? settings.startParameter.parallelProjectExecutionEnabled : false,
-                    maxWorkerCount: settings.startParameter.hasProperty("maxWorkerCount") ? settings.startParameter.maxWorkerCount : 1,
-                    configureOnDemand: settings.startParameter.hasProperty("configureOnDemand") ? settings.startParameter.configureOnDemand : false,
+                    parallelExecution: settings.startParameter.hasProperty("parallelProjectExecutionEnabled") ? settings.startParameter.parallelProjectExecutionEnabled : null,
+                    maxWorkerCount: settings.startParameter.hasProperty("maxWorkerCount") ? settings.startParameter.maxWorkerCount : null,
+                    configureOnDemand: settings.startParameter.hasProperty("configureOnDemand") ? settings.startParameter.configureOnDemand : null,
                     gradleVersion: settings.gradle.gradleVersion,
                     taskNames: settings.gradle.startParameter.taskNames,
                     directory: gradle.startParameter.currentDir.absolutePath

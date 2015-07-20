@@ -150,7 +150,7 @@ public class Build implements Comparable<Build> {
 
     private <T extends Event> T handleEvent(JsonNode json, Class<T> eventType) throws JsonProcessingException {
         T event = jackson.treeToValue(json.path("event"), eventType);
-        log.info("Event: {}", event);
+        log.trace("Event: {}", event);
 
         eventStore.push(event);
         return event;
