@@ -493,7 +493,7 @@ var createProjectDetails = function(pubsub, buildNumber) {
                     if (task.durationMillis != null) {
                         return formatMilliseconds(task.durationMillis);
                     }
-                    else {
+                    else if (task.estimateMillis != null) {
                         if (task.running) {
                             var now = new Date().getTime();
                             var elapsed = now - task.startedLocalTime;
