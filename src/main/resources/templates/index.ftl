@@ -14,7 +14,7 @@
 
         <script src="/assets/jquery/jquery-2.1.4.min.js"></script>
         <script src="/assets/mdl/material.min.js"></script>
-        <script src="/webjars/baconjs/0.7.18/Bacon.js"></script>
+	<script src="/assets/bacon/bacon.js"></script>
 
         <style type="text/css">
             #go {
