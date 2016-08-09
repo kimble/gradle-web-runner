@@ -21,18 +21,7 @@ various events to the backend which in turn is able to process and stream these 
 web interface over web sockets.
 
 
-Screenshots
-------------------------
-
-### Configuration page
-![Configuration page](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/configuration-page.png)
-
-### Building Hibernate
-![Building hibernate](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/v5.png)
-
-### Full test report
-![Test report](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/full-test-report.png)
-
+![Gif](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/out.png)
 
 
 Give it a spin
