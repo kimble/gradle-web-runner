@@ -21,7 +21,7 @@ various events to the backend which in turn is able to process and stream these 
 web interface over web sockets.
 
 
-![Gif](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/out.png)
+![Gif](https://raw.githubusercontent.com/kimble/gradle-web-runner/master/screenshots/out.gif)
 
 
 Give it a spin
